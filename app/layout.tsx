@@ -23,7 +23,11 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
         <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Black+Han+Sans&family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&display=swap" rel="stylesheet" />
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        {/* Vercel Web Analytics: 방문·조회수 (쿠키 없음). 대시보드 Analytics 탭에서 켜야 수집돼요 */}
+        <script defer src="/_vercel/insights/script.js" />
+      </body>
     </html>
   );
 }
