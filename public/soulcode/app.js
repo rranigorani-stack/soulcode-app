@@ -1253,7 +1253,7 @@ async function initCloud(){
 const LOGIN_BTN={kakao:['kakao','카카오로 시작하기'],apple:['apple',' Apple로 계속하기'],google:['google','Google로 계속하기']};
 function loginButtons(){
   const list=(window.soulConfig&&window.soulConfig.providers)||['kakao'];
-  return list.filter(p=>LOGIN_BTN[p]).map(p=>`<button class="login ${LOGIN_BTN[p][0]}" onclick="loginWith('${p}')">${LOGIN_BTN[p][1]}</button>`).join('')+`<button class="login email" onclick="loginWith('email')">✉️ 이메일로 로그인 링크 받기</button>`;
+  return list.filter(p=>LOGIN_BTN[p]).map(p=>`<button class="login ${LOGIN_BTN[p][0]}" onclick="loginWith('${p}')">${LOGIN_BTN[p][1]}</button>`).join('')+((window.soulConfig&&window.soulConfig.emailLogin)?`<button class="login email" onclick="loginWith('email')">✉️ 이메일로 로그인 링크 받기</button>`:'');
 }
 function ageOf(birth){if(!birth)return null;const b=new Date(birth+'T00:00:00'),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;return a}
 function loginWith(p){
@@ -1290,6 +1290,7 @@ function renderSync(){
     pw.querySelector('.test-note').innerHTML='결제는 <b>토스페이먼츠</b>로 안전하게 처리돼요.<br>이용권은 결제일부터 30일 / 365일 유지되고 <b>자동 갱신되지 않아요.</b>';
     pw.querySelector('.plans .plan[data-p=month] small:last-child').textContent='30일 이용권';
     pw.querySelector('.plans .plan[data-p=year] small:last-child').textContent='365일 이용권';
+    if(window.soulConfig&&window.soulConfig.payTest){const tb=pw.querySelector('.test-badge');tb.textContent='베타 · 무료 체험';tb.style.display='';pw.querySelector('.btn:not(.ghost)').textContent='베타 무료로 PRO 열기 ✨';pw.querySelector('.test-note').innerHTML='🧪 <b>베타 기간이라 실제로 결제되지 않아요.</b><br>결제창에서 아무 카드나 골라 끝까지 진행하면 PRO가 열려요.';}
     pw.querySelector('.test-note').insertAdjacentHTML('afterend','<p class="consent-note">결제하면 <a href="/terms" target="_blank">이용약관</a>·<a href="/refund" target="_blank">환불정책</a>에 동의한 것으로 봐요.<br>디지털 콘텐츠 특성상 <b>PRO 혜택을 쓰기 시작하면 청약철회가 제한</b>될 수 있어요.</p>');
   }
   if(window.soulConfig){

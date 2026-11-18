@@ -2,12 +2,14 @@ import type { Metadata, Viewport } from 'next';
 import './soulcode.css';
 
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.NEXT_PUBLIC_SITE_URL || 'https://soulcode-app-orcin.vercel.app'),
   title: 'SOULCODE 소울코드 · 사주 × MBTI × 타로',
   description: 'MBTI는 핑계고, 사주는 거들 뿐. 오늘의 나를 해석해주는 소울 리포트',
   manifest: '/manifest.webmanifest',
   appleWebApp: { capable: true, title: '소울코드', statusBarStyle: 'default' },
   icons: { icon: '/icons/icon-192.png', apple: '/icons/apple-touch-icon.png' },
-  openGraph: { title: 'SOULCODE 소울코드', description: '사주 × MBTI × 타로로 오늘의 나를 해석해드림', type: 'website' },
+  openGraph: { title: 'SOULCODE 소울코드', description: '사주 × MBTI × 타로로 오늘의 나를 해석해드림', type: 'website', siteName: '소울코드', locale: 'ko_KR', images: [{ url: '/og.png', width: 1200, height: 630, alt: '소울코드 · 사주 × MBTI × 타로' }] },
+  twitter: { card: 'summary_large_image', images: ['/og.png'] },
 };
 
 export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#F7D4F2' };
