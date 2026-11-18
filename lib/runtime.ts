@@ -11,7 +11,7 @@ import { createClient, type Session, type SupabaseClient } from '@supabase/supab
 import * as Manseryeok from 'manseryeok';
 
 type Provider = 'kakao' | 'apple' | 'google';
-type SampleOpts = { onText?: (u: { text: string; delta: string }) => void; signal?: AbortSignal };
+type SampleOpts = { onText?: (u: { text: string; delta: string }) => void; signal?: AbortSignal; ticket?: boolean };
 
 declare global {
   interface Window {
@@ -19,7 +19,8 @@ declare global {
     claude?: { use: (name: string) => Promise<unknown> };
     soulConfig: { devTestPro: boolean; serverPro: boolean; providers: Provider[]; emailLogin: boolean; payTest: boolean };
     soulAuth?: { signIn: (p: Provider) => void; emailPrompt: () => void; signOut: () => void; label: () => string; deleteAccount: () => Promise<boolean> };
-    soulPay?: { start: (plan: 'month' | 'year') => void };
+    soulPay?: { start: (plan: 'month' | 'year' | 'ticket') => void };
+    soulShop?: { unlockSkin: (skin: string) => Promise<{ ok: boolean; code?: string; skins?: string[] }> };
     toast?: (t: string) => void;
     go?: (id: string) => void;
     __soulBooted?: boolean;
@@ -56,7 +57,7 @@ function makeSample() {
       res = await fetch('/api/ai', {
         method: 'POST',
         headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` },
-        body: JSON.stringify({ prompt: String(input) }),
+        body: JSON.stringify({ prompt: String(input), useTicket: !!opts.ticket }),
         signal: opts.signal,
       });
     } catch (e) {
@@ -160,6 +161,19 @@ async function initPayments(session: Session | null) {
   };
 }
 
+/** 990원 티켓으로 PRO 스킨 평생 소장 */
+function makeShop() {
+  window.soulShop = {
+    unlockSkin: async (skin) => {
+      const token = await accessToken();
+      if (!token) return { ok: false, code: 'auth_required' };
+      const r = await fetch('/api/skins', { method: 'POST', headers: { 'content-type': 'application/json', authorization: `Bearer ${token}` }, body: JSON.stringify({ skin }) });
+      const j = await r.json().catch(() => ({}));
+      return r.ok ? { ok: true, skins: j.skins } : { ok: false, code: j.code };
+    },
+  };
+}
+
 /** 앱 시작: 전역 객체 준비 → 서버 이용권 동기화 → 화면 스크립트 로드 */
 export async function startSoulcode() {
   if (window.__soulBooted) return;
@@ -200,6 +214,12 @@ export async function startSoulcode() {
         const me = await fetch('/api/me', { headers: { authorization: `Bearer ${session.access_token}` } }).then((r) => r.json());
         setLocal('soulcode.pro', me.pro ? { active: true, plan: me.plan, until: me.until } : { active: false });
         setLocal('soulcode.ai.' + kstToday(), me.aiUsed || 0);
+        setLocal('soulcode.tickets', me.tickets || 0);
+        if (Array.isArray(me.skins) && me.skins.length) {
+          let cur: string[] = [];
+          try { cur = JSON.parse(localStorage.getItem('soulcode.unlocks') || '[]') || []; } catch { /* noop */ }
+          setLocal('soulcode.unlocks', [...new Set([...cur, ...me.skins])]);
+        }
       } catch { /* 오프라인이면 지난 상태 유지 */ }
       const uid = session.user.id;
       const sample = makeSample();
@@ -217,6 +237,7 @@ export async function startSoulcode() {
     }
   }
   await initPayments(session);
+  if (session) makeShop();
 
   await new Promise<void>((resolve, reject) => {
     const s = document.createElement('script');
@@ -228,6 +249,7 @@ export async function startSoulcode() {
 
   const qs = new URLSearchParams(location.search);
   if (qs.get('paid') === '1') { window.toast?.('PRO가 시작됐어요! 💎'); history.replaceState(null, '', '/'); }
+  if (qs.get('paid') === 'ticket') { history.replaceState(null, '', '/'); setTimeout(() => (window as unknown as { afterTicket?: () => void }).afterTicket?.(), 500); }
 
   if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

@@ -1,10 +1,12 @@
 import 'server-only';
 import { createClient, type User } from '@supabase/supabase-js';
 
-export const PLANS = {
+export const PLANS: Record<'month' | 'year' | 'ticket', { amount: number; name: string; days?: number; tickets?: number }> = {
   month: { amount: 3900, days: 30, name: '소울코드 PRO 30일 이용권' },
   year: { amount: 29000, days: 365, name: '소울코드 PRO 365일 이용권' },
-} as const;
+  ticket: { amount: 990, tickets: 1, name: '소울코드 1회 이용권' },
+};
+export const SKIN_KEYS = ['strawberry', 'chrome', 'matcha'];
 export type PlanKey = keyof typeof PLANS;
 export const FREE_AI_PER_DAY = 3;
 
@@ -32,9 +34,9 @@ export function kstToday() {
 }
 
 export async function getEntitlement(userId: string) {
-  const { data } = await admin().from('entitlements').select('plan, pro_until').eq('user_id', userId).maybeSingle();
+  const { data } = await admin().from('entitlements').select('plan, pro_until, tickets, skins').eq('user_id', userId).maybeSingle();
   const until = data?.pro_until ? new Date(data.pro_until) : null;
-  return { pro: !!until && until.getTime() > Date.now(), until: until?.toISOString() ?? null, plan: data?.plan ?? null };
+  return { pro: !!until && until.getTime() > Date.now(), until: until?.toISOString() ?? null, plan: data?.plan ?? null, tickets: (data?.tickets as number) ?? 0, skins: (data?.skins as string[]) ?? [] };
 }
 
 export const json = (body: unknown, status = 200) =>

@@ -17,7 +17,7 @@ export async function POST(req: Request) {
   if (!order) return json({ code: 'order_not_found' }, 404);
   if (order.status === 'DONE') {
     const { data: ent } = await db.from('entitlements').select('pro_until').eq('user_id', user.id).maybeSingle();
-    return json({ ok: true, until: ent?.pro_until ?? null, already: true });
+    return json({ ok: true, kind: PLANS[order.plan as PlanKey]?.tickets ? 'ticket' : 'pro', until: ent?.pro_until ?? null, already: true });
   }
   if (Number(amount) !== order.amount) {
     await db.from('payments').update({ status: 'AMOUNT_MISMATCH' }).eq('order_id', orderId);
@@ -41,7 +41,12 @@ export async function POST(req: Request) {
 
   await db.from('payments').update({ status: 'DONE', payment_key: paymentKey, approved_at: new Date().toISOString(), raw: result }).eq('order_id', orderId);
   const plan = PLANS[order.plan as PlanKey];
+  if (plan.tickets) {
+    const { data: tickets, error } = await db.rpc('add_tickets', { p_user: user.id, p_n: plan.tickets });
+    if (error) return json({ code: 'entitlement_error', message: '결제는 됐지만 이용권 반영에 실패했어요. 고객센터로 문의해주세요.' }, 500);
+    return json({ ok: true, kind: 'ticket', tickets });
+  }
   const { data: until, error } = await db.rpc('extend_pro', { p_user: user.id, p_days: plan.days, p_plan: order.plan });
   if (error) return json({ code: 'entitlement_error', message: '결제는 됐지만 이용권 반영에 실패했어요. 고객센터로 문의해주세요.' }, 500);
-  return json({ ok: true, until });
+  return json({ ok: true, kind: 'pro', until });
 }

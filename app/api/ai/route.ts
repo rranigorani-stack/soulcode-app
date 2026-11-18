@@ -23,16 +23,26 @@ export async function POST(req: Request) {
 
   const body = await req.json().catch(() => null);
   const prompt = typeof body?.prompt === 'string' ? body.prompt : '';
+  const useTicket = body?.useTicket === true;
   if (!prompt.trim() || prompt.length > MAX_PROMPT) return json({ code: 'invalid_request' }, 400);
 
   // 무료 사용자는 하루 3회 — DB 함수로 원자적으로 차감 (동시 요청에도 초과 불가)
   const ent = await getEntitlement(user.id);
   const day = kstToday();
-  // PRO도 사용 기록은 남김 (환불 시 사용 여부 확인용) — 한도만 사실상 무제한
-  const { data: count, error } = await admin().rpc('increment_ai_usage', { p_user: user.id, p_day: day, p_limit: ent.pro ? 1_000_000 : FREE_AI_PER_DAY });
-  if (error) return json({ code: 'upstream_error' }, 500);
-  if (count === null) return json({ code: 'quota_exceeded' }, 402);
-  const refund = async () => { await admin().rpc('refund_ai_usage', { p_user: user.id, p_day: day }); };
+  // 990원 티켓: PRO가 아니면 티켓 1장을 쓰고 이번 1회는 한도와 무관하게 허용
+  let refund: () => Promise<void>;
+  if (useTicket && !ent.pro) {
+    const { data: left, error } = await admin().rpc('use_ticket', { p_user: user.id });
+    if (error) return json({ code: 'upstream_error' }, 500);
+    if (left === null) return json({ code: 'no_ticket' }, 402);
+    refund = async () => { await admin().rpc('add_tickets', { p_user: user.id, p_n: 1 }); };
+  } else {
+    // PRO도 사용 기록은 남김 (환불 시 사용 여부 확인용) — 한도만 사실상 무제한
+    const { data: count, error } = await admin().rpc('increment_ai_usage', { p_user: user.id, p_day: day, p_limit: ent.pro ? 1_000_000 : FREE_AI_PER_DAY });
+    if (error) return json({ code: 'upstream_error' }, 500);
+    if (count === null) return json({ code: 'quota_exceeded' }, 402);
+    refund = async () => { await admin().rpc('refund_ai_usage', { p_user: user.id, p_day: day }); };
+  }
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const enc = new TextEncoder();

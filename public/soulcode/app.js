@@ -913,12 +913,12 @@ function applySkin(k){const app=$('app');if(!k||k==='holo')delete app.dataset.sk
 function setSkin(k){store.set('soulcode.skin',k);applySkin(k)}
 function renderSkins(){
   const cur=store.get('soulcode.skin')||'holo', pro=isPro();
-  $('skins').innerHTML=SKINS.map(s=>`<button class="${s.k===cur?'sel':''}" data-k="${s.k}"><span class="sw" data-skin-prev="${s.k}">${s.sym}</span>${s.n}${s.pro&&!pro?'<span class="lk">PRO</span>':''}</button>`).join('');
+  $('skins').innerHTML=SKINS.map(s=>`<button class="${s.k===cur?'sel':''}" data-k="${s.k}"><span class="sw" data-skin-prev="${s.k}">${s.sym}</span>${s.n}${s.pro&&!pro&&!unlocks().includes(s.k)?'<span class="lk">PRO</span>':''}</button>`).join('');
   $('skins').querySelectorAll('button').forEach(b=>{
     const s=SKINS.find(x=>x.k===b.dataset.k), sw=b.querySelector('.sw');
     const tmp=document.createElement('div'); if(s.k!=='holo')tmp.dataset.skin=s.k; tmp.className='app'; tmp.style.display='none'; document.body.appendChild(tmp);
     sw.style.background=getComputedStyle(tmp).getPropertyValue('--card-back'); tmp.remove();
-    b.onclick=()=>{ if(s.pro&&!isPro()){openPaywall(`'${s.n}' 스킨은 PRO 전용이에요`);return} setSkin(s.k); renderSkins(); toast(`${s.n} 덱으로 바꿨어요 🎴`) };
+    b.onclick=()=>{ if(s.pro&&!isPro()&&!unlocks().includes(s.k)){openSkinOffer(s);return} setSkin(s.k); renderSkins(); toast(`${s.n} 덱으로 바꿨어요 🎴`) };
   });
 }
 function renderProBanner(){
@@ -956,17 +956,19 @@ function aiErr(code){return({rate_limited:'⏳ 요청이 몰렸어요. 잠시 �
 function aiBadge(box){const b=document.createElement('span');b.className='ai-badge';b.textContent='🤖 AI 해석';box.appendChild(b)}
 async function runAI(prompt,box,btn,opts={}){
   if(!AI){toast('AI를 쓸 수 없는 환경이에요');return null}
-  if(opts.pro&&!isPro()){openPaywall(opts.proReason||'PRO 전용 AI 기능이에요');return null}
-  if(aiLeft()<=0){openPaywall('오늘 무료 AI 해석 3회를 다 썼어요');return null}
+  const retry=()=>runAI(prompt,box,btn,{...opts,ticket:true});
+  if(opts.pro&&!isPro()&&!opts.ticket){openOffer(opts.proReason||'PRO 전용 AI 기능이에요',retry);return null}
+  if(!opts.ticket&&aiLeft()<=0){openOffer('오늘 무료 AI 해석 3회를 다 썼어요',retry);return null}
   btn.disabled=true; box.className='ai-box show thinking'; box.textContent='🔮 사주랑 카드를 엮어서 쓰는 중... (보통 10~40초)';
   try{
-    const {text,truncated}=await AI(AI_RULES+'\n\n'+prompt,{cache:false,onText:({text})=>{box.className='ai-box show';box.textContent=text;aiBadge(box)}});
+    const {text,truncated}=await AI(AI_RULES+'\n\n'+prompt,{cache:false,ticket:!!(opts.ticket&&!isPro()),onText:({text})=>{box.className='ai-box show';box.textContent=text;aiBadge(box)}});
     box.className='ai-box show'; box.textContent=text+(truncated?'\n\n(내용이 길어서 일부가 잘렸어요)':''); aiBadge(box);
-    if(!isPro()) store.set('soulcode.ai.'+todayKey(),aiUsed()+1);
+    if(opts.ticket&&!isPro()) store.set('soulcode.tickets',Math.max(0,tickets()-1)); else if(!isPro()) store.set('soulcode.ai.'+todayKey(),aiUsed()+1);
     return text;
   }catch(e){
     if(e.code==='auth_required'){box.className='ai-box';box.textContent='';toast('로그인하면 AI 해석을 쓸 수 있어요 🔐');go('s-me');return null}
-    if(e.code==='quota_exceeded'){box.className='ai-box';box.textContent='';openPaywall('오늘 무료 AI 해석 3회를 다 썼어요');return null}
+    if(e.code==='quota_exceeded'){box.className='ai-box';box.textContent='';openOffer('오늘 무료 AI 해석 3회를 다 썼어요',retry);return null}
+    if(e.code==='no_ticket'){box.className='ai-box';box.textContent='';store.set('soulcode.tickets',0);openOffer('티켓이 다 떨어졌어요',retry);return null}
     box.className='ai-box show'; box.textContent=(e.text?e.text+'\n\n':'')+aiErr(e.code);
     return null;
   }finally{btn.disabled=false;refreshQuota()}
@@ -1204,7 +1206,7 @@ function localSnapshot(){
   const draws={};
   try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('soulcode.draw.'))draws[k.slice(14)]=store.get(k)}}catch(e){}
   const keep=Object.keys(draws).sort().slice(-40), d2={}; keep.forEach(k=>d2[k]=draws[k]);
-  return {v:1,profile:store.get('soulcode.profile')||null,visits:getVisits(),collect:getCollect(),draws:d2,pro:store.get('soulcode.pro')||null,skin:store.get('soulcode.skin')||'holo',updatedAt:store.get('soulcode.updatedAt')||Date.now()};
+  return {v:1,profile:store.get('soulcode.profile')||null,visits:getVisits(),collect:getCollect(),draws:d2,pro:store.get('soulcode.pro')||null,skin:store.get('soulcode.skin')||'holo',events:store.get('soulcode.events')||{},maps:store.get('soulcode.maps')||[],unlocks:store.get('soulcode.unlocks')||[],updatedAt:store.get('soulcode.updatedAt')||Date.now()};
 }
 function mergeCloud(c){
   cloud.applying=true;
@@ -1214,7 +1216,10 @@ function mergeCloud(c){
     if(!c.profile&&newer) store.del('soulcode.profile');
     const v=[...new Set([...(getVisits()||[]),...(c.visits||[])])].sort().slice(-90); mem.visits=v; store.set('soulcode.visits',v);
     const col={...getCollect()}; Object.entries(c.collect||{}).forEach(([k,n])=>col[k]=Math.max(col[k]||0,n)); mem.collect=col; store.set('soulcode.collect',col);
-    Object.entries(c.draws||{}).forEach(([d,dr])=>{const l=store.get('soulcode.draw.'+d);if(!l||(!l.ai&&dr&&dr.ai))store.set('soulcode.draw.'+d,dr)});
+    Object.entries(c.draws||{}).forEach(([d,dr])=>{if(!dr)return;const l=store.get('soulcode.draw.'+d);if(!l){store.set('soulcode.draw.'+d,dr);return}const m={...l};let ch=false;if(!l.ai&&dr.ai){m.ai=dr.ai;ch=true}if(l.fit==null&&dr.fit!=null){m.fit=dr.fit;ch=true}if(ch)store.set('soulcode.draw.'+d,m)});
+    if(c.events){const e={...(store.get('soulcode.events')||{}),...c.events};store.set('soulcode.events',e)}
+    if(c.maps&&c.maps.length){const cur=store.get('soulcode.maps')||[];const have=new Set(cur.map(m=>m.code));store.set('soulcode.maps',[...cur,...c.maps.filter(m=>m&&!have.has(m.code))])}
+    if(c.unlocks){store.set('soulcode.unlocks',[...new Set([...(store.get('soulcode.unlocks')||[]),...c.unlocks])])}
     if(c.pro&&!(window.soulConfig&&window.soulConfig.serverPro)&&(newer||(c.pro.active&&!isPro()))) store.set('soulcode.pro',c.pro);
     if(c.skin&&newer) store.set('soulcode.skin',c.skin);
     if(newer) try{localStorage.setItem('soulcode.updatedAt',JSON.stringify(c.updatedAt))}catch(e){}
@@ -1281,6 +1286,376 @@ function renderSync(){
   }[cloud.status]||['#ddd',''];
   box.innerHTML=`<span class="dot" style="background:${S[0]}"></span><span>${S[1]}</span>`;
 }
+
+
+/* ================= RETENTION: 체크인 · 운세 일기 · 주간 리포트 · 알림 · 이벤트 ================= */
+const FIT=[{v:2,e:'🎯',n:'딱 맞았어'},{v:1,e:'🤏',n:'반반'},{v:0,e:'🙅',n:'전혀'}];
+function allDraws(){
+  const out=[];
+  try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('soulcode.draw.')){const d=store.get(k);if(d&&d.card!=null)out.push({...d,date:k.slice(14)})}}}catch(e){}
+  return out.sort((a,b)=>a.date<b.date?1:-1);
+}
+function fitStats(){
+  const ds=allDraws(), checked=ds.filter(d=>d.fit!=null);
+  const rate=checked.length?Math.round(checked.reduce((s,d)=>s+d.fit,0)/(checked.length*2)*100):null;
+  const cnt={}; ds.forEach(d=>cnt[d.card]=(cnt[d.card]||0)+1);
+  const top=Object.entries(cnt).sort((a,b)=>b[1]-a[1])[0];
+  return {days:ds.length,checked:checked.length,rate,top:top?{card:+top[0],n:top[1]}:null,ds};
+}
+function setFit(date,v){
+  const k='soulcode.draw.'+date, d=store.get(k); if(!d) return;
+  d.fit=v; d.fitAt=Date.now(); store.set(k,d); if(draw&&draw.date===date) draw.fit=v;
+  const s=fitStats();
+  toast(v===2?'기록 완료! 우주랑 통했네 🎯':v===1?'기록 완료! 반은 맞췄다 🤏':'기록 완료! 내일은 맞춰볼게 🙅');
+  renderFit(); renderYesterdayAsk();
+  if(s.checked===3||s.checked===7) setTimeout(()=>toast(`체크 ${s.checked}일 달성! MY에서 운세 일기를 볼 수 있어요 📔`),1900);
+}
+function renderFit(){
+  let box=$('fitBox');
+  if(!box){const anchor=document.querySelector('#result .ai-only')||document.querySelector('#result .msg-box'); if(!anchor)return; anchor.insertAdjacentHTML('afterend','<div class="panel fit-box" id="fitBox"></div><div id="pushAsk"></div>'); box=$('fitBox')}
+  if(!draw){box.style.display='none';return} box.style.display='';
+  const h=new Date().getHours(), s=fitStats();
+  if(draw.fit!=null){
+    const f=FIT.find(x=>x.v===draw.fit);
+    box.innerHTML=`<div class="fit-t">🌙 오늘 카드 체크 완료 ${f.e}</div><div class="fit-s">지금까지 ${s.checked}일 기록 · 적중률 <b>${s.rate}%</b></div><button class="again" style="margin:8px 0 0" onclick="go('s-me');setTimeout(()=>$('diaryBox')&&$('diaryBox').scrollIntoView({behavior:'smooth'}),80)">📔 운세 일기 보기</button>`;
+  }else if(h<18){
+    box.innerHTML=`<div class="fit-t">🌙 저녁에 다시 와서 체크해줘</div><div class="fit-s">오늘 카드가 맞았는지 <b>오후 6시부터</b> 기록할 수 있어요.<br>기록이 쌓이면 나만의 적중률과 AI 주간 리포트가 열려요.</div>`;
+  }else{
+    box.innerHTML=`<div class="fit-t">🌙 오늘 카드, 맞았어?</div><div class="fit-btns">${FIT.map(f=>`<button onclick="setFit('${draw.date}',${f.v})"><span>${f.e}</span>${f.n}</button>`).join('')}</div><div class="fit-s">${s.checked?`지금까지 ${s.checked}일 기록 · 적중률 ${s.rate}%`:'첫 기록을 남겨봐요'}</div>`;
+  }
+  renderPushAsk();
+}
+function yesterdayKey(){const d=new Date();d.setDate(d.getDate()-1);return dateKey(d)}
+function renderYesterdayAsk(){
+  let box=$('yAsk'); const il=$('ilji'); if(!il)return;
+  if(!box){il.insertAdjacentHTML('afterend','<div id="yAsk"></div><div id="evBox"></div>');box=$('yAsk')}
+  const y=store.get('soulcode.draw.'+yesterdayKey());
+  if(!y||y.fit!=null){box.innerHTML='';return}
+  const c=TAROT[y.card];
+  box.innerHTML=`<div class="panel fit-box y-ask"><div class="fit-t">어제 뽑은 <b>${c[2]} ${c[0]}</b>, 맞았어?</div><div class="fit-btns">${FIT.map(f=>`<button onclick="setFit('${yesterdayKey()}',${f.v})"><span>${f.e}</span>${f.n}</button>`).join('')}</div></div>`;
+}
+
+/* ---- 운세 일기 + 주간 리포트 (MY) ---- */
+function weekKey(){const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.getDate()-day);return dateKey(d)}
+function renderDiary(){
+  const me=$('s-me'); if(!me)return;
+  let box=$('diaryBox');
+  if(!box){const anchor=[...me.querySelectorAll('.sec-t')].find(h=>h.textContent.includes('카드 도감')); if(!anchor)return; anchor.insertAdjacentHTML('beforebegin','<div class="sec-t">📔 운세 일기</div><div class="panel" id="diaryBox"></div>'); box=$('diaryBox')}
+  const s=fitStats(), wk=store.get('soulcode.weekly.'+weekKey());
+  const last7=s.ds.filter(d=>{const t=new Date(d.date+'T00:00:00');return (Date.now()-t)/864e5<7});
+  const list=s.ds.slice(0,14).map(d=>{const c=TAROT[d.card],f=FIT.find(x=>x.v===d.fit);const [,m,dd]=d.date.split('-');
+    return `<button class="dy" onclick="diaryOpen('${d.date}')"><span class="dt">${+m}.${+dd}</span><span class="cd">${c[2]} ${c[0]}${d.rev?' <small>역</small>':''}</span><span class="ft">${f?f.e:'·'}</span></button>`}).join('');
+  box.innerHTML=s.days?`<div class="dstats"><div><b>${s.days}</b><small>기록한 날</small></div><div><b>${s.rate!=null?s.rate+'%':'-'}</b><small>적중률</small></div><div><b>${s.top?TAROT[s.top.card][2]:'-'}</b><small>${s.top?`최다 카드 ${s.top.n}회`:'최다 카드'}</small></div></div>
+    <div class="dlist">${list}</div><div id="diaryDetail" class="dd"></div>
+    <div class="sec-mini">🤖 이번 주 AI 리포트 <span class="pro-chip">PRO</span></div>
+    ${last7.length>=3?`<button class="btn pink ai-btn" id="wkBtn" onclick="aiWeekly()">${wk?'🔁 다시 받기':'이번 주 나의 흐름 정리받기'}</button><div class="ai-box${wk?' show':''}" id="wkBox">${wk?esc(wk):''}</div>`
+      :`<p class="fit-s">최근 7일 중 3일 이상 카드를 뽑으면 열려요 (지금 ${last7.length}일)</p>`}`
+    :`<p class="fit-s">오늘의 카드를 뽑고 저녁에 "맞았어?"를 체크하면 여기에 쌓여요 🌙</p>`;
+  if(wk&&$('wkBox'))aiBadge($('wkBox'));
+}
+function diaryOpen(date){
+  const d=store.get('soulcode.draw.'+date), c=TAROT[d.card], box=$('diaryDetail');
+  if(box._d===date){box.innerHTML='';box._d=null;return} box._d=date;
+  box.innerHTML=`<b>${c[2]} ${c[0]} (${c[1]})</b> · ${d.rev?'역방향 · '+c[4]:'정방향 · '+c[3]}${d.ai?`<div class="dd-ai">${esc(d.ai)}</div>`:''}`;
+}
+async function aiWeekly(){
+  const days=fitStats().ds.filter(d=>(Date.now()-new Date(d.date+'T00:00:00'))/864e5<7).reverse();
+  const lines=days.map(d=>{const c=TAROT[d.card],f=FIT.find(x=>x.v===d.fit);return `  ${d.date}: ${c[0]}(${c[1]}) ${d.rev?'역방향':'정방향'} / 키워드 ${d.rev?c[4]:c[3]} / 체감 ${f?f.n:'기록 없음'}`}).join('\n');
+  const prompt=`[데이터]
+${personaData()}
+- 이번 주 뽑은 카드와 본인 체감:
+${lines}
+- ${toneLine(profile.mbti[2])}
+
+[형식]
+첫 줄: 이번 주를 요약하는 20자 이내 헤드라인
+(빈 줄)
+🌊 이번 주 흐름: 3문장 (카드들이 이어지는 흐름 + 사주·MBTI 성향과 연결)
+🎯 잘 맞은 날의 공통점: 1~2문장 (체감 기록 기준, 기록이 없으면 생략)
+(빈 줄)
+👉 다음 주 한 줄 조언
+🍀 다음 주 행운의 요일: 요일 하나와 이유 한 줄`;
+  const text=await runAI(prompt,$('wkBox'),$('wkBtn'),{pro:true,proReason:'AI 주간 리포트는 PRO 전용이에요'});
+  if(text){store.set('soulcode.weekly.'+weekKey(),text);$('wkBtn').textContent='🔁 다시 받기'}
+}
+
+/* ---- 아침 알림 (웹 푸시) ---- */
+const PUSH={supported:()=>'serviceWorker' in navigator&&'PushManager' in window&&'Notification' in window,
+  ios:()=>/iphone|ipad|ipod/i.test(navigator.userAgent),standalone:()=>matchMedia('(display-mode: standalone)').matches||navigator.standalone===true};
+function b64u(s){const p='='.repeat((4-s.length%4)%4);const r=atob((s+p).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from(r,c=>c.charCodeAt(0))}
+async function pushState(){
+  if(!window.soulConfig) return 'off';
+  if(!PUSH.supported()) return PUSH.ios()&&!PUSH.standalone()?'ios-install':'unsupported';
+  if(Notification.permission==='denied') return 'denied';
+  try{const reg=await navigator.serviceWorker.getRegistration();const sub=reg&&await reg.pushManager.getSubscription();return sub?'on':'ready'}catch(e){return 'ready'}
+}
+async function enablePush(){
+  try{
+    const perm=await Notification.requestPermission(); if(perm!=='granted'){toast('알림이 꺼져 있어요. 설정에서 허용해주세요');return}
+    const reg=await navigator.serviceWorker.ready;
+    const {key}=await fetch('/api/push/key').then(r=>r.json());
+    const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(key)});
+    const r=await fetch('/api/push/subscribe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(sub)});
+    if(!r.ok) throw new Error('save');
+    store.set('soulcode.pushAsk','done'); toast('매일 아침 8시에 오늘의 카드를 알려줄게요 🔔');
+  }catch(e){toast('알림을 켜지 못했어요. 잠시 후 다시 시도해주세요')}
+  renderPushAsk(); renderPushSetting();
+}
+async function disablePush(){
+  try{const reg=await navigator.serviceWorker.getRegistration();const sub=reg&&await reg.pushManager.getSubscription();
+    if(sub){await fetch('/api/push/subscribe',{method:'DELETE',headers:{'content-type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})}).catch(()=>{});await sub.unsubscribe()}
+    toast('아침 알림을 껐어요')}catch(e){}
+  renderPushSetting();
+}
+async function renderPushAsk(){
+  const box=$('pushAsk'); if(!box)return;
+  const st=await pushState();
+  if(store.get('soulcode.pushAsk')==='later'||st==='on'||st==='off'||st==='unsupported'||st==='denied'){box.innerHTML='';return}
+  box.innerHTML=st==='ios-install'
+    ?`<div class="panel push-ask"><div class="fit-t">🔔 내일 카드, 아침에 알려줄까?</div><div class="fit-s">아이폰은 <b>공유 버튼 → 홈 화면에 추가</b>로 앱을 설치한 뒤 열면 알림을 켤 수 있어요.</div><button class="again" style="margin:6px 0 0" onclick="store.set('soulcode.pushAsk','later');renderPushAsk()">다음에</button></div>`
+    :`<div class="panel push-ask"><div class="fit-t">🔔 내일 카드, 아침에 알려줄까?</div><div class="fit-s">매일 아침 8시에 한 번만 보내요.</div><div class="fit-btns two"><button onclick="enablePush()"><span>🔔</span>알림 받기</button><button onclick="store.set('soulcode.pushAsk','later');renderPushAsk()"><span>🙅</span>괜찮아요</button></div></div>`;
+}
+async function renderPushSetting(){
+  const me=$('s-me'); if(!me||!window.soulConfig)return;
+  let box=$('pushSet');
+  if(!box){const sync=[...me.querySelectorAll('.sec-t')].find(h=>h.textContent.includes('동기화'));if(!sync)return;sync.insertAdjacentHTML('beforebegin','<div class="sec-t">🔔 아침 알림</div><div class="panel" id="pushSet"></div>');box=$('pushSet')}
+  const st=await pushState();
+  box.innerHTML={on:'<div class="row-set"><span>매일 아침 8시 · 오늘의 카드 알림 <b>켜짐</b></span><button class="again" onclick="disablePush()">끄기</button></div>',
+    ready:'<div class="row-set"><span>매일 아침 8시에 오늘의 카드를 알려줘요</span><button class="btn" style="width:auto;padding:9px 16px;font-size:15px" onclick="enablePush()">켜기</button></div>',
+    'ios-install':'<span class="fit-s">아이폰은 <b>공유 → 홈 화면에 추가</b>로 설치한 뒤 열면 알림을 켤 수 있어요.</span>',
+    denied:'<span class="fit-s">브라우저 설정에서 이 사이트의 알림이 차단돼 있어요. 허용으로 바꾸면 켤 수 있어요.</span>',
+    unsupported:'<span class="fit-s">이 브라우저는 알림을 지원하지 않아요.</span>'}[st]||'';
+}
+
+/* ---- 이벤트 ---- */
+const TERM_TIP={소한:'한 해 중 가장 추운 때. 무리한 시작보다 체력 비축',대한:'겨울의 끝자락. 미뤄둔 정리를 끝내기 좋은 날',입춘:'사주에서 새해가 시작되는 날! 올해 다짐을 적어봐요',우수:'얼음이 녹는 때. 굳었던 관계를 풀기 좋아요',경칩:'개구리가 깨어나는 날. 미뤄둔 일 시작하기',춘분:'낮과 밤이 같은 날. 균형 잡기 좋은 하루',청명:'하늘이 맑아지는 때. 머릿속도 맑게 정리',곡우:'봄비가 곡식을 키우는 때. 공부·자기계발 운 UP',입하:'여름의 시작. 에너지가 오르는 시기',소만:'만물이 차오르는 때. 작은 성과를 챙겨봐요',망종:'씨 뿌리는 시기. 새 계획을 심어봐요',하지:'낮이 가장 긴 날. 활동량 최대로',소서:'더위의 시작. 감정 과열 주의',대서:'가장 더운 때. 쉬어가는 것도 실력',입추:'가을의 시작. 하반기 계획 점검',처서:'더위가 꺾이는 때. 컨디션 회복',백로:'이슬이 맺히는 때. 섬세한 감각이 살아나요',추분:'다시 낮과 밤이 같아지는 날. 균형 점검',한로:'찬 이슬의 때. 마무리 운이 강해요',상강:'서리가 내리는 때. 정리·결단의 기운',입동:'겨울의 시작. 에너지를 안으로 모으기',소설:'첫눈이 오는 때. 감성 충전하기 좋은 날',대설:'눈이 많이 오는 때. 실내에서 나를 돌보기',동지:'밤이 가장 긴 날. 내일부터 해가 길어지는 반전의 날'};
+function lunarOf(d){try{return Manseryeok.solarToLunar(d.getFullYear(),d.getMonth()+1,d.getDate())}catch(e){return null}}
+function termToday(d){try{const ks=dateKey(d);return Manseryeok.getSolarTermsOfYear(d.getFullYear()).find(t=>dateKey(new Date(Date.parse(t.date)))===ks)||null}catch(e){return null}}
+function nextFullMoon(){const d=new Date();for(let i=1;i<32;i++){d.setDate(d.getDate()+1);const l=lunarOf(d);if(l&&l.day===15)return i}return null}
+function evDone(id){return !!(store.get('soulcode.events')||{})[id]}
+function evMark(id,v){const e=store.get('soulcode.events')||{};e[id]=v||Date.now();store.set('soulcode.events',e)}
+function unlocks(){return store.get('soulcode.unlocks')||[]}
+function activeEvents(){
+  const d=new Date(), k=dateKey(d), ev=[], l=lunarOf(d);
+  if(profile&&profile.birth&&profile.birth.slice(5)===k.slice(5)) ev.push({id:'bday-'+k,e:'🎂',t:`생일 축하해, ${esc(profile.nick)}!`,s:'생일에만 뽑을 수 있는 특별 카드가 기다려요',cta:'생일 카드 뽑기',fn:`openWish('bday-${k}','birthday')`});
+  if(l&&l.day===15) ev.push({id:'moon-'+k,e:'🌕',t:'오늘은 음력 보름, 소원 카드 데이',s:'보름달에 소원을 빌고 카드 한 장으로 답을 들어봐요',cta:'소원 카드 뽑기',fn:`openWish('moon-${k}','moon')`});
+  const tm=termToday(d); if(tm) ev.push({id:'term-'+k,e:'🌿',t:`오늘은 ${tm.name}(${tm.hanja})`,s:TERM_TIP[tm.name]||'계절이 바뀌는 날이에요',info:true});
+  const m=d.getMonth()+1, Y=reportYear();
+  if(m===12||m===1) ev.push({id:'ny-'+Y,e:'🎍',t:`${Y} 신년운세 오픈`,s:`${Y}년 12개월 흐름 그래프와 AI 풀이를 미리 봐요`,cta:`${Y} 운세 보기`,fn:`openReport('year')`,keep:true});
+  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:'7일 연속 출석 이벤트',s:`7일 연속 오면 PRO 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,prog:Math.min(n,7)/7,info:true,keep:true})}
+  return ev.filter(e=>e.keep||e.info||!evDone(e.id));
+}
+function checkStreakReward(){
+  if(unlocks().includes('strawberry')||calcStreak()<7)return;
+  store.set('soulcode.unlocks',[...unlocks(),'strawberry']);
+  setTimeout(()=>toast("🎉 7일 연속 출석! '딸기우유' 스킨이 평생 해금됐어요"),600);
+}
+function renderEvents(){
+  if(!$('evBox')) renderYesterdayAsk();
+  const box=$('evBox'); if(!box||!profile)return;
+  checkStreakReward();
+  const all=activeEvents(), fm=nextFullMoon(), ev=all.slice(0,2);
+  box.innerHTML=ev.map(e=>`<div class="ev-card${e.info?' info':''}"><div class="ev-e">${e.e}</div><div class="ev-b"><b>${e.t}</b><small>${e.s}</small>${e.prog!=null?`<i class="ev-bar"><i style="width:${e.prog*100}%"></i></i>`:''}${e.cta?`<button onclick="${e.fn}">${e.cta} →</button>`:''}</div></div>`).join('')
+    +(all.length>2?`<div class="ev-next">${all.slice(2).map(e=>e.e+' '+e.t.replace(/<[^>]+>/g,'')).join(' · ')}</div>`:'')+(fm&&!all.some(e=>e.id.startsWith('moon-'))?`<div class="ev-next">다음 이벤트 · 🌕 보름 소원 카드 D-${fm}</div>`:'');
+}
+function openWish(id,kind){
+  let m=$('wishM');
+  if(!m){$('app').insertAdjacentHTML('beforeend','<div class="modal" id="wishM" onclick="if(event.target.id===\'wishM\')closeWish()"><div class="pw" id="wishIn"></div></div>');m=$('wishM')}
+  const done=(store.get('soulcode.events')||{})[id];
+  const head=kind==='birthday'?['🎂 생일 특별 카드','올해의 나에게 하고 싶은 말을 적어봐요']:['🌕 보름 소원 카드','이루고 싶은 소원 하나를 적어봐요'];
+  if(done&&done.card!=null){wishResult(id,kind,done);m.classList.add('show');return}
+  $('wishIn').innerHTML=`<h3 class="h-display" style="text-align:center">${head[0]}</h3><p class="muted" style="text-align:center;font-size:13.5px;margin:6px 0 14px">${head[1]}</p>
+    <input class="field" id="wishQ" maxlength="40" placeholder="${kind==='birthday'?'예: 올해는 나를 더 아껴주기':'예: 이번 달 안에 합격하기'}" autocomplete="off">
+    <button class="btn" style="margin-top:14px" onclick="drawWish('${id}','${kind}')">카드 한 장 뽑기 ✨</button><button class="btn ghost" style="margin-top:10px" onclick="closeWish()">닫기</button>`;
+  m.classList.add('show');
+}
+function closeWish(){$('wishM')&&$('wishM').classList.remove('show')}
+function drawWish(id,kind){
+  const q=($('wishQ').value||'').trim(), r=rng(hash(profile.nick+id+q+Math.random()));
+  const res={card:Math.floor(r()*22),rev:r()<0.25,q,at:Date.now()};
+  evMark(id,res); addCollect(res.card); wishResult(id,kind,res); renderEvents();
+}
+function wishResult(id,kind,res){
+  const c=TAROT[res.card], luck=LUCK[res.card]+(res.rev?-1:1);
+  const v=luck>=3?['이뤄질 기운이 강해요 ✨','우주가 밀어주는 중. 지금 움직이면 돼요']:luck>=1?['천천히 다가오는 중 🌱','조급해하지 말고 작은 행동부터 쌓아봐요']:['방향을 살짝 틀어봐요 🧭','같은 소원이라도 다른 길로 가면 열려요'];
+  $('wishIn').innerHTML=`<div style="text-align:center"><div class="muted" style="font-size:13px">${kind==='birthday'?'🎂 생일 특별 카드':'🌕 보름 소원 카드'}</div>
+    ${res.q?`<p style="margin:8px 0 2px;font-size:14px">"${esc(res.q)}"</p>`:''}
+    <div class="wish-card" style="background:linear-gradient(165deg,${CARD_BG[res.card]})"><div style="font-size:54px">${c[2]}</div><b>${c[0]}</b><small>${c[1]}${res.rev?' · 역방향':''}</small></div>
+    <h3 class="h-display" style="font-size:22px">${v[0]}</h3><p style="font-size:14px;margin:6px 0 4px">${v[1]}</p><p class="muted" style="font-size:12.5px">키워드 · ${res.rev?c[4]:c[3]}</p></div>
+    <button class="btn" style="margin-top:14px" onclick="shareWish('${kind}',${res.card},'${v[0].replace(/'/g,'')}')">친구한테 자랑하기</button><button class="btn ghost" style="margin-top:10px" onclick="closeWish()">닫기</button>
+    <p class="disclaimer" style="margin-top:10px">재미로 보는 콘텐츠예요</p>`;
+}
+
+async function shareWish(kind,card,verdict){
+  const c=TAROT[card], url=location.origin+'/?from=wish';
+  const text=`${kind==='birthday'?'🎂 생일 특별 카드':'🌕 보름 소원 카드'}: ${c[2]} ${c[0]} — ${verdict}\n너도 뽑아봐 👉 ${url}`;
+  try{if(navigator.share){await navigator.share({text});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(text);toast('복사했어요! 카톡에 붙여넣기 💌')}catch(e){toast('복사하지 못했어요')}
+}
+
+/* ================= 친구들과 궁합 지도 ================= */
+const CM={cur:null,data:null,sel:null,all:false};
+function cmMaps(){return store.get('soulcode.maps')||[]}
+function cmSave(list){store.set('soulcode.maps',list)}
+function cmMe(){getSaju();return {nick:profile.nick.slice(0,10),mbti:profile.mbti,stem:saju.dayStem,yb:saju.yearBranch}}
+function chemOne(a,b){
+  const ea=STEM_EL[a.stem], eb=STEM_EL[b.stem];
+  let sj=SAJU_MATCH[(eb-ea+5)%5].s; const hap=Math.abs(a.stem-b.stem)===5;
+  if(hap)sj=Math.max(sj,95); else if(a.stem%2!==b.stem%2)sj+=4;
+  return {s:Math.round(sj*0.45+mbtiMatch(a.mbti,b.mbti).s*0.4+ttiMatch(a.yb,b.yb).s*0.15),hap};
+}
+function chem(a,b){const x=chemOne(a,b),y=chemOne(b,a);return {s:Math.round((x.s+y.s)/2),hap:x.hap}}
+const chemWord=s=>s>=88?'천생연분 💖':s>=78?'찰떡 케미 ✨':s>=66?'노력하면 꿀케미 🍯':'롤러코스터 🎢';
+const chemCol=s=>s>=85?'#FF4FA8':s>=76?'#8B6CFF':s>=66?'#B9B0CC':'#3D9BFF';
+async function cmApi(path,opt={}){const r=await fetch('/api/maps'+path,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.code||'error'),{code:j.code});return j}
+function cmScreen(){
+  if($('s-map'))return;
+  $('tabbar').insertAdjacentHTML('beforebegin',`<section class="screen" id="s-map"><div class="eng">CHEMISTRY MAP</div><h2 class="page-h h-display">우리 무리 궁합 지도 🗺️</h2><p class="sub" style="margin-bottom:14px">친구들이 링크로 들어오면 서로의 케미가 선으로 이어져요.</p><div id="cmBody"></div><p class="disclaimer">생년월일은 공유되지 않아요 · 재미로 보는 콘텐츠예요</p></section>`);
+}
+function openMap(code){cmScreen();if(code)CM.cur=code;go('s-map')}
+async function renderMap(){
+  const body=$('cmBody'); if(!body)return;
+  if(!profile){body.innerHTML='<div class="panel">먼저 내 정보를 입력해야 지도를 만들 수 있어요.</div>';return}
+  const maps=cmMaps();
+  if(!CM.cur&&maps.length)CM.cur=maps[0].code;
+  const tabs=maps.length?`<div class="chips-sel cm-tabs">${maps.map(m=>`<button class="chip ${m.code===CM.cur?'sel':''}" onclick="CM.cur='${m.code}';CM.sel=null;renderMap()">${esc(m.title)}</button>`).join('')}<button class="chip" onclick="CM.cur='new';renderMap()">＋ 새 지도</button></div>`:'';
+  if(!maps.length||CM.cur==='new'){
+    body.innerHTML=tabs+`<div class="panel"><label class="lb" style="margin-top:0">지도 이름</label><input class="field" id="cmTitle" maxlength="20" placeholder="예: 우리 과 동기들, 단톡방 7인" autocomplete="off"><button class="btn" style="margin-top:14px" onclick="cmCreate()">지도 만들고 친구 초대하기 🗺️</button><p class="fit-s">지도에는 내 별명·MBTI·사주 일간·띠만 올라가요.</p></div>`;
+    return;
+  }
+  body.innerHTML=tabs+'<div class="panel" style="text-align:center">지도 불러오는 중... 🛰️</div>';
+  try{CM.data=await cmApi('/'+CM.cur)}catch(e){
+    if(e.code==='not_found'){cmSave(cmMaps().filter(m=>m.code!==CM.cur));CM.cur=null;toast('삭제된 지도예요');return renderMap()}
+    body.innerHTML=tabs+'<div class="panel">지도를 불러오지 못했어요. <button class="again" onclick="renderMap()">다시 시도</button></div>';return}
+  const mine=cmMaps().find(m=>m.code===CM.cur)||{}, M=CM.data.members, n=M.length;
+  const pairs=[]; for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)pairs.push({i,j,...chem(M[i],M[j])});
+  pairs.sort((a,b)=>b.s-a.s);
+  const avg=M.map((_,k)=>{const ps=pairs.filter(p=>p.i===k||p.j===k);return ps.length?ps.reduce((s,p)=>s+p.s,0)/ps.length:0});
+  const R=n<=2?70:n<=6?110:128, C=170, pos=M.map((_,k)=>{const a=-Math.PI/2+k*2*Math.PI/Math.max(n,1);return [C+R*Math.cos(a),C+R*Math.sin(a)]});
+  const sel=CM.sel, show=p=>sel!=null?(p.i===sel||p.j===sel):(CM.all||n<=6||p.s>=80||p.s<64);
+  const lines=pairs.filter(show).sort((a,b)=>a.s-b.s).map(p=>{const [x1,y1]=pos[p.i],[x2,y2]=pos[p.j],c=chemCol(p.s),w=p.s>=85?4:p.s>=76?3:2;
+    const lab=sel!=null?`<g><rect x="${(x1+x2)/2-15}" y="${(y1+y2)/2-10}" width="30" height="20" rx="10" fill="#fff" stroke="${c}" stroke-width="1.5"/><text x="${(x1+x2)/2}" y="${(y1+y2)/2+4.5}" text-anchor="middle" font-size="12" font-weight="900" fill="#1B1433">${p.s}</text></g>`:'';
+    return `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="${c}" stroke-width="${w}" stroke-linecap="round" ${p.s<66?'stroke-dasharray="5 5"':''} opacity="${sel!=null||p.s>=76||p.s<66?1:.55}"/>${lab}`}).join('');
+  const nodes=M.map((m,k)=>{const [x,y]=pos[k],me=m.id===mine.memberId,dim=sel!=null&&sel!==k&&!pairs.some(p=>(p.i===sel&&p.j===k)||(p.j===sel&&p.i===k));
+    return `<g class="cm-node" onclick="CM.sel=${sel===k?'null':k};renderMap()" opacity="${dim?.35:1}"><circle cx="${x}" cy="${y}" r="${sel===k?27:23}" fill="${me?'#FFE04D':'#fff'}" stroke="#1B1433" stroke-width="${sel===k?3.5:2.5}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="20">${STEM_INFO[m.stem].emoji}</text><text x="${x}" y="${y+40}" text-anchor="middle" font-size="12.5" font-weight="900" fill="#1B1433">${esc(m.nick)}</text><text x="${x}" y="${y+54}" text-anchor="middle" font-size="10.5" fill="#6E6189">${m.mbti}</text></g>`}).join('');
+  const best=pairs[0], worst=pairs[pairs.length-1], star=n>2?avg.indexOf(Math.max(...avg)):-1;
+  const nm=k=>esc(M[k].nick);
+  const sup=n>=2?`<div class="sec-t">🏆 우리 무리 어워즈</div><div class="cm-awards">
+    <div class="mini"><div class="k">💖 베스트 케미</div><div class="v">${nm(best.i)} × ${nm(best.j)}<small>${best.s}점 · ${chemWord(best.s)}</small></div></div>
+    ${pairs.length>1?`<div class="mini"><div class="k">🎢 롤러코스터 케미</div><div class="v">${nm(worst.i)} × ${nm(worst.j)}<small>${worst.s}점 · 서로에게 좋은 자극제</small></div></div>`:''}
+    ${star>=0?`<div class="mini"><div class="k">👑 우리 무리 인싸</div><div class="v">${nm(star)}<small>평균 ${Math.round(avg[star])}점 · 누구랑도 잘 맞음</small></div></div>`:''}
+    ${pairs.some(p=>p.hap)?`<div class="mini"><div class="k">🧲 천간합 커플</div><div class="v">${pairs.filter(p=>p.hap).slice(0,2).map(p=>nm(p.i)+' × '+nm(p.j)).join(', ')}<small>사주 일간이 서로 끌어당기는 드문 조합</small></div></div>`:''}</div>`:'';
+  const selInfo=sel!=null?`<div class="panel cm-sel"><b>${STEM_INFO[M[sel].stem].emoji} ${nm(sel)}</b>의 케미 순위<div class="cm-rank">${pairs.filter(p=>p.i===sel||p.j===sel).map(p=>{const o=p.i===sel?p.j:p.i;return `<div><span>${nm(o)} <small>${M[o].mbti}</small></span><b style="color:${chemCol(p.s)}">${p.s}</b><small>${chemWord(p.s)}</small></div>`}).join('')||'<p class="fit-s">아직 다른 멤버가 없어요</p>'}</div></div>`:'';
+  body.innerHTML=tabs+`<div class="panel cm-map"><div class="cm-head"><b>${esc(CM.data.title)}</b><small>${n}명 · ${n<2?'친구를 초대해봐요':'사람을 누르면 그 사람 기준으로 보여줘요'}</small></div>
+    <svg viewBox="0 0 340 360" class="cm-svg">${lines}${nodes}</svg>
+    <div class="cm-legend"><span><i style="background:#FF4FA8"></i>찰떡 85+</span><span><i style="background:#8B6CFF"></i>좋음 76+</span><span><i style="background:#B9B0CC"></i>무난</span><span><i class="dash" style="border-color:#3D9BFF"></i>티격태격</span></div>
+    ${n>6&&sel==null?`<button class="again" style="margin:6px 0 0" onclick="CM.all=!CM.all;renderMap()">${CM.all?'강한 선만 보기':'모든 선 보기'}</button>`:''}</div>
+    ${selInfo}
+    <button class="btn" style="margin-top:16px" onclick="cmInvite()">💌 친구 초대하기</button>
+    ${sup}
+    <div class="sec-t">👥 멤버 ${n}명</div><div class="panel cm-members">${M.map((m,k)=>`<div><span>${STEM_INFO[m.stem].emoji} ${esc(m.nick)} <small>${m.mbti}</small>${m.id===mine.memberId?' <em>나</em>':''}</span>${mine.ownerToken&&m.id!==mine.memberId?`<button class="again" onclick="cmKick('${m.id}')">빼기</button>`:''}</div>`).join('')}</div>
+    <div class="cm-foot"><button class="again" onclick="renderMap()">🔄 새로고침</button>${mine.ownerToken?`<button class="again" onclick="cmDelete()">지도 삭제</button>`:mine.memberId?`<button class="again" onclick="cmLeave()">지도 나가기</button>`:''}</div>`;
+}
+async function cmCreate(){
+  const title=($('cmTitle').value||'').trim(); if(!title){toast('지도 이름을 적어주세요');return}
+  try{const r=await cmApi('',{method:'POST',body:JSON.stringify({title,me:cmMe()})});
+    cmSave([{code:r.code,title,ownerToken:r.ownerToken,memberId:r.memberId,memberToken:r.memberToken},...cmMaps()]);CM.cur=r.code;CM.sel=null;await renderMap();cmInvite()}
+  catch(e){toast('지도를 만들지 못했어요. 잠시 후 다시 시도해주세요')}
+}
+async function cmInvite(){
+  const m=cmMaps().find(x=>x.code===CM.cur); if(!m)return;
+  const url=`${location.origin}/?map=${m.code}`, text=`${profile.nick}님이 '${m.title}' 궁합 지도에 초대했어요 🗺️\n생일이랑 MBTI만 넣으면 우리 무리 케미가 한눈에 보여요!\n👉 ${url}`;
+  try{if(navigator.share){await navigator.share({text});return}}catch(e){return}
+  try{await navigator.clipboard.writeText(text);toast('초대 링크를 복사했어요! 단톡방에 붙여넣기 💌')}catch(e){prompt('이 링크를 복사해서 보내주세요',url)}
+}
+async function cmKick(id){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm('이 멤버를 지도에서 뺄까요?'))return;
+  try{await cmApi(`/${m.code}/members/${id}`,{method:'DELETE',headers:{'x-map-token':m.ownerToken}});CM.sel=null;renderMap()}catch(e){toast('빼지 못했어요')}}
+async function cmLeave(){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm('이 지도에서 나갈까요? 내 정보가 지도에서 지워져요.'))return;
+  try{await cmApi(`/${m.code}/members/${m.memberId}`,{method:'DELETE',headers:{'x-map-token':m.memberToken}})}catch(e){}
+  cmSave(cmMaps().filter(x=>x.code!==m.code));CM.cur=null;CM.sel=null;toast('지도에서 나왔어요');renderMap()}
+async function cmDelete(){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm(`'${m.title}' 지도를 삭제할까요? 모든 멤버에게서 사라져요.`))return;
+  try{await cmApi('/'+m.code,{method:'DELETE',headers:{'x-map-token':m.ownerToken}})}catch(e){toast('삭제하지 못했어요');return}
+  cmSave(cmMaps().filter(x=>x.code!==m.code));CM.cur=null;CM.sel=null;toast('지도를 삭제했어요');renderMap()}
+async function cmJoinPrompt(){
+  const code=store.get('soulcode.pendingMap'); if(!code||!profile)return;
+  if(cmMaps().some(m=>m.code===code)){store.del('soulcode.pendingMap');openMap(code);return}
+  let info; try{info=await cmApi('/'+code)}catch(e){store.del('soulcode.pendingMap');toast('없어진 지도 링크예요');return}
+  let m=$('wishM'); if(!m){openWish('x','moon');closeWish();m=$('wishM')}
+  const host=info.members[0];
+  $('wishIn').innerHTML=`<div style="text-align:center"><div style="font-size:46px">🗺️</div><h3 class="h-display" style="font-size:22px;margin-top:6px">${host?esc(host.nick)+'님의 ':''}'${esc(info.title)}'<br>궁합 지도에 초대받았어요</h3><p class="fit-s" style="margin:10px 0 0">지금 ${info.members.length}명 참여 중 · 들어가면 모두와의 케미가 바로 보여요.<br>공유되는 건 <b>별명·MBTI·사주 일간·띠</b>뿐이고, 생년월일은 공유되지 않아요.</p></div>
+    <button class="btn" style="margin-top:16px" onclick="cmJoin('${code}')">참여하기 💞</button><button class="btn ghost" style="margin-top:10px" onclick="store.del('soulcode.pendingMap');closeWish()">다음에</button>`;
+  m.classList.add('show');
+}
+async function cmJoin(code){
+  try{const info=await cmApi('/'+code), r=await cmApi(`/${code}/join`,{method:'POST',body:JSON.stringify(cmMe())});
+    cmSave([{code,title:info.title,memberId:r.memberId,memberToken:r.memberToken},...cmMaps().filter(m=>m.code!==code)]);
+    store.del('soulcode.pendingMap');closeWish();toast('지도에 들어왔어요! 🎉');openMap(code)}
+  catch(e){toast(e.code==='full'?'이 지도는 30명이 꽉 찼어요':'참여하지 못했어요. 잠시 후 다시 시도해주세요')}
+}
+function cmEntry(){
+  const f=$('mtForm'); if(!f||$('cmEntry')||!window.soulConfig)return;
+  f.insertAdjacentHTML('beforebegin',`<button class="panel cm-entry" id="cmEntry" onclick="openMap()"><span class="ev-e">🗺️</span><span class="ev-b"><b>친구들과 궁합 지도 만들기</b><small>링크 하나로 단톡방 전체 케미를 한 장에! 베스트 케미·인싸 어워즈까지</small></span><span style="font-size:22px">→</span></button>`);
+}
+
+
+/* ================= 990원 1회 이용권 (티켓) ================= */
+const tickets=()=>store.get('soulcode.tickets')||0;
+function offerModal(html){
+  let m=$('offerM');
+  if(!m){$('app').insertAdjacentHTML('beforeend','<div class="modal" id="offerM" onclick="if(event.target.id===\'offerM\')closeOffer()"><div class="pw" id="offerIn"></div></div>');m=$('offerM')}
+  $('offerIn').innerHTML=html+(window.soulConfig&&window.soulConfig.payTest?'<p class="consent-note">🧪 베타 기간이라 실제로 결제되지 않아요</p>':'')+'<p class="consent-note">결제하면 <a href="/terms" target="_blank">이용약관</a>·<a href="/refund" target="_blank">환불정책</a>에 동의한 것으로 봐요. 이용권을 쓰면 청약철회가 제한돼요.</p>';
+  m.classList.add('show');
+}
+function closeOffer(){$('offerM')&&$('offerM').classList.remove('show')}
+const OFFER={after:null};
+function needLogin(){if(window.soulConfig&&window.soulConfig.serverPro)return false;toast('결제하려면 먼저 로그인해주세요 🔐');closeOffer();closePaywall();go('s-me');return true}
+function openOffer(reason,after){
+  if(!window.soulPay){openPaywall(reason);return}
+  OFFER.after=after; const n=tickets();
+  offerModal(`<div style="text-align:center"><div style="font-size:44px">🎟️</div><h3 class="h-display" style="font-size:24px">이번 한 번만 볼래요?</h3><p class="muted" style="font-size:13.5px;margin-top:4px">${esc(reason)}</p></div>
+    ${n>0&&after?`<button class="btn" style="margin-top:16px" onclick="useTicketNow()">티켓 1장 쓰고 바로 보기 <small style="font-size:13px">(보유 ${n}장)</small></button>`:''}
+    <div class="offer-opts">
+      <button class="offer ${n>0&&after?'':'hot'}" onclick="buyTicket({type:'ai'})"><span class="o-t">🎟️ 1회 이용권</span><b>990원</b><small>${after?'지금 이 해석 한 번 바로 보기':'PRO 해석이나 스킨 하나를 한 번'}</small></button>
+      <button class="offer" onclick="closeOffer();openPaywall('AI 무제한 + 스킨 3종')"><span class="o-badge">티켓 4장 값</span><span class="o-t">💎 PRO 30일</span><b>3,900원</b><small>AI 무제한 · 연간 리포트 · 스킨 3종</small></button>
+    </div>
+    <button class="btn ghost" style="margin-top:12px" onclick="closeOffer()">다음에</button>`);
+}
+function useTicketNow(){const f=OFFER.after;closeOffer();OFFER.after=null;if(f)f()}
+function buyTicket(ctx){if(needLogin())return;store.set('soulcode.afterPay',ctx);closeOffer();window.soulPay.start('ticket')}
+function openSkinOffer(s){
+  if(!window.soulPay){openPaywall(`'${s.n}' 스킨은 PRO 전용이에요`);return}
+  const n=tickets();
+  offerModal(`<div style="text-align:center"><div class="sw skin-prev" data-skin-prev="${s.k}" style="margin:0 auto 10px">${s.sym}</div><h3 class="h-display" style="font-size:24px">'${s.n}' 덱 갖고 싶다면</h3><p class="muted" style="font-size:13.5px;margin-top:4px">한 번 사면 PRO가 끝나도 평생 내 거예요</p></div>
+    ${n>0?`<button class="btn" style="margin-top:16px" onclick="ownSkin('${s.k}')">티켓 1장으로 평생 소장 <small style="font-size:13px">(보유 ${n}장)</small></button>`:''}
+    <div class="offer-opts">
+      <button class="offer ${n>0?'':'hot'}" onclick="buyTicket({type:'skin',k:'${s.k}'})"><span class="o-t">🎴 이 스킨만</span><b>990원</b><small>평생 소장</small></button>
+      <button class="offer" onclick="closeOffer();openPaywall('스킨 3종 + AI 무제한')"><span class="o-badge">스킨 3종 다</span><span class="o-t">💎 PRO 30일</span><b>3,900원</b><small>스킨 3종 · AI 무제한</small></button>
+    </div>
+    <button class="btn ghost" style="margin-top:12px" onclick="closeOffer()">다음에</button>`);
+  const sw=$('offerIn').querySelector('.skin-prev'); const tmp=document.createElement('div'); tmp.dataset.skin=s.k; tmp.className='app'; tmp.style.display='none'; document.body.appendChild(tmp); sw.style.background=getComputedStyle(tmp).getPropertyValue('--card-back'); tmp.remove();
+}
+async function ownSkin(k){
+  if(needLogin()||!window.soulShop)return;
+  const r=await window.soulShop.unlockSkin(k);
+  if(!r.ok){toast(r.code==='no_ticket'?'티켓이 없어요':'잠시 후 다시 시도해주세요');return}
+  store.set('soulcode.unlocks',[...new Set([...unlocks(),...(r.skins||[k])])]); store.set('soulcode.tickets',Math.max(0,tickets()-1));
+  closeOffer(); setSkin(k); renderSkins(); burst($('app'),18); const s=SKINS.find(x=>x.k===k); toast(`'${s?s.n:k}' 덱 평생 소장 완료 🎴`);
+}
+window.afterTicket=function(){
+  const ctx=store.get('soulcode.afterPay'); store.del('soulcode.afterPay');
+  toast('🎟️ 1회 이용권 1장 충전 완료!');
+  if(ctx&&ctx.type==='skin'){setTimeout(()=>ownSkin(ctx.k),900)}
+  else setTimeout(()=>toast('아까 그 해석 버튼을 다시 누르면 티켓으로 바로 열려요'),2000);
+};
+
+/* ---- 연결 ---- */
+{const _go=go; go=function(id){if(id==='s-map')cmScreen(); _go(id); if(id==='s-map'){$('tabbar').classList.add('show');document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.go==='s-match'));renderMap()} if(id==='s-match')cmEntry(); if(['s-tarot','s-soul','s-match','s-me'].includes(id))setTimeout(cmJoinPrompt,400)};}
+try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$/.test(q)){store.set('soulcode.pendingMap',q);history.replaceState(null,'',location.pathname)}}catch(e){}
+{const _pb=renderProBanner; renderProBanner=function(){_pb(); const n=tickets(); if(n>0&&!isPro())$('proBanner').insertAdjacentHTML('beforeend',`<div class="tk-line">🎟️ 1회 이용권 <b>${n}장</b> 보유 · PRO 기능을 한 번씩 열 수 있어요</div>`)};}
+{const pw=$('paywall'); if(pw&&window.soulPay){const pl=pw.querySelector('.plans'); pl&&pl.insertAdjacentHTML('afterend','<button class="again tk-link" onclick="closePaywall();openOffer(\'PRO 대신 필요한 것만 한 번\',null)">한 번만 필요해요? 1회 이용권 990원 →</button>')}}
+{const _fill=fillResult; fillResult=function(){_fill(); renderFit()};
+ const _rt=renderTarot; renderTarot=function(){_rt(); renderYesterdayAsk(); renderEvents()};
+ const _rm=renderMe; renderMe=function(){_rm(); renderDiary(); renderPushSetting(); const n=calcStreak(); if(unlocks().includes('strawberry'))$('stS').textContent="🍓 '딸기우유' 스킨 평생 해금 완료"; else $('stS').textContent=n>=7?'7일 달성! 스킨이 곧 해금돼요':`${7-n}일만 더 오면 '딸기우유' 스킨 평생 해금 🍓`}}
 
 /* ================= PRODUCTION HOOKS ================= */
 (function(){
