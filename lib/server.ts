@@ -10,6 +10,34 @@ export const SKIN_KEYS = ['strawberry', 'chrome', 'matcha'];
 export type PlanKey = keyof typeof PLANS;
 export const FREE_AI_PER_DAY = 3;
 
+/**
+ * AI 비용 안전장치 (Vercel 환경변수로 코드 수정 없이 조절)
+ * - AI_PAUSED=1            : AI 전체 일시 중지 (비상 스위치)
+ * - AI_FREE_PER_DAY        : 무료 사용자 1인당 하루 횟수 (기본 3)
+ * - AI_BUSY_AT             : 오늘 무료 호출이 이 수를 넘으면 '붐비는 날' 모드 (기본 2000)
+ * - AI_FREE_PER_DAY_BUSY   : 붐비는 날 1인당 무료 횟수 (기본 1)
+ * - AI_DAILY_FREE_CAP      : 하루 전체 무료 호출 상한 (기본 5000) — 넘으면 무료 마감, 유료는 계속
+ * - AI_DAILY_TOTAL_CAP     : 하루 전체 호출 상한 (기본 30000) — 비용 폭주 방지 최후 방어선
+ */
+const envInt = (k: string, d: number) => { const v = parseInt(process.env[k] || '', 10); return Number.isFinite(v) && v >= 0 ? v : d; };
+export function aiPolicy() {
+  return {
+    paused: process.env.AI_PAUSED === '1',
+    freePerDay: envInt('AI_FREE_PER_DAY', FREE_AI_PER_DAY),
+    busyAt: envInt('AI_BUSY_AT', 2000),
+    freePerDayBusy: envInt('AI_FREE_PER_DAY_BUSY', 1),
+    dailyFreeCap: envInt('AI_DAILY_FREE_CAP', 5000),
+    dailyTotalCap: envInt('AI_DAILY_TOTAL_CAP', 30000),
+  };
+}
+/** 오늘 무료 사용자 1인 한도 (붐비는 날이면 줄어듦) */
+export async function freeLimitToday(day: string) {
+  const p = aiPolicy();
+  const { data } = await admin().from('ai_budget').select('free_calls').eq('day', day).maybeSingle();
+  const busy = (data?.free_calls ?? 0) >= p.busyAt;
+  return { limit: busy ? Math.min(p.freePerDayBusy, p.freePerDay) : p.freePerDay, busy };
+}
+
 export function supabaseConfigured() {
   return !!(process.env.NEXT_PUBLIC_SUPABASE_URL && process.env.SUPABASE_SERVICE_ROLE_KEY);
 }

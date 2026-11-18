@@ -933,8 +933,9 @@ function renderProBanner(){
 let AI=null;
 async function initAI(){try{if(!window.claude||!claude.use)return;AI=await claude.use('sample');if(AI){$('app').classList.add('ai-on');refreshQuota()}}catch(e){AI=null}}
 const aiUsed=()=>store.get('soulcode.ai.'+todayKey())||0;
-const aiLeft=()=>isPro()?Infinity:Math.max(0,3-aiUsed());
-function quotaText(){return isPro()?'💎 PRO · AI 해석 무제한':`오늘 무료 AI 해석 ${aiLeft()}/3회 남음`}
+const freeLimit=()=>{const n=store.get('soulcode.freeLimit');return typeof n==='number'?n:3};
+const aiLeft=()=>isPro()?Infinity:Math.max(0,freeLimit()-aiUsed());
+function quotaText(){return isPro()?'💎 PRO · AI 해석 무제한':`오늘 무료 AI 해석 ${aiLeft()}/${freeLimit()}회 남음`}
 function refreshQuota(){document.querySelectorAll('.ai-quota').forEach(e=>e.textContent=quotaText())}
 const AI_RULES=`너는 젠지를 위한 '사주 × MBTI × 타로' 앱 「소울코드」의 해석가야.
 - 말투: 친근한 존댓말 + 위트. 짧은 문장. 이모지는 전체에서 2~4개만.
@@ -952,13 +953,13 @@ function personaData(){
 - 오행 분포: ${EL.map((e,i)=>e.ko+S.counts[i]).join(' ')} → 강한 기운 ${EL[S.counts.indexOf(mx)].ko}, 약한 기운 ${EL[S.counts.indexOf(mn)].ko}`;
 }
 const toneLine=t=>t==='T'?'해석 톤: T형 — 팩트와 논리 위주, 담백하고 실용적으로.':'해석 톤: F형 — 공감과 위로 위주, 따뜻하게.';
-function aiErr(code){return({rate_limited:'⏳ 요청이 몰렸어요. 잠시 후 다시 눌러주세요.',not_granted:'🙅 이번 접속에서는 AI 사용이 허용되지 않았어요.',sampling_disabled:'🙅 이 계정에서는 AI를 쓸 수 없어요.',refused:'🫥 이 내용은 해석하기 어려워요. 질문을 바꿔볼까요?',session_expired:'🔑 다시 로그인이 필요해요.',cancelled:'멈췄어요.'})[code]||'📡 연결이 끊겼어요. 다시 눌러주세요.'}
+function aiErr(code){return({ai_paused:'🛠️ AI 해석이 잠깐 쉬는 중이에요. 오늘 운세와 카드 풀이는 그대로 볼 수 있어요!',rate_limited:'⏳ 요청이 몰렸어요. 잠시 후 다시 눌러주세요.',not_granted:'🙅 이번 접속에서는 AI 사용이 허용되지 않았어요.',sampling_disabled:'🙅 이 계정에서는 AI를 쓸 수 없어요.',refused:'🫥 이 내용은 해석하기 어려워요. 질문을 바꿔볼까요?',session_expired:'🔑 다시 로그인이 필요해요.',cancelled:'멈췄어요.'})[code]||'📡 연결이 끊겼어요. 다시 눌러주세요.'}
 function aiBadge(box){const b=document.createElement('span');b.className='ai-badge';b.textContent='🤖 AI 해석';box.appendChild(b)}
 async function runAI(prompt,box,btn,opts={}){
   if(!AI){toast('AI를 쓸 수 없는 환경이에요');return null}
   const retry=()=>runAI(prompt,box,btn,{...opts,ticket:true});
   if(opts.pro&&!isPro()&&!opts.ticket){openOffer(opts.proReason||'PRO 전용 AI 기능이에요',retry);return null}
-  if(!opts.ticket&&aiLeft()<=0){openOffer('오늘 무료 AI 해석 3회를 다 썼어요',retry);return null}
+  if(!opts.ticket&&aiLeft()<=0){openOffer(`오늘 무료 AI 해석 ${freeLimit()}회를 다 썼어요`,retry);return null}
   btn.disabled=true; box.className='ai-box show thinking'; box.textContent='🔮 사주랑 카드를 엮어서 쓰는 중... (보통 10~40초)';
   try{
     const {text,truncated}=await AI(AI_RULES+'\n\n'+prompt,{cache:false,ticket:!!(opts.ticket&&!isPro()),onText:({text})=>{box.className='ai-box show';box.textContent=text;aiBadge(box)}});
@@ -967,7 +968,8 @@ async function runAI(prompt,box,btn,opts={}){
     return text;
   }catch(e){
     if(e.code==='auth_required'){box.className='ai-box';box.textContent='';toast('로그인하면 AI 해석을 쓸 수 있어요 🔐');go('s-me');return null}
-    if(e.code==='quota_exceeded'){box.className='ai-box';box.textContent='';openOffer('오늘 무료 AI 해석 3회를 다 썼어요',retry);return null}
+    if(e.code==='quota_exceeded'){box.className='ai-box';box.textContent='';openOffer(`오늘 무료 AI 해석 ${freeLimit()}회를 다 썼어요`,retry);return null}
+    if(e.code==='free_sold_out'){box.className='ai-box';box.textContent='';openOffer('오늘 무료 AI 해석이 인기 폭발로 마감됐어요 🔥',retry);return null}
     if(e.code==='no_ticket'){box.className='ai-box';box.textContent='';store.set('soulcode.tickets',0);openOffer('티켓이 다 떨어졌어요',retry);return null}
     box.className='ai-box show'; box.textContent=(e.text?e.text+'\n\n':'')+aiErr(e.code);
     return null;

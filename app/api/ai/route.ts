@@ -1,5 +1,5 @@
 import Anthropic from '@anthropic-ai/sdk';
-import { admin, FREE_AI_PER_DAY, getEntitlement, json, kstToday, requireUser, supabaseConfigured } from '@/lib/server';
+import { admin, aiPolicy, freeLimitToday, getEntitlement, json, kstToday, requireUser, supabaseConfigured } from '@/lib/server';
 
 export const runtime = 'nodejs';
 export const dynamic = 'force-dynamic';
@@ -26,9 +26,14 @@ export async function POST(req: Request) {
   const useTicket = body?.useTicket === true;
   if (!prompt.trim() || prompt.length > MAX_PROMPT) return json({ code: 'invalid_request' }, 400);
 
-  // 무료 사용자는 하루 3회 — DB 함수로 원자적으로 차감 (동시 요청에도 초과 불가)
+  const policy = aiPolicy();
+  if (policy.paused) return json({ code: 'ai_paused', message: 'AI 해석 점검 중이에요' }, 503);
+
+  // 무료 사용자는 하루 N회 — DB 함수로 원자적으로 차감 (동시 요청에도 초과 불가)
   const ent = await getEntitlement(user.id);
   const day = kstToday();
+  const isFree = !ent.pro && !useTicket;
+  const freeLimit = isFree ? (await freeLimitToday(day)).limit : 0;
   // 990원 티켓: PRO가 아니면 티켓 1장을 쓰고 이번 1회는 한도와 무관하게 허용
   let refund: () => Promise<void>;
   if (useTicket && !ent.pro) {
@@ -38,11 +43,21 @@ export async function POST(req: Request) {
     refund = async () => { await admin().rpc('add_tickets', { p_user: user.id, p_n: 1 }); };
   } else {
     // PRO도 사용 기록은 남김 (환불 시 사용 여부 확인용) — 한도만 사실상 무제한
-    const { data: count, error } = await admin().rpc('increment_ai_usage', { p_user: user.id, p_day: day, p_limit: ent.pro ? 1_000_000 : FREE_AI_PER_DAY });
+    const { data: count, error } = await admin().rpc('increment_ai_usage', { p_user: user.id, p_day: day, p_limit: ent.pro ? 1_000_000 : freeLimit });
     if (error) return json({ code: 'upstream_error' }, 500);
     if (count === null) return json({ code: 'quota_exceeded' }, 402);
     refund = async () => { await admin().rpc('refund_ai_usage', { p_user: user.id, p_day: day }); };
   }
+
+  // 하루 전체 예산 (비용 폭주 방지). 무료 마감이어도 유료(PRO·티켓)는 전체 상한까지 계속
+  const { data: okBudget, error: budgetErr } = await admin().rpc('take_ai_budget', { p_day: day, p_free: isFree, p_free_cap: policy.dailyFreeCap, p_total_cap: policy.dailyTotalCap });
+  if (budgetErr || !okBudget) {
+    await refund();
+    if (budgetErr) return json({ code: 'upstream_error' }, 500);
+    return isFree ? json({ code: 'free_sold_out', message: '오늘 무료 AI 해석이 모두 마감됐어요' }, 429) : json({ code: 'ai_paused', message: '오늘 AI 해석이 마감됐어요' }, 503);
+  }
+  const userRefund = refund;
+  refund = async () => { await userRefund(); await admin().rpc('refund_ai_budget', { p_day: day, p_free: isFree }); };
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const enc = new TextEncoder();
@@ -58,8 +73,9 @@ export async function POST(req: Request) {
         });
         req.signal.addEventListener('abort', () => s.abort());
         s.on('text', (t) => { sent = true; controller.enqueue(enc.encode(t)); });
-        await s.finalMessage();
+        const fin = await s.finalMessage();
         controller.close();
+        admin().rpc('add_ai_tokens', { p_day: day, p_in: fin.usage?.input_tokens ?? 0, p_out: fin.usage?.output_tokens ?? 0 }).then(() => {}, () => {});
       } catch (e) {
         if (!sent) await refund();
         console.error('[api/ai]', e);

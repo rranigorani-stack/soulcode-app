@@ -214,6 +214,7 @@ export async function startSoulcode() {
         const me = await fetch('/api/me', { headers: { authorization: `Bearer ${session.access_token}` } }).then((r) => r.json());
         setLocal('soulcode.pro', me.pro ? { active: true, plan: me.plan, until: me.until } : { active: false });
         setLocal('soulcode.ai.' + kstToday(), me.aiUsed || 0);
+        if (typeof me.freeLimit === 'number') setLocal('soulcode.freeLimit', me.freeLimit);
         setLocal('soulcode.tickets', me.tickets || 0);
         if (Array.isArray(me.skins) && me.skins.length) {
           let cur: string[] = [];
