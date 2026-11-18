@@ -286,7 +286,7 @@ function finishOnb(){
   go('s-loading');
   const msgs=['우주에서 너의 좌표 검색 중... 🛰️','오행 밸런스 체크 중... 물 한 잔 하고 와 💧','MBTI랑 사주 소개팅 시키는 중 💞','찾았다, 너의 소울코드! ✨'];
   msgs.forEach((m,i)=>setTimeout(()=>$('loadTxt').textContent=m,i*650));
-  setTimeout(()=>go('s-soul'),2700);
+  setTimeout(()=>{const t=store.get('soulcode.afterOnb');if(t){store.del('soulcode.afterOnb');go(t);toast('궁합 볼 상대의 생일을 넣어봐요 🔎')}else go('s-soul')},2700);
 }
 
 /* ================= SOUL ================= */
@@ -1649,7 +1649,16 @@ window.afterTicket=function(){
 };
 
 /* ---- 연결 ---- */
-{const _go=go; go=function(id){if(id==='s-map')cmScreen(); _go(id); if(id==='s-map'){$('tabbar').classList.add('show');document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.go==='s-match'));renderMap()} if(id==='s-match')cmEntry(); if(['s-tarot','s-soul','s-match','s-me'].includes(id))setTimeout(cmJoinPrompt,400)};}
+function applyPrefill(){try{const p=store.get('soulcode.prefill');if(!p||profile)return;if(p.nick&&!$('nick').value){$('nick').value=p.nick;$('n1').disabled=false}if(p.birth&&!$('birth').value){$('birth').value=p.birth;$('n2').disabled=false}if(p.mbti&&/^[EI][SN][TF][JP]$/.test(p.mbti)&&Object.keys(ob.mbti).length===0){[...p.mbti].forEach(ch=>{const b=document.querySelector(`.mbti-opt[data-v="${ch}"]`);b&&b.click()})}}catch(e){}}
+function pastEntry(){
+  if(!window.soulConfig)return;
+  const soul=$('s-soul'); if(soul&&!$('pastLink')){const d=soul.querySelector('.disclaimer');d&&d.insertAdjacentHTML('beforebegin','<a class="panel past-link wanted-link" id="pastLink" href="/wanted?utm_source=app_soul"><span class="ev-e">🚨</span><span class="ev-b"><b>운명의 상대 수배전단 뽑기</b><small>내 사주에 부족한 기운으로 찾은 그 사람</small></span><span style="font-size:22px">→</span></a>')}
+  const mt=$('s-match'); if(mt&&!$('wantedLink')){const f=$('mtForm');f&&f.insertAdjacentHTML('beforebegin','<a class="panel past-link wanted-link" id="wantedLink" href="/wanted?utm_source=app_match"><span class="ev-e">🚨</span><span class="ev-b"><b>운명의 상대 수배전단</b><small>내 사주에 부족한 기운으로 그린 몽타주</small></span><span style="font-size:22px">→</span></a>')}
+  const sp=$('s-splash'); if(sp&&!$('pastSplash')){const d=sp.querySelector('.disclaimer');d&&d.insertAdjacentHTML('afterend','<div id="pastSplash" class="past-splash"><a href="/wanted?utm_source=app_splash">🚨 운명의 상대 수배전단</a></div>')}
+}
+pastEntry();
+try{if(new URLSearchParams(location.search).get('go')==='match'){store.set('soulcode.afterOnb','s-match');history.replaceState(null,'',location.pathname)}}catch(e){}
+{const _go=go; go=function(id){if(id==='s-map')cmScreen(); _go(id); if(id==='s-onb')applyPrefill(); if(id==='s-map'){$('tabbar').classList.add('show');document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.go==='s-match'));renderMap()} if(id==='s-match')cmEntry(); if(['s-tarot','s-soul','s-match','s-me'].includes(id))setTimeout(cmJoinPrompt,400)};}
 try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$/.test(q)){store.set('soulcode.pendingMap',q);history.replaceState(null,'',location.pathname)}}catch(e){}
 {const _pb=renderProBanner; renderProBanner=function(){_pb(); const n=tickets(); if(n>0&&!isPro())$('proBanner').insertAdjacentHTML('beforeend',`<div class="tk-line">🎟️ 1회 이용권 <b>${n}장</b> 보유 · PRO 기능을 한 번씩 열 수 있어요</div>`)};}
 {const pw=$('paywall'); if(pw&&window.soulPay){const pl=pw.querySelector('.plans'); pl&&pl.insertAdjacentHTML('afterend','<button class="again tk-link" onclick="closePaywall();openOffer(\'PRO 대신 필요한 것만 한 번\',null)">한 번만 필요해요? 1회 이용권 990원 →</button>')}}
@@ -1679,5 +1688,5 @@ try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$
 
 /* ================= BOOT ================= */
 applySkin(store.get('soulcode.skin'));
-if(profile && MBTI[profile.mbti]){ logVisit(); go('s-tarot'); }
+if(profile && MBTI[profile.mbti]){ logVisit(); const t=store.get('soulcode.afterOnb'); if(t){store.del('soulcode.afterOnb');go(t)} else go('s-tarot'); }
 initAI(); initCloud();
