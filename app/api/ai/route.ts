@@ -28,12 +28,11 @@ export async function POST(req: Request) {
   // 무료 사용자는 하루 3회 — DB 함수로 원자적으로 차감 (동시 요청에도 초과 불가)
   const ent = await getEntitlement(user.id);
   const day = kstToday();
-  if (!ent.pro) {
-    const { data: count, error } = await admin().rpc('increment_ai_usage', { p_user: user.id, p_day: day, p_limit: FREE_AI_PER_DAY });
-    if (error) return json({ code: 'upstream_error' }, 500);
-    if (count === null) return json({ code: 'quota_exceeded' }, 402);
-  }
-  const refund = async () => { if (!ent.pro) await admin().rpc('refund_ai_usage', { p_user: user.id, p_day: day }); };
+  // PRO도 사용 기록은 남김 (환불 시 사용 여부 확인용) — 한도만 사실상 무제한
+  const { data: count, error } = await admin().rpc('increment_ai_usage', { p_user: user.id, p_day: day, p_limit: ent.pro ? 1_000_000 : FREE_AI_PER_DAY });
+  if (error) return json({ code: 'upstream_error' }, 500);
+  if (count === null) return json({ code: 'quota_exceeded' }, 402);
+  const refund = async () => { await admin().rpc('refund_ai_usage', { p_user: user.id, p_day: day }); };
 
   const client = new Anthropic({ apiKey: process.env.ANTHROPIC_API_KEY });
   const enc = new TextEncoder();

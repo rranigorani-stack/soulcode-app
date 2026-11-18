@@ -17,8 +17,8 @@ declare global {
   interface Window {
     Manseryeok: typeof Manseryeok;
     claude?: { use: (name: string) => Promise<unknown> };
-    soulConfig: { devTestPro: boolean; serverPro: boolean };
-    soulAuth?: { signIn: (p: Provider) => void; emailPrompt: () => void; signOut: () => void; label: () => string };
+    soulConfig: { devTestPro: boolean; serverPro: boolean; providers: Provider[] };
+    soulAuth?: { signIn: (p: Provider) => void; emailPrompt: () => void; signOut: () => void; label: () => string; deleteAccount: () => Promise<boolean> };
     soulPay?: { start: (plan: 'month' | 'year') => void };
     toast?: (t: string) => void;
     go?: (id: string) => void;
@@ -30,6 +30,8 @@ const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const SUPABASE_ANON = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 const TOSS_CLIENT_KEY = process.env.NEXT_PUBLIC_TOSS_CLIENT_KEY || '';
 const DEV_TEST_PRO = process.env.NEXT_PUBLIC_DEV_TEST_PRO === 'true';
+/** 켜 둔 소셜 로그인만 버튼으로 노출 (예: "kakao,google") */
+const PROVIDERS = (process.env.NEXT_PUBLIC_AUTH_PROVIDERS || 'kakao').split(',').map((x) => x.trim()).filter(Boolean) as Provider[];
 
 const kstToday = () => new Date(Date.now() + 9 * 3600e3).toISOString().slice(0, 10);
 const setLocal = (k: string, v: unknown) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch { /* 저장 불가 환경 */ } };
@@ -161,7 +163,7 @@ export async function startSoulcode() {
   if (window.__soulBooted) return;
   window.__soulBooted = true;
   window.Manseryeok = Manseryeok;
-  window.soulConfig = { devTestPro: DEV_TEST_PRO && !TOSS_CLIENT_KEY, serverPro: false };
+  window.soulConfig = { devTestPro: DEV_TEST_PRO && !TOSS_CLIENT_KEY, serverPro: false, providers: PROVIDERS };
 
   let session: Session | null = null;
   if (SUPABASE_URL && SUPABASE_ANON) {
@@ -178,6 +180,16 @@ export async function startSoulcode() {
       emailPrompt: emailModal,
       signOut: async () => { await supabase!.auth.signOut(); },
       label: () => providerName[session?.user.app_metadata?.provider || 'email'] || '내 계정',
+      deleteAccount: async () => {
+        const token = await accessToken();
+        if (!token) return false;
+        const r = await fetch('/api/account/delete', { method: 'POST', headers: { authorization: `Bearer ${token}` } });
+        if (!r.ok) return false;
+        // 이 기기에 남은 기록도 정리 (스킨 등 단순 설정 포함)
+        try { Object.keys(localStorage).filter((k) => k.startsWith('soulcode.') || k.startsWith('sb-')).forEach((k) => localStorage.removeItem(k)); } catch { /* noop */ }
+        await supabase!.auth.signOut().catch(() => {});
+        return true;
+      },
     };
 
     if (session) {

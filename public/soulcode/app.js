@@ -1250,6 +1250,25 @@ async function initCloud(){
   }catch(e){cloud.status='off'}
   renderSync();
 }
+const LOGIN_BTN={kakao:['kakao','카카오로 시작하기'],apple:['apple',' Apple로 계속하기'],google:['google','Google로 계속하기']};
+function loginButtons(){
+  const list=(window.soulConfig&&window.soulConfig.providers)||['kakao'];
+  return list.filter(p=>LOGIN_BTN[p]).map(p=>`<button class="login ${LOGIN_BTN[p][0]}" onclick="loginWith('${p}')">${LOGIN_BTN[p][1]}</button>`).join('')+`<button class="login email" onclick="loginWith('email')">✉️ 이메일로 로그인 링크 받기</button>`;
+}
+function ageOf(birth){if(!birth)return null;const b=new Date(birth+'T00:00:00'),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;return a}
+function loginWith(p){
+  const a=profile?ageOf(profile.birth):null;
+  if(a!==null&&a<14){toast('만 14세 이상부터 로그인할 수 있어요 🙏');return}
+  if(p==='email')soulAuth.emailPrompt();else soulAuth.signIn(p);
+}
+async function deleteAccount(){
+  if(!window.soulAuth)return;
+  if(!confirm('정말 탈퇴할까요?\n\n계정과 동기화된 기록(출석·도감·카드 기록)이 바로 삭제되고, 남은 PRO 이용권도 사라져요. 되돌릴 수 없어요.\n(결제 기록만 법에 따라 5년간 보관돼요)'))return;
+  toast('탈퇴 처리 중...');
+  const ok=await soulAuth.deleteAccount();
+  if(ok){alert('탈퇴가 완료됐어요. 그동안 고마웠어요 💜');location.href='/'}
+  else toast('탈퇴에 실패했어요. 잠시 후 다시 시도하거나 문의해주세요');
+}
 function renderSync(){
   const box=$('syncBox'); if(!box) return;
   const t=cloud.last?`${pad2(cloud.last.getHours())}:${pad2(cloud.last.getMinutes())}`:'';
@@ -1258,7 +1277,7 @@ function renderSync(){
     init:['#ddd','연결 확인 중...'],
     slow:['var(--yellow)','클라우드 응답이 늦어요. 이 기기에는 계속 저장돼요.'],
     readonly:['var(--orange)','보기 전용 권한이라 이 기기에만 저장돼요.'],
-    off:['#ddd',window.soulAuth?`이 기기에만 저장 중이에요. 로그인하면 기록이 저장되고 AI 해석도 열려요.<div class="login-btns"><button class="login kakao" onclick="soulAuth.signIn('kakao')">카카오로 시작하기</button><button class="login apple" onclick="soulAuth.signIn('apple')"> Apple로 계속하기</button><button class="login google" onclick="soulAuth.signIn('google')">Google로 계속하기</button><button class="login email" onclick="soulAuth.emailPrompt()">✉️ 이메일로 로그인 링크 받기</button></div>`:(window.soulConfig?'이 기기에만 저장돼요.<br><small class="muted">로그인 기능은 곧 열려요</small>':'이 브라우저에만 저장돼요.<br><small class="muted">claude.ai에 로그인한 상태로 열면 자동으로 동기화돼요</small>')],
+    off:['#ddd',window.soulAuth?`이 기기에만 저장 중이에요. 로그인하면 기록이 저장되고 AI 해석도 열려요.<div class="login-btns">${loginButtons()}</div><p class="consent-note">로그인하면 <a href="/terms" target="_blank">이용약관</a>과 <a href="/privacy" target="_blank">개인정보처리방침</a>에 동의하고,<br>만 14세 이상임을 확인한 것으로 봐요.</p>`:(window.soulConfig?'이 기기에만 저장돼요.<br><small class="muted">로그인 기능은 곧 열려요</small>':'이 브라우저에만 저장돼요.<br><small class="muted">claude.ai에 로그인한 상태로 열면 자동으로 동기화돼요</small>')],
   }[cloud.status]||['#ddd',''];
   box.innerHTML=`<span class="dot" style="background:${S[0]}"></span><span>${S[1]}</span>`;
 }
@@ -1271,6 +1290,14 @@ function renderSync(){
     pw.querySelector('.test-note').innerHTML='결제는 <b>토스페이먼츠</b>로 안전하게 처리돼요.<br>이용권은 결제일부터 30일 / 365일 유지되고 <b>자동 갱신되지 않아요.</b>';
     pw.querySelector('.plans .plan[data-p=month] small:last-child').textContent='30일 이용권';
     pw.querySelector('.plans .plan[data-p=year] small:last-child').textContent='365일 이용권';
+    pw.querySelector('.test-note').insertAdjacentHTML('afterend','<p class="consent-note">결제하면 <a href="/terms" target="_blank">이용약관</a>·<a href="/refund" target="_blank">환불정책</a>에 동의한 것으로 봐요.<br>디지털 콘텐츠 특성상 <b>PRO 혜택을 쓰기 시작하면 청약철회가 제한</b>될 수 있어요.</p>');
+  }
+  if(window.soulConfig){
+    // 정식 버전: 프로토타입용 요소 정리 + 약관 링크·탈퇴 메뉴
+    document.querySelectorAll('button.again[onclick="redraw()"]').forEach(b=>b.remove());
+    const me=$('s-me'), dis=me.querySelector('.disclaimer');
+    [...me.querySelectorAll('.sec-t')].filter(h=>h.textContent.includes('정식 버전')).forEach(h=>{h.textContent='🚀 곧 추가될 기능';const nx=h.nextElementSibling;if(nx)nx.innerHTML=nx.innerHTML.replace(/<br>📲[^<]*/,'')});
+    dis.insertAdjacentHTML('afterend',`<div class="legal-links"><a href="/terms">이용약관</a>·<a href="/privacy"><b>개인정보처리방침</b></a>·<a href="/refund">환불정책</a>${window.soulConfig.serverPro?'<br><button onclick="deleteAccount()">회원 탈퇴</button>':''}</div>`);
   }
 })();
 
