@@ -44,6 +44,14 @@ window.SOUL_CONTENT = {
       { name: 'Responsibility Day', desc: 'Energy that shapes you comes in. Keep your promises and you will be recognized. Might feel a bit tiring.' },
       { name: 'Recharge Day', desc: 'Supporting energy comes in. Perfect for studying, resting and listening to advice.' },
     ],
+    TG_THEME: {
+      비겁: { name: 'Allies & Rivals', d: 'Your bonds with friends and coworkers grow stronger. Great synergy together, just ease off comparing and competing!', love: 'A comfy, friend-like connection comes in. Hello, friend-of-a-friend setup', work: 'You shine in team projects', money: 'Money leaks easily. Split the bill 💸', body: 'Overflowing energy. Great time to start working out' },
+      식상: { name: 'Expression & Creation', d: 'A great flow for talking, making and showing. Your charm spills outward.', love: 'Charm season! Make the first move and it lands', work: 'Strong at ideas, presentations and content', money: 'Your talent can turn into money. Jot down side-hustle ideas', body: 'Talking a lot? Take care of your throat 🗣️' },
+      재성: { name: 'Results & Rewards', d: 'Your effort turns into results you can hold. Your practical sense shines.', love: 'Lots of exciting meetups and dates', work: 'Results and grades become visible', money: 'Money moves fast! It goes out as fast as it comes in, so track it', body: 'Busy enough to skip meals. Watch out' },
+      관성: { name: 'Duty & Recognition', d: 'More to do, but pull it off and you\'ll be clearly recognized.', love: 'Good for getting serious. Watch the push-and-pull fatigue', work: 'Luck with exams, reviews and promotions. Just hit your deadlines', money: 'Stable, but hold off on big spending', body: 'Watch stress fatigue and get your sleep' },
+      인성: { name: 'Learning & Recharge', d: 'Study, rest and advice sink in well. Depth beats speed.', love: 'You\'re drawn to people who understand you', work: 'Perfect for certificates, study and planning', money: 'Easier to save than spend', body: 'Top recovery mode. A good rest fixes everything' },
+    },
+    TTI_YEAR: { yukhap: 'This year\'s energy holds hands with your sign! Helpers and chances come your way.', samhap: 'Same-team energy. Luck opens up in groups and collabs.', same: 'It\'s your own sign\'s year. You stand out more, but overdoing it tires you fast.', none: 'A smooth flow. Go at your own pace.', hae: 'Small misunderstandings pop up easily. Mind your words a little more.', wonjin: 'Hurt feelings come up for no reason. Try a routine to clear your mind.', chung: 'A year of change and movement. Big shifts like moving, transferring or a new job are likely.' },
     SKINS: ['Hologram', 'Starry Night', 'Strawberry Milk', 'Y2K Chrome', 'Matcha Latte'],
     BR_REL: {
       yukhap: ['Six Harmony', 'Your spouse palaces form a Six Harmony! A magnet couple that pulls each other in.'],
@@ -164,6 +172,14 @@ window.SOUL_CONTENT = {
       { name: '責任デー', desc: '自分を磨く気が入る日。約束を守ると認められる。少し疲れやすいかも。' },
       { name: '充電デー', desc: '自分を助ける気が入る日。勉強・休息・アドバイスを聞くのに最適。' },
     ],
+    TG_THEME: {
+      비겁: { name: '味方&ライバル', d: '友達や同僚とのつながりが強まる。一緒にやると相乗効果、ただ比較と競争心はちょっと手放して!', love: '友達みたいな気楽な縁が来そう。知り合いの紹介に期待', work: 'チーム作業・協力で存在感UP', money: 'お金が漏れやすい。割り勘必須 💸', body: 'エネルギーあふれる。運動を始めるのにいい時期' },
+      식상: { name: '表現&創作', d: '話す・作る・見せるのにいい流れ。あなたの魅力が外へあふれ出る。', love: '魅力発揮シーズン!先に近づくと反応◎', work: 'アイデア・発表・コンテンツに強い', money: '才能がお金になる流れ。副業アイデアをメモ', body: 'おしゃべりが増えるぶん喉のケアを 🗣️' },
+      재성: { name: '成果&実り', d: '頑張った分だけ結果が手に入る。現実感覚が光る時期。', love: 'ときめく出会いやデートイベントが多め', work: '成果や成績が目に見える', money: 'お金の流れが活発!入る分出ていくので記録必須', body: '忙しくて食事を抜きがち。注意' },
+      관성: { name: '責任&評価', d: 'やることは増えるけど、やり遂げれば確実に認められる。', love: '真剣な関係に発展しやすい。でも駆け引き疲れに注意', work: '合格・評価・昇進運。締め切りさえ守ればOK', money: '安定しているけど大きな出費は保留', body: 'ストレス疲れに注意、睡眠をしっかり' },
+      인성: { name: '学び&充電', d: '勉強・休息・アドバイスがよく入る時期。スピードより深さが勝つ。', love: '自分をわかってくれる人に心が向く', work: '資格・勉強・企画に最適', money: '使うより貯めやすい時期', body: '回復力最高。ゆっくり休めば全部回復' },
+    },
+    TTI_YEAR: { yukhap: '今年の気とあなたの干支が手を取る年!助けてくれる人とチャンスが来やすい。', samhap: '同じチームの気。集まりや協力で運が開ける。', same: 'あなたの干支の年。存在感は大きくなるけど、無理すると疲れやすい。', none: 'おだやかな流れ。自分のペースでいけばOK。', hae: '小さな誤解が生まれやすい。ひとこと気をつけて。', wonjin: 'なんとなく寂しくなることが起きやすい。心を整える習慣がおすすめ。', chung: '変化と移動の多い年。引っ越し・転校・転職など大きな変化が来やすい。' },
     SKINS: ['ホログラム', '星空', 'いちごミルク', 'Y2Kクローム', '抹茶ラテ'],
     BR_REL: {
       yukhap: ['六合', '配偶者の座どうしが六合!お互い引き寄せ合う磁石カップル。'],
@@ -254,6 +270,8 @@ window.applyContentI18n = function () {
   try { Object.keys(C.MBTI).forEach((k) => Object.assign(MBTI[k], C.MBTI[k])); } catch (e) { /* 아직 정의 전 */ }
   try { Object.assign(SYNERGY, C.SYNERGY); } catch (e) { /* 아직 정의 전 */ }
   try { C.RELATION.forEach((e, i) => Object.assign(RELATION[i], e)); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.keys(C.TG_THEME).forEach((k) => Object.assign(TG_THEME[k], C.TG_THEME[k])); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.assign(TTI_YEAR, C.TTI_YEAR); } catch (e) { /* 아직 정의 전 */ }
   try { C.SKINS.forEach((n, i) => { SKINS[i].n = n; }); } catch (e) { /* 아직 정의 전 */ }
   try { Object.keys(C.BR_REL).forEach((k) => { BR_REL[k].n = C.BR_REL[k][0]; BR_REL[k].d = C.BR_REL[k][1]; }); } catch (e) { /* 아직 정의 전 */ }
   try { Object.keys(C.TEN_INFO).forEach((k) => { TEN_INFO[k].d = C.TEN_INFO[k]; }); } catch (e) { /* 아직 정의 전 */ }

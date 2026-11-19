@@ -209,8 +209,8 @@ function mountBirthPicker(dateEl,onChange){
   tg.innerHTML='<button type="button" class="chip sel" data-c="solar">☀️ 양력</button><button type="button" class="chip" data-c="lunar">🌙 음력</button>';
   dateEl.before(tg);
   const box=document.createElement('div'); box.style.display='none';
-  box.innerHTML=`<div style="display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px"><select class="field ly" aria-label="음력 연도"><option value="">년</option>${Array.from({length:86},(_,i)=>2025-i).map(v=>`<option value="${v}">${v}년</option>`).join('')}</select><select class="field lm" aria-label="음력 월"><option value="">월</option>${Array.from({length:12},(_,i)=>`<option value="${i+1}">${i+1}월</option>`).join('')}</select><select class="field ld" aria-label="음력 일"><option value="">일</option>${Array.from({length:30},(_,i)=>`<option value="${i+1}">${i+1}일</option>`).join('')}</select></div>
-    <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button type="button" class="chip ll">윤달이에요</button><span class="lc" style="font-size:14px"></span></div>`;
+  box.innerHTML=`<div style="display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px"><select class="field ly" aria-label="음력 연도"><option value="">${TL('년','Year','年')}</option>${Array.from({length:86},(_,i)=>2025-i).map(v=>`<option value="${v}">${TL(v+'년',v,v+'年')}</option>`).join('')}</select><select class="field lm" aria-label="음력 월"><option value="">${TL('월','Month','月')}</option>${Array.from({length:12},(_,i)=>`<option value="${i+1}">${TL((i+1)+'월',i+1,(i+1)+'月')}</option>`).join('')}</select><select class="field ld" aria-label="음력 일"><option value="">${TL('일','Day','日')}</option>${Array.from({length:30},(_,i)=>`<option value="${i+1}">${TL((i+1)+'일',i+1,(i+1)+'日')}</option>`).join('')}</select></div>
+    <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button type="button" class="chip ll">${TL('윤달이에요','Leap month','閏月です')}</button><span class="lc" style="font-size:14px"></span></div>`;
   dateEl.after(box);
   const ly=box.querySelector('.ly'),lm=box.querySelector('.lm'),ld=box.querySelector('.ld'),ll=box.querySelector('.ll'),lc=box.querySelector('.lc');
   const st={lunar:false,leap:false};
@@ -218,8 +218,8 @@ function mountBirthPicker(dateEl,onChange){
     if(!st.lunar) return;
     const y=+ly.value,m=+lm.value,d=+ld.value;
     if(!y||!m||!d){dateEl.value='';lc.textContent='';onChange();return}
-    try{const s=Manseryeok.lunarToSolar(y,m,d,st.leap);dateEl.value=`${s.year}-${pad2(s.month)}-${pad2(s.day)}`;lc.innerHTML=`= 양력 <b>${s.year}.${s.month}.${s.day}</b> ✅`}
-    catch(e){dateEl.value='';lc.innerHTML=`<b style="color:var(--fire)">없는 날짜예요${st.leap?' (그해엔 이 윤달이 없어요)':''}</b>`}
+    try{const s=Manseryeok.lunarToSolar(y,m,d,st.leap);dateEl.value=`${s.year}-${pad2(s.month)}-${pad2(s.day)}`;lc.innerHTML=`= ${TL('양력','Solar','新暦')} <b>${s.year}.${s.month}.${s.day}</b> ✅`}
+    catch(e){dateEl.value='';lc.innerHTML=`<b style="color:var(--fire)">${TL('없는 날짜예요','That date doesn\'t exist','存在しない日付です')}${st.leap?TL(' (그해엔 이 윤달이 없어요)',' (no such leap month that year)',' (その年にこの閏月はありません)'):''}</b>`}
     onChange();
   };
   [ly,lm,ld].forEach(s=>s.onchange=conv);
@@ -490,22 +490,22 @@ function redraw(){store.del('soulcode.draw.'+todayKey());draw=null;showPicker();
 /* ================= SHARE ================= */
 function shareText(){
   const sn=soulName();
-  let s=`🔮 SOULCODE | ${profile.nick}님의 소울타입\n${sn.emoji} ${sn.title} “${sn.sub}”`;
-  if(draw&&draw.lucky){const c=TAROT[draw.card];s+=`\n\n🃏 오늘의 카드: ${c[0]} (${draw.rev?'역':'정'}방향)\n${draw.rev?c[4]:c[3]}\n📊 운세 지수 ${draw.lucky.total} · 럭키컬러 ${draw.lucky.color}`}
-  return s+'\n\n#소울코드 #사주MBTI #오늘의타로';
+  let s=TL(`🔮 SOULCODE | ${profile.nick}님의 소울타입`,`🔮 SOULCODE | ${profile.nick}'s soul type`,`🔮 SOULCODE | ${profile.nick}さんのソウルタイプ`)+`\n${sn.emoji} ${sn.title} “${sn.sub}”`;
+  if(draw&&draw.lucky){const c=TAROT[draw.card];s+=TL(`\n\n🃏 오늘의 카드: ${c[0]} (${draw.rev?'역':'정'}방향)\n${draw.rev?c[4]:c[3]}\n📊 운세 지수 ${draw.lucky.total} · 럭키컬러 ${draw.lucky.color}`,`\n\n🃏 Today's card: ${c[0]} (${draw.rev?'reversed':'upright'})\n${draw.rev?c[4]:c[3]}\n📊 Luck score ${draw.lucky.total} · lucky color ${draw.lucky.color}`,`\n\n🃏 今日のカード: ${c[0]}(${draw.rev?'逆':'正'}位置)\n${draw.rev?c[4]:c[3]}\n📊 運勢スコア ${draw.lucky.total} · ラッキーカラー ${draw.lucky.color}`)}
+  return s+TL('\n\n#소울코드 #사주MBTI #오늘의타로','\n\n#soulcode #MBTI #tarot','\n\n#ソウルコード #MBTI #タロット');
 }
 function openShare(){
   if(!saju) getSaju();
   const sn=soulName(); const c=draw?TAROT[draw.card]:null;
   $('storyIn').innerHTML=`<div class="logo-s holo-text">SOULCODE</div>
-    <div><div class="big-e">${sn.emoji}</div><div class="muted" style="font-size:12px;margin:6px 0 4px">${esc(profile.nick)}님의 소울타입</div><div class="st h-display">${sn.title}</div><div class="holo-text" style="font-weight:700;font-size:14px;margin-top:4px">“${sn.sub}”</div></div>
-    ${c&&draw.lucky?`<div class="card-l">🃏 오늘의 카드 <b>${c[0]}</b> ${draw.rev?'(역)':''}<br><span class="muted">${draw.rev?c[4]:c[3]}</span><br>📊 운세 지수 <b>${draw.lucky.total}</b></div>`:`<div class="card-l muted">오늘의 타로는 아직 안 뽑았어요</div>`}
-    <div class="muted" style="font-size:11px">#소울코드 #사주MBTI</div>`;
+    <div><div class="big-e">${sn.emoji}</div><div class="muted" style="font-size:12px;margin:6px 0 4px">${TL(esc(profile.nick)+'님의 소울타입',esc(profile.nick)+'\'s soul type',esc(profile.nick)+'さんのソウルタイプ')}</div><div class="st h-display">${sn.title}</div><div class="holo-text" style="font-weight:700;font-size:14px;margin-top:4px">“${sn.sub}”</div></div>
+    ${c&&draw.lucky?`<div class="card-l">${TL('🃏 오늘의 카드','🃏 Today\'s card','🃏 今日のカード')} <b>${c[0]}</b> ${draw.rev?TL('(역)','(rev.)','(逆)'):''}<br><span class="muted">${draw.rev?c[4]:c[3]}</span><br>${TL('📊 운세 지수','📊 Luck score','📊 運勢スコア')} <b>${draw.lucky.total}</b></div>`:`<div class="card-l muted">${TL('오늘의 타로는 아직 안 뽑았어요','You haven\'t drawn today\'s tarot yet','今日のタロットはまだ引いていません')}</div>`}
+    <div class="muted" style="font-size:11px">${TL('#소울코드 #사주MBTI','#soulcode #MBTI','#ソウルコード #MBTI')}</div>`;
   $('share').classList.add('show');
 }
 function closeShare(){$('share').classList.remove('show')}
 function copyShare(){
-  navigator.clipboard.writeText(shareText()).then(()=>toast('복사 완료! 스토리에 붙여넣어 보세요 📋')).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));
+  navigator.clipboard.writeText(shareText()).then(()=>toast(TL('복사 완료! 스토리에 붙여넣어 보세요 📋','Copied! Paste it into your story 📋','コピー完了!ストーリーに貼り付けてみて 📋'))).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));
 }
 $('share').onclick=e=>{if(e.target.id==='share')closeShare()};
 
@@ -1078,6 +1078,7 @@ const TG_THEME={
   인성:{name:'배움 & 충전',emoji:'🔋',d:'공부·휴식·조언이 잘 들어오는 시기. 속도보다 깊이가 이겨요.',love:'나를 이해해주는 사람에게 마음이 가요',work:'자격증·공부·기획에 최적',money:'쓰기보다 모으기 쉬운 시기',body:'회복력 최고. 푹 쉬면 다 풀려요'},
 };
 const TTI_YEAR={yukhap:'올해 기운과 내 띠가 손잡는 해! 귀인과 기회가 잘 들어와요.',samhap:'같은 팀 기운이에요. 모임·협업에서 운이 트여요.',same:'내 띠의 해예요. 존재감은 커지지만 무리하면 쉽게 지쳐요.',none:'무난한 흐름. 내 페이스대로 가면 OK.',hae:'자잘한 오해가 생기기 쉬워요. 말 한마디 더 신경 쓰기.',wonjin:'괜히 서운한 일이 생기기 쉬워요. 마음 정리 루틴 추천.',chung:'변화와 이동이 많은 해. 이사·전학·이직 같은 큰 변화가 들어오기 쉬워요.'};
+const MONS=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'], MN=m=>TL(m+'월',MONS[m-1],m+'月'), YN=y=>TL(y+'년',String(y),y+'年');
 const clampS=v=>Math.max(35,Math.min(98,Math.round(v)));
 function luckOf(p){
   const tg=tenGod(saju.dayStem,p.s), g=TG_GROUP[tg], rel=brRel(saju.pillars.day.b,p.b);
@@ -1094,13 +1095,13 @@ const yearPillar=y=>calcSaju(y,7,1,'').pillars.year;
 const reportYear=()=>{const n=new Date();return n.getMonth()>=9?n.getFullYear()+1:n.getFullYear()};
 const rp={mode:'month',off:0};
 function openReport(mode){rp.mode=mode;rp.off=0;go('s-report')}
-const catBars=c=>`<div class="bars">${[['💘 연애',c.love,'var(--pink)'],['💼 일·공부',c.work,'var(--lav)'],['💸 금전',c.money,'var(--green)'],['🔋 컨디션',c.body,'var(--blue)']].map(([l,v,col])=>`<div class="row"><span class="nm" style="width:88px">${l}</span><div class="track"><div class="fill" data-w="${v}" style="background:${col}"></div></div><span class="ct">${v}</span></div>`).join('')}</div>`;
-const themeGrid=th=>`<div class="grid2"><div class="mini"><div class="k">💘 연애</div><div class="v">${th.love}</div></div><div class="mini"><div class="k">💼 일·공부</div><div class="v">${th.work}</div></div><div class="mini"><div class="k">💸 금전</div><div class="v">${th.money}</div></div><div class="mini"><div class="k">🔋 컨디션</div><div class="v">${th.body}</div></div></div>`;
+const catBars=c=>`<div class="bars">${[['💘 '+SCORE_CATS[0][1],c.love,'var(--pink)'],['💼 '+SCORE_CATS[1][1],c.work,'var(--lav)'],['💸 '+SCORE_CATS[2][1],c.money,'var(--green)'],['🔋 '+SCORE_CATS[3][1],c.body,'var(--blue)']].map(([l,v,col])=>`<div class="row"><span class="nm" style="width:88px">${l}</span><div class="track"><div class="fill" data-w="${v}" style="background:${col}"></div></div><span class="ct">${v}</span></div>`).join('')}</div>`;
+const themeGrid=th=>`<div class="grid2"><div class="mini"><div class="k">💘 ${SCORE_CATS[0][1]}</div><div class="v">${th.love}</div></div><div class="mini"><div class="k">💼 ${SCORE_CATS[1][1]}</div><div class="v">${th.work}</div></div><div class="mini"><div class="k">💸 ${SCORE_CATS[2][1]}</div><div class="v">${th.money}</div></div><div class="mini"><div class="k">🔋 ${SCORE_CATS[3][1]}</div><div class="v">${th.body}</div></div></div>`;
 function renderReport(){
   if(!profile) return; getSaju();
   const n=new Date(), Y=reportYear();
   const m1=new Date(n.getFullYear(),n.getMonth(),1), m2=new Date(n.getFullYear(),n.getMonth()+1,1);
-  const segs=[['month',0,`📅 ${m1.getMonth()+1}월`],['month',1,`📅 ${m2.getMonth()+1}월`],['year',0,`🔮 ${Y}년`]];
+  const segs=[['month',0,`📅 ${MN(m1.getMonth()+1)}`],['month',1,`📅 ${MN(m2.getMonth()+1)}`],['year',0,`🔮 ${YN(Y)}`]];
   $('rpSeg').innerHTML=segs.map(([m,o,l])=>`<button class="chip ${rp.mode===m&&rp.off===o?'sel':''}" data-m="${m}" data-o="${o}">${l}</button>`).join('');
   $('rpSeg').querySelectorAll('.chip').forEach(b=>b.onclick=()=>{rp.mode=b.dataset.m;rp.off=+b.dataset.o;renderReport();$('s-report').scrollTo({top:0})});
   if(rp.mode==='month') renderMonthReport(rp.off?m2:m1); else renderYearReport(Y);
@@ -1110,8 +1111,8 @@ function renderReport(){
 }
 function renderMonthReport(md){
   const y=md.getFullYear(), m=md.getMonth()+1, mp=monthPillar(y,m), L=luckOf(mp), th=TG_THEME[L.g];
-  $('rpTitle').textContent=`${m}월 운세 리포트`;
-  $('rpSub').textContent=`${STEMS[mp.s]}${BRANCHES[mp.b]}월 · ${esc(profile.nick)}님의 ${STEMS[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko} 기준`;
+  $('rpTitle').textContent=TL(`${m}월 운세 리포트`,`${MONS[m-1]} fortune report`,`${m}月の運勢レポート`);
+  $('rpSub').textContent=TL(`${STEMS[mp.s]}${BRANCHES[mp.b]}월 · ${esc(profile.nick)}님의 ${STEMS[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko} 기준`,`${STEMS[mp.s]}${BRANCHES[mp.b]} month · for ${profile.nick}'s ${STEMS[saju.dayStem]} ${EL[STEM_EL[saju.dayStem]].ko}`,`${STEMS[mp.s]}${BRANCHES[mp.b]}月 · ${profile.nick}さんの${STEMS[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko}基準`);
   const days=new Date(y,m,0).getDate(), first=new Date(y,m-1,1).getDay(), now=new Date();
   const list=[]; for(let d=1;d<=days;d++){const p=dayPillar(y,m,d);list.push({d,p,L:luckOf(p)})}
   const good=[...list].sort((a,b)=>b.L.score-a.L.score).slice(0,3), bad=[...list].sort((a,b)=>a.L.score-b.L.score).slice(0,2);
@@ -1119,57 +1120,57 @@ function renderMonthReport(md){
   const cells=Array(first).fill('<div class="blank"></div>').concat(list.map(x=>{
     const cls=goodSet.has(x.d)?'good':badSet.has(x.d)?'bad':'', isT=(now.getFullYear()===y&&now.getMonth()+1===m&&now.getDate()===x.d);
     return `<button class="${cls} ${isT?'today':''}" data-d="${x.d}">${x.d}<small>${goodSet.has(x.d)?'🍀':badSet.has(x.d)?'⚡':x.L.dohwa?'🌸':''}</small></button>`}));
-  const dl=x=>`${m}/${x.d} <small class="muted">(${STEMS[x.p.s]}${BRANCHES[x.p.b]}일 · ${x.L.tg})</small>`;
+  const dl=x=>`${m}/${x.d} <small class="muted">(${STEMS[x.p.s]}${BRANCHES[x.p.b]}${TL('일','','日')} · ${tn(x.L.tg)})</small>`;
   $('rpBody').innerHTML=`
     <div class="soul-hero"><div class="soul-hero-in" style="padding:22px 18px">
       <div class="soul-emoji" style="width:96px;height:96px;font-size:48px">${th.emoji}</div>
-      <div class="soul-title h-display" style="font-size:26px">${th.name}의 달</div>
-      <div class="soul-sub">이달의 기운: ${L.tg} · ${BR_REL[L.rel].n} ${BR_REL[L.rel].i}</div>
+      <div class="soul-title h-display" style="font-size:26px">${TL(th.name+'의 달','A month of '+th.name,th.name+'の月')}</div>
+      <div class="soul-sub">${TL('이달의 기운','This month','今月の気')}: ${tn(L.tg)} · ${BR_REL[L.rel].n} ${BR_REL[L.rel].i}</div>
       <p style="position:relative;margin-top:14px;font-size:14.5px;line-height:1.7">${th.d}</p>
     </div></div>
-    <div class="sec-t">📊 분야별 지수 · 종합 ${L.score}점</div>
+    <div class="sec-t">${TL(`📊 분야별 지수 · 종합 ${L.score}점`,`📊 Scores by area · overall ${L.score}`,`📊 分野別スコア · 総合${L.score}点`)}</div>
     <div class="panel">${catBars(L.cat)}</div>
-    <div class="sec-t">🗓️ 날짜별 기운 <span class="muted" style="font-size:13px">(🍀 럭키 · ⚡ 조심 · 🌸 매력 UP)</span></div>
-    <div class="panel"><div class="cal">${['일','월','화','수','목','금','토'].map(w=>`<div class="h">${w}</div>`).join('')}${cells.join('')}</div></div>
-    <div class="grid2" style="margin-top:12px"><div class="mini"><div class="k">🍀 럭키 데이</div><div class="v">${good.map(dl).join('<br>')}</div></div><div class="mini"><div class="k">⚡ 조심 데이</div><div class="v">${bad.map(dl).join('<br>')}</div></div></div>
-    <div class="sec-t">💡 이번 달 분야별 한 줄</div>${themeGrid(th)}
-    <div class="ai-only"><button class="btn pink ai-btn" id="aiRpBtn" onclick="aiReport()">🤖 AI로 이번 달 풀어쓰기</button><div class="ai-box" id="aiRp"></div><p class="ai-quota"></p></div>
-    <p class="disclaimer">KASI 정본 만세력 기준 월운·일진 · 재미로 보는 콘텐츠예요</p>`;
-  $('rpBody').querySelectorAll('.cal button').forEach(b=>b.onclick=()=>{const x=list[+b.dataset.d-1];toast(`${m}/${x.d} ${STEMS[x.p.s]}${BRANCHES[x.p.b]}일 · ${x.L.tg} · ${x.L.score}점${goodSet.has(x.d)?' 🍀':badSet.has(x.d)?' ⚡':''}`)});
+    <div class="sec-t">${TL('🗓️ 날짜별 기운','🗓️ Day by day','🗓️ 日ごとの気')} <span class="muted" style="font-size:13px">${TL('(🍀 럭키 · ⚡ 조심 · 🌸 매력 UP)','(🍀 lucky · ⚡ careful · 🌸 charm UP)','(🍀 ラッキー · ⚡ 注意 · 🌸 魅力UP)')}</span></div>
+    <div class="panel"><div class="cal">${TL(['일','월','화','수','목','금','토'],['S','M','T','W','T','F','S'],['日','月','火','水','木','金','土']).map(w=>`<div class="h">${w}</div>`).join('')}${cells.join('')}</div></div>
+    <div class="grid2" style="margin-top:12px"><div class="mini"><div class="k">${TL('🍀 럭키 데이','🍀 Lucky days','🍀 ラッキーデー')}</div><div class="v">${good.map(dl).join('<br>')}</div></div><div class="mini"><div class="k">${TL('⚡ 조심 데이','⚡ Careful days','⚡ 注意デー')}</div><div class="v">${bad.map(dl).join('<br>')}</div></div></div>
+    <div class="sec-t">${TL('💡 이번 달 분야별 한 줄','💡 One line per area','💡 今月の分野別ひとこと')}</div>${themeGrid(th)}
+    <div class="ai-only"><button class="btn pink ai-btn" id="aiRpBtn" onclick="aiReport()">${TL('🤖 AI로 이번 달 풀어쓰기','🤖 Explain this month with AI','🤖 AIで今月を解説')}</button><div class="ai-box" id="aiRp"></div><p class="ai-quota"></p></div>
+    <p class="disclaimer">${TL('KASI 정본 만세력 기준 월운·일진 · 재미로 보는 콘텐츠예요','Based on KASI calendar data · just for fun','韓国天文研究院の暦データ基準 · お楽しみコンテンツです')}</p>`;
+  $('rpBody').querySelectorAll('.cal button').forEach(b=>b.onclick=()=>{const x=list[+b.dataset.d-1];toast(`${m}/${x.d} ${STEMS[x.p.s]}${BRANCHES[x.p.b]} · ${tn(x.L.tg)} · ${x.L.score}${TL('점','','点')}${goodSet.has(x.d)?' 🍀':badSet.has(x.d)?' ⚡':''}`)});
   rp.data={kind:'month',label:`${y}년 ${m}월`,pillar:`${STEMS[mp.s]}${BRANCHES[mp.b]}월`,L,th,good:good.map(x=>`${m}/${x.d}`),bad:bad.map(x=>`${m}/${x.d}`)};
 }
 function renderYearReport(Y){
   const yp=yearPillar(Y), LY=luckOf(yp), th=TG_THEME[LY.g], ttiRel=BR_REL[brRel(saju.yearBranch,yp.b)];
-  $('rpTitle').textContent=`${Y}년 연간 운세`;
-  $('rpSub').textContent=`${STEMS[yp.s]}${BRANCHES[yp.b]}년 · ${esc(profile.nick)}님의 ${STEMS[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko} 기준`;
+  $('rpTitle').textContent=TL(`${Y}년 연간 운세`,`${Y} yearly fortune`,`${Y}年の年間運勢`);
+  $('rpSub').textContent=TL(`${STEMS[yp.s]}${BRANCHES[yp.b]}년 · ${esc(profile.nick)}님의 ${STEMS[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko} 기준`,`${STEMS[yp.s]}${BRANCHES[yp.b]} year · for ${profile.nick}'s ${STEMS[saju.dayStem]} ${EL[STEM_EL[saju.dayStem]].ko}`,`${STEMS[yp.s]}${BRANCHES[yp.b]}年 · ${profile.nick}さんの${STEMS[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko}基準`);
   const months=[]; for(let m=1;m<=12;m++){const p=monthPillar(Y,m);months.push({m,p,L:luckOf(p)})}
   const srt=[...months].sort((a,b)=>b.L.score-a.L.score), hi=new Set(srt.slice(0,3).map(x=>x.m)), lo=new Set(srt.slice(-2).map(x=>x.m));
   const bestBy=k=>[...months].sort((a,b)=>b.L.cat[k]-a.L.cat[k])[0].m;
   const pro=isPro();
   const detail=months.map(x=>{const t=TG_THEME[x.L.g];const top=Object.entries(x.L.cat).sort((a,b)=>b[1]-a[1])[0][0];
-    return `<div class="mrow"><b>${x.m}월</b><div><span class="muted" style="font-size:12.5px">${STEMS[x.p.s]}${BRANCHES[x.p.b]}월 · ${x.L.tg} · ${x.L.score}점</span><br>${t.emoji} ${t.name} — ${t[top]}</div></div>`}).join('');
+    return `<div class="mrow"><b>${MN(x.m)}</b><div><span class="muted" style="font-size:12.5px">${STEMS[x.p.s]}${BRANCHES[x.p.b]} · ${tn(x.L.tg)} · ${x.L.score}${TL('점','','点')}</span><br>${t.emoji} ${t.name} — ${t[top]}</div></div>`}).join('');
   $('rpBody').innerHTML=`
     <div class="soul-hero"><div class="soul-hero-in" style="padding:22px 18px">
       <div class="soul-emoji" style="width:96px;height:96px;font-size:48px">${th.emoji}</div>
-      <div class="soul-title h-display" style="font-size:26px">${th.name}의 해</div>
-      <div class="soul-sub">${Y}년의 기운: ${LY.tg} · 일지와 ${BR_REL[LY.rel].n}</div>
+      <div class="soul-title h-display" style="font-size:26px">${TL(th.name+'의 해','A year of '+th.name,th.name+'の年')}</div>
+      <div class="soul-sub">${TL(`${Y}년의 기운: ${LY.tg} · 일지와 ${BR_REL[LY.rel].n}`,`${Y} energy: ${tn(LY.tg)} · ${BR_REL[LY.rel].n} with your day branch`,`${Y}年の気: ${tn(LY.tg)} · 日支と${BR_REL[LY.rel].n}`)}</div>
       <p style="position:relative;margin-top:14px;font-size:14.5px;line-height:1.7">${th.d}</p>
     </div></div>
-    <div class="sec-t">🐾 띠로 보면 · ${ANIMALS[saju.yearBranch]}띠 × ${BRANCHES[yp.b]}(${ANIMALS[yp.b]})년</div>
+    <div class="sec-t">${TL(`🐾 띠로 보면 · ${ANIMALS[saju.yearBranch]}띠 × ${BRANCHES[yp.b]}(${ANIMALS[yp.b]})년`,`🐾 By zodiac · ${ZOD_EN[saju.yearBranch]} × year of the ${ZOD_EN[yp.b]}`,`🐾 干支で見ると · ${ZOD_JA[saju.yearBranch]} × ${ZOD_JA[yp.b]}`)}</div>
     <div class="panel line-list"><p>${ttiRel.i} <b>${ttiRel.n}</b> · ${TTI_YEAR[brRel(saju.yearBranch,yp.b)]}</p></div>
-    <div class="sec-t">📈 12개월 흐름</div>
+    <div class="sec-t">${TL('📈 12개월 흐름','📈 12-month flow','📈 12か月の流れ')}</div>
     <div class="panel"><div class="ychart">${months.map(x=>`<div><i class="${hi.has(x.m)?'hi':lo.has(x.m)?'lo':''}" data-h="${Math.round((x.L.score-30)/70*100)}"></i><span>${x.m}</span></div>`).join('')}</div>
-      <p class="muted" style="font-size:12.5px;margin-top:8px"><span style="color:var(--wood)">■</span> 최고의 달 &nbsp; <span style="color:var(--fire)">■</span> 조심할 달</p></div>
+      <p class="muted" style="font-size:12.5px;margin-top:8px"><span style="color:var(--wood)">■</span> ${TL('최고의 달','Best months','最高の月')} &nbsp; <span style="color:var(--fire)">■</span> ${TL('조심할 달','Careful months','注意の月')}</p></div>
     <div class="grid2" style="margin-top:12px">
-      <div class="mini"><div class="k">🚀 최고의 달</div><div class="v">${srt.slice(0,3).map(x=>x.m+'월').join(' · ')}</div></div>
-      <div class="mini"><div class="k">🫧 쉬어갈 달</div><div class="v">${srt.slice(-2).map(x=>x.m+'월').join(' · ')}</div></div>
-      <div class="mini"><div class="k">💘 연애운 피크</div><div class="v">${bestBy('love')}월</div></div>
-      <div class="mini"><div class="k">💸 금전운 피크</div><div class="v">${bestBy('money')}월</div></div>
+      <div class="mini"><div class="k">${TL('🚀 최고의 달','🚀 Best months','🚀 最高の月')}</div><div class="v">${srt.slice(0,3).map(x=>MN(x.m)).join(' · ')}</div></div>
+      <div class="mini"><div class="k">${TL('🫧 쉬어갈 달','🫧 Rest months','🫧 ひと休みの月')}</div><div class="v">${srt.slice(-2).map(x=>MN(x.m)).join(' · ')}</div></div>
+      <div class="mini"><div class="k">${TL('💘 연애운 피크','💘 Love peak','💘 恋愛運ピーク')}</div><div class="v">${MN(bestBy('love'))}</div></div>
+      <div class="mini"><div class="k">${TL('💸 금전운 피크','💸 Money peak','💸 金運ピーク')}</div><div class="v">${MN(bestBy('money'))}</div></div>
     </div>
-    <div class="sec-t">🗓️ 12개월 상세 리포트</div>
+    <div class="sec-t">${TL('🗓️ 12개월 상세 리포트','🗓️ 12-month details','🗓️ 12か月の詳細レポート')}</div>
     <div class="panel lock-card">${pro?'':`<div class="lock-veil">🔒 12개월 상세는 PRO에서 열려요<button class="btn" onclick="openPaywall('연간 12개월 상세 리포트는 PRO 전용이에요')">PRO 구경하기</button></div>`}${detail}</div>
-    <div class="ai-only"><button class="btn pink ai-btn" id="aiRpBtn" onclick="aiReport()">🤖 AI로 ${Y}년 풀어쓰기 ${pro?'':'(PRO)'}</button><div class="ai-box" id="aiRp"></div><p class="ai-quota"></p></div>
-    <p class="disclaimer">KASI 정본 만세력 기준 세운·월운 · 재미로 보는 콘텐츠예요</p>`;
+    <div class="ai-only"><button class="btn pink ai-btn" id="aiRpBtn" onclick="aiReport()">${TL(`🤖 AI로 ${Y}년 풀어쓰기`,`🤖 Explain ${Y} with AI`,`🤖 AIで${Y}年を解説`)} ${pro?'':'(PRO)'}</button><div class="ai-box" id="aiRp"></div><p class="ai-quota"></p></div>
+    <p class="disclaimer">${TL('KASI 정본 만세력 기준 세운·월운 · 재미로 보는 콘텐츠예요','Based on KASI calendar data · just for fun','韓国天文研究院の暦データ基準 · お楽しみコンテンツです')}</p>`;
   rp.data={kind:'year',label:`${Y}년`,pillar:`${STEMS[yp.s]}${BRANCHES[yp.b]}년`,L:LY,th,months:months.map(x=>`${x.m}월 ${STEMS[x.p.s]}${BRANCHES[x.p.b]} ${x.L.tg} ${x.L.score}점`).join(', '),best:srt.slice(0,3).map(x=>x.m+'월').join(', '),worst:srt.slice(-2).map(x=>x.m+'월').join(', '),love:bestBy('love'),money:bestBy('money'),tti:`${ANIMALS[saju.yearBranch]}띠 × ${ANIMALS[yp.b]}해: ${ttiRel.n}`};
 }
 async function aiReport(){
@@ -1274,41 +1275,41 @@ async function initCloud(){
   }catch(e){cloud.status='off'}
   renderSync();
 }
-const LOGIN_BTN={kakao:['kakao','카카오로 시작하기'],apple:['apple',' Apple로 계속하기'],google:['google','Google로 계속하기']};
+const LOGIN_BTN={kakao:['kakao',TL('카카오로 시작하기','Continue with Kakao','Kakaoで始める')],apple:['apple',TL(' Apple로 계속하기',' Continue with Apple',' Appleで続ける')],google:['google',TL('Google로 계속하기','Continue with Google','Googleで続ける')]};
 function loginButtons(){
   const list=(window.soulConfig&&window.soulConfig.providers)||['kakao'];
-  return list.filter(p=>LOGIN_BTN[p]).map(p=>`<button class="login ${LOGIN_BTN[p][0]}" onclick="loginWith('${p}')">${LOGIN_BTN[p][1]}</button>`).join('')+((window.soulConfig&&window.soulConfig.emailLogin)?`<button class="login email" onclick="loginWith('email')">✉️ 이메일로 로그인 링크 받기</button>`:'');
+  return list.filter(p=>LOGIN_BTN[p]).map(p=>`<button class="login ${LOGIN_BTN[p][0]}" onclick="loginWith('${p}')">${LOGIN_BTN[p][1]}</button>`).join('')+((window.soulConfig&&window.soulConfig.emailLogin)?`<button class="login email" onclick="loginWith('email')">${TL('✉️ 이메일로 로그인 링크 받기','✉️ Get a login link by email','✉️ メールでログインリンクを受け取る')}</button>`:'');
 }
 function ageOf(birth){if(!birth)return null;const b=new Date(birth+'T00:00:00'),n=new Date();let a=n.getFullYear()-b.getFullYear();if(n.getMonth()<b.getMonth()||(n.getMonth()===b.getMonth()&&n.getDate()<b.getDate()))a--;return a}
 function loginWith(p){
   const a=profile?ageOf(profile.birth):null;
-  if(a!==null&&a<14){toast('만 14세 이상부터 로그인할 수 있어요 🙏');return}
+  if(a!==null&&a<14){toast(TL('만 14세 이상부터 로그인할 수 있어요 🙏','You must be 14 or older to log in 🙏','ログインは14歳以上から 🙏'));return}
   if(p==='email')soulAuth.emailPrompt();else soulAuth.signIn(p);
 }
 async function deleteAccount(){
   if(!window.soulAuth)return;
-  if(!confirm('정말 탈퇴할까요?\n\n계정과 동기화된 기록(출석·도감·카드 기록)이 바로 삭제되고, 남은 PRO 이용권도 사라져요. 되돌릴 수 없어요.\n(결제 기록만 법에 따라 5년간 보관돼요)'))return;
-  toast('탈퇴 처리 중...');
+  if(!confirm(TL('정말 탈퇴할까요?\n\n계정과 동기화된 기록(출석·도감·카드 기록)이 바로 삭제되고, 남은 PRO 이용권도 사라져요. 되돌릴 수 없어요.\n(결제 기록만 법에 따라 5년간 보관돼요)','Delete your account?\n\nYour synced records (streaks, collection, card history) will be deleted right away, along with any remaining PRO time. This cannot be undone.\n(Payment records are kept for 5 years as required by law)','本当に退会しますか?\n\n同期された記録(ログイン・図鑑・カード記録)はすぐに削除され、残りのPRO利用権も消えます。元に戻せません。\n(決済記録のみ法律により5年間保管されます)')))return;
+  toast(TL('탈퇴 처리 중...','Deleting account...','退会処理中...'));
   const ok=await soulAuth.deleteAccount();
-  if(ok){alert('탈퇴가 완료됐어요. 그동안 고마웠어요 💜');location.href='/'}
-  else toast('탈퇴에 실패했어요. 잠시 후 다시 시도하거나 문의해주세요');
+  if(ok){alert(TL('탈퇴가 완료됐어요. 그동안 고마웠어요 💜','Your account has been deleted. Thanks for everything 💜','退会が完了しました。今までありがとう 💜'));location.href='/'}
+  else toast(TL('탈퇴에 실패했어요. 잠시 후 다시 시도하거나 문의해주세요','Deletion failed. Please try again later or contact us','退会できませんでした。しばらくしてから再度お試しいただくか、お問い合わせください'));
 }
 function renderSync(){
   const box=$('syncBox'); if(!box) return;
   const t=cloud.last?`${pad2(cloud.last.getHours())}:${pad2(cloud.last.getMinutes())}`:'';
   const S={
-    on:['var(--green)',`<b>${window.soulAuth?esc(window.soulAuth.label()):'claude.ai 계정'}으로 동기화 중</b>${t?` · 마지막 저장 ${t}`:''}<br><small class="muted">다른 기기에서 로그인해도 출석·도감·PRO가 그대로 이어져요</small>${window.soulAuth?'<br><button class="again" style="margin:6px 0 0" onclick="soulAuth.signOut()">로그아웃</button>':''}`],
-    init:['#ddd','연결 확인 중...'],
-    slow:['var(--yellow)','클라우드 응답이 늦어요. 이 기기에는 계속 저장돼요.'],
-    readonly:['var(--orange)','보기 전용 권한이라 이 기기에만 저장돼요.'],
-    off:['#ddd',window.soulAuth?`이 기기에만 저장 중이에요. 로그인하면 기록이 저장되고 AI 해석도 열려요.<div class="login-btns">${loginButtons()}</div><p class="consent-note">로그인하면 <a href="/terms" target="_blank">이용약관</a>과 <a href="/privacy" target="_blank">개인정보처리방침</a>에 동의하고,<br>만 14세 이상임을 확인한 것으로 봐요.</p>`:(window.soulConfig?'이 기기에만 저장돼요.<br><small class="muted">로그인 기능은 곧 열려요</small>':'이 브라우저에만 저장돼요.<br><small class="muted">claude.ai에 로그인한 상태로 열면 자동으로 동기화돼요</small>')],
+    on:['var(--green)',`<b>${TL((window.soulAuth?esc(window.soulAuth.label()):'claude.ai 계정')+'으로 동기화 중','Syncing with '+(window.soulAuth?esc(window.soulAuth.label()):'claude.ai'),(window.soulAuth?esc(window.soulAuth.label()):'claude.ai')+'で同期中')}</b>${t?TL(` · 마지막 저장 ${t}`,` · last saved ${t}`,` · 最終保存 ${t}`):''}<br><small class="muted">${TL('다른 기기에서 로그인해도 출석·도감·PRO가 그대로 이어져요','Log in on another device and your streak, collection and PRO carry over','他の端末でログインしても記録・図鑑・PROがそのまま続きます')}</small>${window.soulAuth?`<br><button class="again" style="margin:6px 0 0" onclick="soulAuth.signOut()">${TL('로그아웃','Log out','ログアウト')}</button>`:''}`],
+    init:['#ddd',TL('연결 확인 중...','Checking connection...','接続を確認中...')],
+    slow:['var(--yellow)',TL('클라우드 응답이 늦어요. 이 기기에는 계속 저장돼요.','The cloud is slow to respond. Still saving on this device.','クラウドの応答が遅れています。この端末には保存され続けます。')],
+    readonly:['var(--orange)',TL('보기 전용 권한이라 이 기기에만 저장돼요.','View-only access, so saving on this device only.','閲覧専用のため、この端末にだけ保存されます。')],
+    off:['#ddd',window.soulAuth?`${TL('이 기기에만 저장 중이에요. 로그인하면 기록이 저장되고 AI 해석도 열려요.','Saving on this device only. Log in to keep your records and unlock AI readings.','この端末にだけ保存中です。ログインすると記録が保存され、AI解説も使えます。')}<div class="login-btns">${loginButtons()}</div><p class="consent-note">${TL('로그인하면 <a href="/terms" target="_blank">이용약관</a>과 <a href="/privacy" target="_blank">개인정보처리방침</a>에 동의하고,<br>만 14세 이상임을 확인한 것으로 봐요.','By logging in you agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a><br>and confirm you are 14 or older.','ログインすると<a href="/terms" target="_blank">利用規約</a>と<a href="/privacy" target="_blank">プライバシーポリシー</a>に同意し、<br>14歳以上であることを確認したものとみなします。')}</p>`:(window.soulConfig?TL('이 기기에만 저장돼요.<br><small class="muted">로그인 기능은 곧 열려요</small>','Saved on this device only.<br><small class="muted">Login is coming soon</small>','この端末にだけ保存されます。<br><small class="muted">ログイン機能はもうすぐ</small>'):TL('이 브라우저에만 저장돼요.<br><small class="muted">claude.ai에 로그인한 상태로 열면 자동으로 동기화돼요</small>','Saved in this browser only.','このブラウザにだけ保存されます。'))],
   }[cloud.status]||['#ddd',''];
   box.innerHTML=`<span class="dot" style="background:${S[0]}"></span><span>${S[1]}</span>`;
 }
 
 
 /* ================= RETENTION: 체크인 · 운세 일기 · 주간 리포트 · 알림 · 이벤트 ================= */
-const FIT=[{v:2,e:'🎯',n:'딱 맞았어'},{v:1,e:'🤏',n:'반반'},{v:0,e:'🙅',n:'전혀'}];
+const FIT=[{v:2,e:'🎯',n:TL('딱 맞았어','Spot on','ぴったり')},{v:1,e:'🤏',n:TL('반반','Half','半分')},{v:0,e:'🙅',n:TL('전혀','Not at all','全然')}];
 function allDraws(){
   const out=[];
   try{for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith('soulcode.draw.')){const d=store.get(k);if(d&&d.card!=null)out.push({...d,date:k.slice(14)})}}}catch(e){}
@@ -1325,9 +1326,9 @@ function setFit(date,v){
   const k='soulcode.draw.'+date, d=store.get(k); if(!d) return;
   d.fit=v; d.fitAt=Date.now(); store.set(k,d); if(draw&&draw.date===date) draw.fit=v;
   const s=fitStats();
-  toast(v===2?'기록 완료! 우주랑 통했네 🎯':v===1?'기록 완료! 반은 맞췄다 🤏':'기록 완료! 내일은 맞춰볼게 🙅');
+  toast(v===2?TL('기록 완료! 우주랑 통했네 🎯','Logged! You and the universe are in sync 🎯','記録完了!宇宙と通じ合った 🎯'):v===1?TL('기록 완료! 반은 맞췄다 🤏','Logged! Half right 🤏','記録完了!半分当たり 🤏'):TL('기록 완료! 내일은 맞춰볼게 🙅','Logged! Better luck tomorrow 🙅','記録完了!明日は当てるね 🙅'));
   renderFit(); renderYesterdayAsk();
-  if(s.checked===3||s.checked===7) setTimeout(()=>toast(`체크 ${s.checked}일 달성! MY에서 운세 일기를 볼 수 있어요 📔`),1900);
+  if(s.checked===3||s.checked===7) setTimeout(()=>toast(TL(`체크 ${s.checked}일 달성! MY에서 운세 일기를 볼 수 있어요 📔`,`${s.checked} check-ins! See your fortune diary in MY 📔`,`チェック${s.checked}日達成!MYで運勢日記が見られます 📔`)),1900);
 }
 function renderFit(){
   let box=$('fitBox');
@@ -1351,7 +1352,7 @@ function renderYesterdayAsk(){
   const y=store.get('soulcode.draw.'+yesterdayKey());
   if(!y||y.fit!=null){box.innerHTML='';return}
   const c=TAROT[y.card];
-  box.innerHTML=`<div class="panel fit-box y-ask"><div class="fit-t">어제 뽑은 <b>${c[2]} ${c[0]}</b>, 맞았어?</div><div class="fit-btns">${FIT.map(f=>`<button onclick="setFit('${yesterdayKey()}',${f.v})"><span>${f.e}</span>${f.n}</button>`).join('')}</div></div>`;
+  box.innerHTML=`<div class="panel fit-box y-ask"><div class="fit-t">${TL(`어제 뽑은 <b>${c[2]} ${c[0]}</b>, 맞았어?`,`Was yesterday's <b>${c[2]} ${c[0]}</b> right?`,`昨日引いた<b>${c[2]} ${c[0]}</b>、当たった?`)}</div><div class="fit-btns">${FIT.map(f=>`<button onclick="setFit('${yesterdayKey()}',${f.v})"><span>${f.e}</span>${f.n}</button>`).join('')}</div></div>`;
 }
 
 /* ---- 운세 일기 + 주간 리포트 (MY) ---- */
@@ -1359,23 +1360,23 @@ function weekKey(){const d=new Date();const day=(d.getDay()+6)%7;d.setDate(d.get
 function renderDiary(){
   const me=$('s-me'); if(!me)return;
   let box=$('diaryBox');
-  if(!box){const anchor=[...me.querySelectorAll('.sec-t')].find(h=>h.textContent.includes('카드 도감')); if(!anchor)return; anchor.insertAdjacentHTML('beforebegin','<div class="sec-t">📔 운세 일기</div><div class="panel" id="diaryBox"></div>'); box=$('diaryBox')}
+  if(!box){const anchor=[...me.querySelectorAll('.sec-t')].find(h=>(h.dataset.ko||h.textContent).includes('카드 도감')); if(!anchor)return; anchor.insertAdjacentHTML('beforebegin',`<div class="sec-t">${TL('📔 운세 일기','📔 Fortune diary','📔 運勢日記')}</div><div class="panel" id="diaryBox"></div>`); box=$('diaryBox')}
   const s=fitStats(), wk=store.get('soulcode.weekly.'+weekKey());
   const last7=s.ds.filter(d=>{const t=new Date(d.date+'T00:00:00');return (Date.now()-t)/864e5<7});
   const list=s.ds.slice(0,14).map(d=>{const c=TAROT[d.card],f=FIT.find(x=>x.v===d.fit);const [,m,dd]=d.date.split('-');
-    return `<button class="dy" onclick="diaryOpen('${d.date}')"><span class="dt">${+m}.${+dd}</span><span class="cd">${c[2]} ${c[0]}${d.rev?' <small>역</small>':''}</span><span class="ft">${f?f.e:'·'}</span></button>`}).join('');
-  box.innerHTML=s.days?`<div class="dstats"><div><b>${s.days}</b><small>기록한 날</small></div><div><b>${s.rate!=null?s.rate+'%':'-'}</b><small>적중률</small></div><div><b>${s.top?TAROT[s.top.card][2]:'-'}</b><small>${s.top?`최다 카드 ${s.top.n}회`:'최다 카드'}</small></div></div>
+    return `<button class="dy" onclick="diaryOpen('${d.date}')"><span class="dt">${+m}.${+dd}</span><span class="cd">${c[2]} ${c[0]}${d.rev?` <small>${TL('역','rev.','逆')}</small>`:''}</span><span class="ft">${f?f.e:'·'}</span></button>`}).join('');
+  box.innerHTML=s.days?`<div class="dstats"><div><b>${s.days}</b><small>${TL('기록한 날','Days logged','記録した日')}</small></div><div><b>${s.rate!=null?s.rate+'%':'-'}</b><small>${TL('적중률','Hit rate','的中率')}</small></div><div><b>${s.top?TAROT[s.top.card][2]:'-'}</b><small>${s.top?TL(`최다 카드 ${s.top.n}회`,`Top card ${s.top.n}x`,`最多カード${s.top.n}回`):TL('최다 카드','Top card','最多カード')}</small></div></div>
     <div class="dlist">${list}</div><div id="diaryDetail" class="dd"></div>
-    <div class="sec-mini">🤖 이번 주 AI 리포트 <span class="pro-chip">PRO</span></div>
-    ${last7.length>=3?`<button class="btn pink ai-btn" id="wkBtn" onclick="aiWeekly()">${wk?'🔁 다시 받기':'이번 주 나의 흐름 정리받기'}</button><div class="ai-box${wk?' show':''}" id="wkBox">${wk?esc(wk):''}</div>`
-      :`<p class="fit-s">최근 7일 중 3일 이상 카드를 뽑으면 열려요 (지금 ${last7.length}일)</p>`}`
-    :`<p class="fit-s">오늘의 카드를 뽑고 저녁에 "맞았어?"를 체크하면 여기에 쌓여요 🌙</p>`;
+    <div class="sec-mini">${TL('🤖 이번 주 AI 리포트','🤖 This week\'s AI report','🤖 今週のAIレポート')} <span class="pro-chip">PRO</span></div>
+    ${last7.length>=3?`<button class="btn pink ai-btn" id="wkBtn" onclick="aiWeekly()">${wk?TL('🔁 다시 받기','🔁 Get it again','🔁 もう一度受け取る'):TL('이번 주 나의 흐름 정리받기','Sum up my week','今週の流れをまとめてもらう')}</button><div class="ai-box${wk?' show':''}" id="wkBox">${wk?esc(wk):''}</div>`
+      :`<p class="fit-s">${TL(`최근 7일 중 3일 이상 카드를 뽑으면 열려요 (지금 ${last7.length}일)`,`Opens when you draw cards on 3 of the last 7 days (now ${last7.length})`,`直近7日のうち3日以上カードを引くと開きます(今${last7.length}日)`)}</p>`}`
+    :`<p class="fit-s">${TL('오늘의 카드를 뽑고 저녁에 "맞았어?"를 체크하면 여기에 쌓여요 🌙','Draw today\'s card and check "Was it right?" in the evening to fill this up 🌙','今日のカードを引いて、夜に「当たった?」をチェックするとここにたまります 🌙')}</p>`;
   if(wk&&$('wkBox'))aiBadge($('wkBox'));
 }
 function diaryOpen(date){
   const d=store.get('soulcode.draw.'+date), c=TAROT[d.card], box=$('diaryDetail');
   if(box._d===date){box.innerHTML='';box._d=null;return} box._d=date;
-  box.innerHTML=`<b>${c[2]} ${c[0]} (${c[1]})</b> · ${d.rev?'역방향 · '+c[4]:'정방향 · '+c[3]}${d.ai?`<div class="dd-ai">${esc(d.ai)}</div>`:''}`;
+  box.innerHTML=`<b>${c[2]} ${c[0]} (${c[1]})</b> · ${d.rev?TL('역방향 · ','Reversed · ','逆位置 · ')+c[4]:TL('정방향 · ','Upright · ','正位置 · ')+c[3]}${d.ai?`<div class="dd-ai">${esc(d.ai)}</div>`:''}`;
 }
 async function aiWeekly(){
   const days=fitStats().ds.filter(d=>(Date.now()-new Date(d.date+'T00:00:00'))/864e5<7).reverse();
@@ -1395,7 +1396,7 @@ ${lines}
 👉 다음 주 한 줄 조언
 🍀 다음 주 행운의 요일: 요일 하나와 이유 한 줄`;
   const text=await runAI(prompt,$('wkBox'),$('wkBtn'),{pro:true,proReason:'AI 주간 리포트는 PRO 전용이에요'});
-  if(text){store.set('soulcode.weekly.'+weekKey(),text);$('wkBtn').textContent='🔁 다시 받기'}
+  if(text){store.set('soulcode.weekly.'+weekKey(),text);$('wkBtn').textContent=TL('🔁 다시 받기','🔁 Get it again','🔁 もう一度受け取る')}
 }
 
 /* ---- 아침 알림 (웹 푸시) ---- */
@@ -1410,20 +1411,20 @@ async function pushState(){
 }
 async function enablePush(){
   try{
-    const perm=await Notification.requestPermission(); if(perm!=='granted'){toast('알림이 꺼져 있어요. 설정에서 허용해주세요');return}
+    const perm=await Notification.requestPermission(); if(perm!=='granted'){toast(TL('알림이 꺼져 있어요. 설정에서 허용해주세요','Notifications are off. Please allow them in settings','通知がオフです。設定で許可してください'));return}
     const reg=await navigator.serviceWorker.ready;
     const {key}=await fetch('/api/push/key').then(r=>r.json());
     const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(key)});
     const r=await fetch('/api/push/subscribe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(sub)});
     if(!r.ok) throw new Error('save');
-    store.set('soulcode.pushAsk','done'); toast('매일 아침 8시에 오늘의 카드를 알려줄게요 🔔');
-  }catch(e){toast('알림을 켜지 못했어요. 잠시 후 다시 시도해주세요')}
+    store.set('soulcode.pushAsk','done'); toast(TL('매일 아침 8시에 오늘의 카드를 알려줄게요 🔔','We\'ll send today\'s card every morning at 8 🔔','毎朝8時に今日のカードをお知らせします 🔔'));
+  }catch(e){toast(TL('알림을 켜지 못했어요. 잠시 후 다시 시도해주세요','Couldn\'t turn on notifications. Please try again later','通知をオンにできませんでした。しばらくしてから再度お試しください'))}
   renderPushAsk(); renderPushSetting();
 }
 async function disablePush(){
   try{const reg=await navigator.serviceWorker.getRegistration();const sub=reg&&await reg.pushManager.getSubscription();
     if(sub){await fetch('/api/push/subscribe',{method:'DELETE',headers:{'content-type':'application/json'},body:JSON.stringify({endpoint:sub.endpoint})}).catch(()=>{});await sub.unsubscribe()}
-    toast('아침 알림을 껐어요')}catch(e){}
+    toast(TL('아침 알림을 껐어요','Morning alert turned off','朝の通知をオフにしました'))}catch(e){}
   renderPushSetting();
 }
 async function renderPushAsk(){
@@ -1431,22 +1432,23 @@ async function renderPushAsk(){
   const st=await pushState();
   if(store.get('soulcode.pushAsk')==='later'||st==='on'||st==='off'||st==='unsupported'||st==='denied'){box.innerHTML='';return}
   box.innerHTML=st==='ios-install'
-    ?`<div class="panel push-ask"><div class="fit-t">🔔 내일 카드, 아침에 알려줄까?</div><div class="fit-s">아이폰은 <b>공유 버튼 → 홈 화면에 추가</b>로 앱을 설치한 뒤 열면 알림을 켤 수 있어요.</div><button class="again" style="margin:6px 0 0" onclick="store.set('soulcode.pushAsk','later');renderPushAsk()">다음에</button></div>`
-    :`<div class="panel push-ask"><div class="fit-t">🔔 내일 카드, 아침에 알려줄까?</div><div class="fit-s">매일 아침 8시에 한 번만 보내요.</div><div class="fit-btns two"><button onclick="enablePush()"><span>🔔</span>알림 받기</button><button onclick="store.set('soulcode.pushAsk','later');renderPushAsk()"><span>🙅</span>괜찮아요</button></div></div>`;
+    ?`<div class="panel push-ask"><div class="fit-t">${TL('🔔 내일 카드, 아침에 알려줄까?','🔔 Get tomorrow\'s card in the morning?','🔔 明日のカード、朝にお知らせする?')}</div><div class="fit-s">${TL('아이폰은 <b>공유 버튼 → 홈 화면에 추가</b>로 앱을 설치한 뒤 열면 알림을 켤 수 있어요.','On iPhone, install the app via <b>Share → Add to Home Screen</b>, then open it to turn on alerts.','iPhoneは<b>共有ボタン → ホーム画面に追加</b>でアプリを入れてから開くと通知をオンにできます。')}</div><button class="again" style="margin:6px 0 0" onclick="store.set('soulcode.pushAsk','later');renderPushAsk()">${TL('다음에','Later','また今度')}</button></div>`
+    :`<div class="panel push-ask"><div class="fit-t">${TL('🔔 내일 카드, 아침에 알려줄까?','🔔 Get tomorrow\'s card in the morning?','🔔 明日のカード、朝にお知らせする?')}</div><div class="fit-s">${TL('매일 아침 8시에 한 번만 보내요.','Just once, every morning at 8.','毎朝8時に1回だけ送ります。')}</div><div class="fit-btns two"><button onclick="enablePush()"><span>🔔</span>${TL('알림 받기','Turn on','受け取る')}</button><button onclick="store.set('soulcode.pushAsk','later');renderPushAsk()"><span>🙅</span>${TL('괜찮아요','No thanks','大丈夫')}</button></div></div>`;
 }
 async function renderPushSetting(){
   const me=$('s-me'); if(!me||!window.soulConfig)return;
   let box=$('pushSet');
-  if(!box){const sync=[...me.querySelectorAll('.sec-t')].find(h=>h.textContent.includes('동기화'));if(!sync)return;sync.insertAdjacentHTML('beforebegin','<div class="sec-t">🔔 아침 알림</div><div class="panel" id="pushSet"></div>');box=$('pushSet')}
+  if(!box){const sync=[...me.querySelectorAll('.sec-t')].find(h=>(h.dataset.ko||h.textContent).includes('동기화'));if(!sync)return;sync.insertAdjacentHTML('beforebegin',`<div class="sec-t">${TL('🔔 아침 알림','🔔 Morning alert','🔔 朝の通知')}</div><div class="panel" id="pushSet"></div>`);box=$('pushSet')}
   const st=await pushState();
-  box.innerHTML={on:'<div class="row-set"><span>매일 아침 8시 · 오늘의 카드 알림 <b>켜짐</b></span><button class="again" onclick="disablePush()">끄기</button></div>',
-    ready:'<div class="row-set"><span>매일 아침 8시에 오늘의 카드를 알려줘요</span><button class="btn" style="width:auto;padding:9px 16px;font-size:15px" onclick="enablePush()">켜기</button></div>',
-    'ios-install':'<span class="fit-s">아이폰은 <b>공유 → 홈 화면에 추가</b>로 설치한 뒤 열면 알림을 켤 수 있어요.</span>',
-    denied:'<span class="fit-s">브라우저 설정에서 이 사이트의 알림이 차단돼 있어요. 허용으로 바꾸면 켤 수 있어요.</span>',
-    unsupported:'<span class="fit-s">이 브라우저는 알림을 지원하지 않아요.</span>'}[st]||'';
+  box.innerHTML={on:`<div class="row-set"><span>${TL('매일 아침 8시 · 오늘의 카드 알림 <b>켜짐</b>','Daily 8 a.m. card alert <b>ON</b>','毎朝8時 · 今日のカード通知 <b>オン</b>')}</span><button class="again" onclick="disablePush()">${TL('끄기','Turn off','オフ')}</button></div>`,
+    ready:`<div class="row-set"><span>${TL('매일 아침 8시에 오늘의 카드를 알려줘요','Get today\'s card every morning at 8','毎朝8時に今日のカードをお知らせ')}</span><button class="btn" style="width:auto;padding:9px 16px;font-size:15px" onclick="enablePush()">${TL('켜기','Turn on','オン')}</button></div>`,
+    'ios-install':`<span class="fit-s">${TL('아이폰은 <b>공유 → 홈 화면에 추가</b>로 설치한 뒤 열면 알림을 켤 수 있어요.','On iPhone, install via <b>Share → Add to Home Screen</b>, then open it to turn on alerts.','iPhoneは<b>共有 → ホーム画面に追加</b>で入れてから開くと通知をオンにできます。')}</span>`,
+    denied:`<span class="fit-s">${TL('브라우저 설정에서 이 사이트의 알림이 차단돼 있어요. 허용으로 바꾸면 켤 수 있어요.','Notifications are blocked for this site in your browser settings. Allow them to turn this on.','ブラウザ設定でこのサイトの通知がブロックされています。許可にするとオンにできます。')}</span>`,
+    unsupported:`<span class="fit-s">${TL('이 브라우저는 알림을 지원하지 않아요.','This browser doesn\'t support notifications.','このブラウザは通知に対応していません。')}</span>`}[st]||'';
 }
 
 /* ---- 이벤트 ---- */
+const TERM_EN={"소한": ["Minor Cold", "The coldest stretch of the year. Save energy instead of forcing new starts"], "대한": ["Major Cold", "The tail end of winter. Good day to finish delayed cleanups"], "입춘": ["Start of Spring", "The new year begins in saju! Write down your resolutions"], "우수": ["Rain Water", "Ice melts. Good for thawing frozen relationships"], "경칩": ["Awakening of Insects", "The frogs wake up. Start what you have been putting off"], "춘분": ["Spring Equinox", "Day and night are equal. A good day for balance"], "청명": ["Clear and Bright", "The sky clears. Clear your head too"], "곡우": ["Grain Rain", "Spring rain grows the grain. Study and self-growth luck UP"], "입하": ["Start of Summer", "Summer begins. Your energy rises"], "소만": ["Grain Buds", "Everything fills up. Collect small wins"], "망종": ["Grain in Ear", "Sowing season. Plant a new plan"], "하지": ["Summer Solstice", "The longest day. Max out your activity"], "소서": ["Minor Heat", "The heat begins. Watch emotional overheating"], "대서": ["Major Heat", "The hottest time. Resting is a skill too"], "입추": ["Start of Autumn", "Autumn begins. Review your second-half plans"], "처서": ["End of Heat", "The heat breaks. Recover your condition"], "백로": ["White Dew", "Dew forms. Your fine senses wake up"], "추분": ["Autumn Equinox", "Day and night are equal again. Check your balance"], "한로": ["Cold Dew", "Cold dew season. Strong luck for wrapping things up"], "상강": ["Frost Descent", "Frost falls. Energy for sorting and deciding"], "입동": ["Start of Winter", "Winter begins. Gather your energy inward"], "소설": ["Minor Snow", "First snow season. Great day to recharge your feelings"], "대설": ["Major Snow", "Heavy snow. Take care of yourself indoors"], "동지": ["Winter Solstice", "The longest night. From tomorrow the days grow longer"]}, TERM_JA={"소한": "一年で最も寒い時期。無理な始動より体力を温存", "대한": "冬の終わり。後回しにしていた片づけを終えるのにいい日", "입춘": "四柱推命で新年が始まる日!今年の目標を書いてみて", "우수": "氷が溶ける時期。固まった関係をほぐすのにいい", "경칩": "カエルが目覚める日。後回しにしていたことを始めよう", "춘분": "昼と夜が同じ長さの日。バランスを整えるのにいい一日", "청명": "空が澄む時期。頭の中もすっきり整理", "곡우": "春雨が穀物を育てる時期。勉強・自己成長運UP", "입하": "夏の始まり。エネルギーが上がる時期", "소만": "万物が満ちる時期。小さな成果を大切に", "망종": "種まきの時期。新しい計画を植えよう", "하지": "昼が最も長い日。活動量を最大に", "소서": "暑さの始まり。感情の過熱に注意", "대서": "最も暑い時期。休むのも実力", "입추": "秋の始まり。下半期の計画をチェック", "처서": "暑さが和らぐ時期。コンディション回復", "백로": "露が結ぶ時期。繊細な感覚がよみがえる", "추분": "再び昼と夜が同じになる日。バランスを点検", "한로": "冷たい露の時期。締めくくり運が強い", "상강": "霜が降りる時期。整理・決断の気", "입동": "冬の始まり。エネルギーを内に集めよう", "소설": "初雪の時期。感性を充電するのにいい日", "대설": "雪が多く降る時期。室内で自分をいたわろう", "동지": "夜が最も長い日。明日から日が長くなる逆転の日"};
 const TERM_TIP={소한:'한 해 중 가장 추운 때. 무리한 시작보다 체력 비축',대한:'겨울의 끝자락. 미뤄둔 정리를 끝내기 좋은 날',입춘:'사주에서 새해가 시작되는 날! 올해 다짐을 적어봐요',우수:'얼음이 녹는 때. 굳었던 관계를 풀기 좋아요',경칩:'개구리가 깨어나는 날. 미뤄둔 일 시작하기',춘분:'낮과 밤이 같은 날. 균형 잡기 좋은 하루',청명:'하늘이 맑아지는 때. 머릿속도 맑게 정리',곡우:'봄비가 곡식을 키우는 때. 공부·자기계발 운 UP',입하:'여름의 시작. 에너지가 오르는 시기',소만:'만물이 차오르는 때. 작은 성과를 챙겨봐요',망종:'씨 뿌리는 시기. 새 계획을 심어봐요',하지:'낮이 가장 긴 날. 활동량 최대로',소서:'더위의 시작. 감정 과열 주의',대서:'가장 더운 때. 쉬어가는 것도 실력',입추:'가을의 시작. 하반기 계획 점검',처서:'더위가 꺾이는 때. 컨디션 회복',백로:'이슬이 맺히는 때. 섬세한 감각이 살아나요',추분:'다시 낮과 밤이 같아지는 날. 균형 점검',한로:'찬 이슬의 때. 마무리 운이 강해요',상강:'서리가 내리는 때. 정리·결단의 기운',입동:'겨울의 시작. 에너지를 안으로 모으기',소설:'첫눈이 오는 때. 감성 충전하기 좋은 날',대설:'눈이 많이 오는 때. 실내에서 나를 돌보기',동지:'밤이 가장 긴 날. 내일부터 해가 길어지는 반전의 날'};
 function lunarOf(d){try{return Manseryeok.solarToLunar(d.getFullYear(),d.getMonth()+1,d.getDate())}catch(e){return null}}
 function termToday(d){try{const ks=dateKey(d);return Manseryeok.getSolarTermsOfYear(d.getFullYear()).find(t=>dateKey(new Date(Date.parse(t.date)))===ks)||null}catch(e){return null}}
@@ -1458,7 +1460,7 @@ function activeEvents(){
   const d=new Date(), k=dateKey(d), ev=[], l=lunarOf(d);
   if(profile&&profile.birth&&profile.birth.slice(5)===k.slice(5)) ev.push({id:'bday-'+k,e:'🎂',t:TL(`생일 축하해, ${esc(profile.nick)}!`,`Happy birthday, ${esc(profile.nick)}!`,`お誕生日おめでとう、${esc(profile.nick)}!`),s:TL('생일에만 뽑을 수 있는 특별 카드가 기다려요','A special card you can only draw on your birthday is waiting','誕生日だけ引ける特別なカードが待ってるよ'),cta:TL('생일 카드 뽑기','Draw birthday card','誕生日カードを引く'),fn:`openWish('bday-${k}','birthday')`});
   if(l&&l.day===15) ev.push({id:'moon-'+k,e:'🌕',t:TL('오늘은 음력 보름, 소원 카드 데이','Full moon today: wish card day','今日は満月、願いごとカードの日'),s:TL('보름달에 소원을 빌고 카드 한 장으로 답을 들어봐요','Make a wish on the full moon and get your answer from one card','満月に願いをかけて、カード1枚で答えを聞こう'),cta:TL('소원 카드 뽑기','Draw wish card','願いごとカードを引く'),fn:`openWish('moon-${k}','moon')`});
-  const tm=termToday(d); if(tm) ev.push({id:'term-'+k,e:'🌿',t:`오늘은 ${tm.name}(${tm.hanja})`,s:TERM_TIP[tm.name]||'계절이 바뀌는 날이에요',info:true});
+  const tm=termToday(d); if(tm) ev.push({id:'term-'+k,e:'🌿',t:TL(`오늘은 ${tm.name}(${tm.hanja})`,`Today is ${(TERM_EN[tm.name]||[tm.hanja])[0]} (${tm.hanja})`,`今日は${tm.hanja}`),s:TL(TERM_TIP[tm.name]||'계절이 바뀌는 날이에요',(TERM_EN[tm.name]||[0,'A day when the season shifts'])[1],TERM_JA[tm.name]||'季節が変わる日です'),info:true});
   const m=d.getMonth()+1, Y=reportYear();
   if(m===12||m===1) ev.push({id:'ny-'+Y,e:'🎍',t:TL(`${Y} 신년운세 오픈`,`${Y} yearly fortune is open`,`${Y}年の運勢オープン`),s:TL(`${Y}년 12개월 흐름 그래프와 AI 풀이를 미리 봐요`,`Preview your ${Y} month-by-month graph and AI reading`,`${Y}年12か月の流れグラフとAI解説を先取り`),cta:TL(`${Y} 운세 보기`,`See ${Y}`,`${Y}年の運勢を見る`),fn:`openReport('year')`,keep:true});
   if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:TL('7일 연속 출석 이벤트','7-day streak event','7日連続ログインイベント'),s:TL(`7일 연속 오면 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,`Visit 7 days in a row to unlock the 'Strawberry Milk' skin forever · now <b>${Math.min(n,7)}/7</b>`,`7日連続で来るとスキン「いちごミルク」が永久解放 · 今 <b>${Math.min(n,7)}/7</b>`),prog:Math.min(n,7)/7,info:true,keep:true})}
@@ -1481,11 +1483,11 @@ function openWish(id,kind){
   let m=$('wishM');
   if(!m){$('app').insertAdjacentHTML('beforeend','<div class="modal" id="wishM" onclick="if(event.target.id===\'wishM\')closeWish()"><div class="pw" id="wishIn"></div></div>');m=$('wishM')}
   const done=(store.get('soulcode.events')||{})[id];
-  const head=kind==='birthday'?['🎂 생일 특별 카드','올해의 나에게 하고 싶은 말을 적어봐요']:['🌕 보름 소원 카드','이루고 싶은 소원 하나를 적어봐요'];
+  const head=kind==='birthday'?[TL('🎂 생일 특별 카드','🎂 Birthday special card','🎂 誕生日の特別カード'),TL('올해의 나에게 하고 싶은 말을 적어봐요','Write a message to yourself for this year','今年の自分に言いたいことを書いてみて')]:[TL('🌕 보름 소원 카드','🌕 Full-moon wish card','🌕 満月の願いごとカード'),TL('이루고 싶은 소원 하나를 적어봐요','Write down one wish','叶えたい願いをひとつ書いてみて')];
   if(done&&done.card!=null){wishResult(id,kind,done);m.classList.add('show');return}
   $('wishIn').innerHTML=`<h3 class="h-display" style="text-align:center">${head[0]}</h3><p class="muted" style="text-align:center;font-size:13.5px;margin:6px 0 14px">${head[1]}</p>
-    <input class="field" id="wishQ" maxlength="40" placeholder="${kind==='birthday'?'예: 올해는 나를 더 아껴주기':'예: 이번 달 안에 합격하기'}" autocomplete="off">
-    <button class="btn" style="margin-top:14px" onclick="drawWish('${id}','${kind}')">카드 한 장 뽑기 ✨</button><button class="btn ghost" style="margin-top:10px" onclick="closeWish()">닫기</button>`;
+    <input class="field" id="wishQ" maxlength="40" placeholder="${kind==='birthday'?TL('예: 올해는 나를 더 아껴주기','e.g. Treat myself better this year','例: 今年はもっと自分を大切にする'):TL('예: 이번 달 안에 합격하기','e.g. Pass my exam this month','例: 今月中に合格する')}" autocomplete="off">
+    <button class="btn" style="margin-top:14px" onclick="drawWish('${id}','${kind}')">${TL('카드 한 장 뽑기 ✨','Draw a card ✨','カードを1枚引く ✨')}</button><button class="btn ghost" style="margin-top:10px" onclick="closeWish()">${TL('닫기','Close','閉じる')}</button>`;
   m.classList.add('show');
 }
 function closeWish(){$('wishM')&&$('wishM').classList.remove('show')}
@@ -1496,20 +1498,20 @@ function drawWish(id,kind){
 }
 function wishResult(id,kind,res){
   const c=TAROT[res.card], luck=LUCK[res.card]+(res.rev?-1:1);
-  const v=luck>=3?['이뤄질 기운이 강해요 ✨','우주가 밀어주는 중. 지금 움직이면 돼요']:luck>=1?['천천히 다가오는 중 🌱','조급해하지 말고 작은 행동부터 쌓아봐요']:['방향을 살짝 틀어봐요 🧭','같은 소원이라도 다른 길로 가면 열려요'];
-  $('wishIn').innerHTML=`<div style="text-align:center"><div class="muted" style="font-size:13px">${kind==='birthday'?'🎂 생일 특별 카드':'🌕 보름 소원 카드'}</div>
+  const v=luck>=3?TL(['이뤄질 기운이 강해요 ✨','우주가 밀어주는 중. 지금 움직이면 돼요'],['Strong chance it comes true ✨','The universe has your back. Move now'],['叶う気が強いよ ✨','宇宙が後押し中。今動けばOK']):luck>=1?TL(['천천히 다가오는 중 🌱','조급해하지 말고 작은 행동부터 쌓아봐요'],['Slowly on its way 🌱','No rush. Stack up small actions first'],['ゆっくり近づいてる 🌱','焦らず小さな行動から積み重ねて']):TL(['방향을 살짝 틀어봐요 🧭','같은 소원이라도 다른 길로 가면 열려요'],['Try shifting direction a bit 🧭','The same wish can open up via a different path'],['少し方向を変えてみて 🧭','同じ願いでも別の道なら開けるよ']);
+  $('wishIn').innerHTML=`<div style="text-align:center"><div class="muted" style="font-size:13px">${kind==='birthday'?TL('🎂 생일 특별 카드','🎂 Birthday special card','🎂 誕生日の特別カード'):TL('🌕 보름 소원 카드','🌕 Full-moon wish card','🌕 満月の願いごとカード')}</div>
     ${res.q?`<p style="margin:8px 0 2px;font-size:14px">"${esc(res.q)}"</p>`:''}
-    <div class="wish-card" style="background:linear-gradient(165deg,${CARD_BG[res.card]})"><div style="font-size:54px">${c[2]}</div><b>${c[0]}</b><small>${c[1]}${res.rev?' · 역방향':''}</small></div>
-    <h3 class="h-display" style="font-size:22px">${v[0]}</h3><p style="font-size:14px;margin:6px 0 4px">${v[1]}</p><p class="muted" style="font-size:12.5px">키워드 · ${res.rev?c[4]:c[3]}</p></div>
-    <button class="btn" style="margin-top:14px" onclick="shareWish('${kind}',${res.card},'${v[0].replace(/'/g,'')}')">친구한테 자랑하기</button><button class="btn ghost" style="margin-top:10px" onclick="closeWish()">닫기</button>
-    <p class="disclaimer" style="margin-top:10px">재미로 보는 콘텐츠예요</p>`;
+    <div class="wish-card" style="background:linear-gradient(165deg,${CARD_BG[res.card]})"><div style="font-size:54px">${c[2]}</div><b>${c[0]}</b><small>${c[1]}${res.rev?TL(' · 역방향',' · reversed',' · 逆位置'):''}</small></div>
+    <h3 class="h-display" style="font-size:22px">${v[0]}</h3><p style="font-size:14px;margin:6px 0 4px">${v[1]}</p><p class="muted" style="font-size:12.5px">${TL('키워드','Keywords','キーワード')} · ${res.rev?c[4]:c[3]}</p></div>
+    <button class="btn" style="margin-top:14px" onclick="shareWish('${kind}',${res.card},'${v[0].replace(/'/g,'')}')">${TL('친구한테 자랑하기','Show it off to friends','友達に自慢する')}</button><button class="btn ghost" style="margin-top:10px" onclick="closeWish()">${TL('닫기','Close','閉じる')}</button>
+    <p class="disclaimer" style="margin-top:10px">${TL('재미로 보는 콘텐츠예요','Just for fun','お楽しみコンテンツです')}</p>`;
 }
 
 async function shareWish(kind,card,verdict){
   const c=TAROT[card], url=location.origin+'/?from=wish';
-  const text=`${kind==='birthday'?'🎂 생일 특별 카드':'🌕 보름 소원 카드'}: ${c[2]} ${c[0]} — ${verdict}\n너도 뽑아봐 👉 ${url}`;
+  const text=`${kind==='birthday'?TL('🎂 생일 특별 카드','🎂 Birthday special card','🎂 誕生日の特別カード'):TL('🌕 보름 소원 카드','🌕 Full-moon wish card','🌕 満月の願いごとカード')}: ${c[2]} ${c[0]} — ${verdict}\n${TL('너도 뽑아봐','Draw yours too','あなたも引いてみて')} 👉 ${url}`;
   try{if(navigator.share){await navigator.share({text});return}}catch(e){return}
-  try{await navigator.clipboard.writeText(text);toast('복사했어요! 카톡에 붙여넣기 💌')}catch(e){toast('복사하지 못했어요')}
+  try{await navigator.clipboard.writeText(text);toast(TL('복사했어요! 카톡에 붙여넣기 💌','Copied! Paste it in a chat 💌','コピーしました!LINEに貼り付けて 💌'))}catch(e){toast(TL('복사하지 못했어요','Couldn\'t copy','コピーできませんでした'))}
 }
 
 /* ================= 친구들과 궁합 지도 ================= */
@@ -1524,28 +1526,28 @@ function chemOne(a,b){
   return {s:Math.round(sj*0.45+mbtiMatch(a.mbti,b.mbti).s*0.4+ttiMatch(a.yb,b.yb).s*0.15),hap};
 }
 function chem(a,b){const x=chemOne(a,b),y=chemOne(b,a);return {s:Math.round((x.s+y.s)/2),hap:x.hap}}
-const chemWord=s=>s>=88?'천생연분 💖':s>=78?'찰떡 케미 ✨':s>=66?'노력하면 꿀케미 🍯':'롤러코스터 🎢';
+const chemWord=s=>s>=88?TL('천생연분 💖','Soulmates 💖','運命の相手 💖'):s>=78?TL('찰떡 케미 ✨','Perfect chemistry ✨','相性ばっちり ✨'):s>=66?TL('노력하면 꿀케미 🍯','Sweet with effort 🍯','歩み寄れば最高 🍯'):TL('롤러코스터 🎢','Rollercoaster 🎢','ジェットコースター 🎢');
 const chemCol=s=>s>=85?'#FF4FA8':s>=76?'#8B6CFF':s>=66?'#B9B0CC':'#3D9BFF';
 async function cmApi(path,opt={}){const r=await fetch('/api/maps'+path,{...opt,headers:{'content-type':'application/json',...(opt.headers||{})}});const j=await r.json().catch(()=>({}));if(!r.ok)throw Object.assign(new Error(j.code||'error'),{code:j.code});return j}
 function cmScreen(){
   if($('s-map'))return;
-  $('tabbar').insertAdjacentHTML('beforebegin',`<section class="screen" id="s-map"><div class="eng">CHEMISTRY MAP</div><h2 class="page-h h-display">우리 무리 궁합 지도 🗺️</h2><p class="sub" style="margin-bottom:14px">친구들이 링크로 들어오면 서로의 케미가 선으로 이어져요.</p><div id="cmBody"></div><p class="disclaimer">생년월일은 공유되지 않아요 · 재미로 보는 콘텐츠예요</p></section>`);
+  $('tabbar').insertAdjacentHTML('beforebegin',`<section class="screen" id="s-map"><div class="eng">CHEMISTRY MAP</div><h2 class="page-h h-display">${TL('우리 무리 궁합 지도 🗺️','Our crew chemistry map 🗺️','仲間の相性マップ 🗺️')}</h2><p class="sub" style="margin-bottom:14px">${TL('친구들이 링크로 들어오면 서로의 케미가 선으로 이어져요.','When friends join via the link, your chemistry connects as lines.','友達がリンクから入ると、お互いの相性が線でつながります。')}</p><div id="cmBody"></div><p class="disclaimer">${TL('생년월일은 공유되지 않아요 · 재미로 보는 콘텐츠예요','Birthdays are never shared · just for fun','生年月日は共有されません · お楽しみコンテンツです')}</p></section>`);
 }
 function openMap(code){cmScreen();if(code)CM.cur=code;go('s-map')}
 async function renderMap(){
   const body=$('cmBody'); if(!body)return;
-  if(!profile){body.innerHTML='<div class="panel">먼저 내 정보를 입력해야 지도를 만들 수 있어요.</div>';return}
+  if(!profile){body.innerHTML=`<div class="panel">${TL('먼저 내 정보를 입력해야 지도를 만들 수 있어요.','Enter your info first to make a map.','まず自分の情報を入力するとマップを作れます。')}</div>`;return}
   const maps=cmMaps();
   if(!CM.cur&&maps.length)CM.cur=maps[0].code;
-  const tabs=maps.length?`<div class="chips-sel cm-tabs">${maps.map(m=>`<button class="chip ${m.code===CM.cur?'sel':''}" onclick="CM.cur='${m.code}';CM.sel=null;renderMap()">${esc(m.title)}</button>`).join('')}<button class="chip" onclick="CM.cur='new';renderMap()">＋ 새 지도</button></div>`:'';
+  const tabs=maps.length?`<div class="chips-sel cm-tabs">${maps.map(m=>`<button class="chip ${m.code===CM.cur?'sel':''}" onclick="CM.cur='${m.code}';CM.sel=null;renderMap()">${esc(m.title)}</button>`).join('')}<button class="chip" onclick="CM.cur='new';renderMap()">${TL('＋ 새 지도','＋ New map','＋ 新しいマップ')}</button></div>`:'';
   if(!maps.length||CM.cur==='new'){
-    body.innerHTML=tabs+`<div class="panel"><label class="lb" style="margin-top:0">지도 이름</label><input class="field" id="cmTitle" maxlength="20" placeholder="예: 우리 과 동기들, 단톡방 7인" autocomplete="off"><button class="btn" style="margin-top:14px" onclick="cmCreate()">지도 만들고 친구 초대하기 🗺️</button><p class="fit-s">지도에는 내 별명·MBTI·사주 일간·띠만 올라가요.</p></div>`;
+    body.innerHTML=tabs+`<div class="panel"><label class="lb" style="margin-top:0">${TL('지도 이름','Map name','マップ名')}</label><input class="field" id="cmTitle" maxlength="20" placeholder="${TL('예: 우리 과 동기들, 단톡방 7인','e.g. Class of 2026, group chat squad','例: ゼミの仲間、グループLINE7人')}" autocomplete="off"><button class="btn" style="margin-top:14px" onclick="cmCreate()">${TL('지도 만들고 친구 초대하기 🗺️','Make a map and invite friends 🗺️','マップを作って友達を招待 🗺️')}</button><p class="fit-s">${TL('지도에는 내 별명·MBTI·사주 일간·띠만 올라가요.','Only your nickname, MBTI, day master and zodiac go on the map.','マップに載るのはニックネーム・MBTI・日干・干支だけです。')}</p></div>`;
     return;
   }
-  body.innerHTML=tabs+'<div class="panel" style="text-align:center">지도 불러오는 중... 🛰️</div>';
+  body.innerHTML=tabs+`<div class="panel" style="text-align:center">${TL('지도 불러오는 중... 🛰️','Loading map... 🛰️','マップを読み込み中... 🛰️')}</div>`;
   try{CM.data=await cmApi('/'+CM.cur)}catch(e){
-    if(e.code==='not_found'){cmSave(cmMaps().filter(m=>m.code!==CM.cur));CM.cur=null;toast('삭제된 지도예요');return renderMap()}
-    body.innerHTML=tabs+'<div class="panel">지도를 불러오지 못했어요. <button class="again" onclick="renderMap()">다시 시도</button></div>';return}
+    if(e.code==='not_found'){cmSave(cmMaps().filter(m=>m.code!==CM.cur));CM.cur=null;toast(TL('삭제된 지도예요','This map was deleted','削除されたマップです'));return renderMap()}
+    body.innerHTML=tabs+`<div class="panel">${TL('지도를 불러오지 못했어요.','Couldn\'t load the map.','マップを読み込めませんでした。')} <button class="again" onclick="renderMap()">${TL('다시 시도','Retry','再試行')}</button></div>`;return}
   const mine=cmMaps().find(m=>m.code===CM.cur)||{}, M=CM.data.members, n=M.length;
   const pairs=[]; for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)pairs.push({i,j,...chem(M[i],M[j])});
   pairs.sort((a,b)=>b.s-a.s);
@@ -1559,61 +1561,61 @@ async function renderMap(){
     return `<g class="cm-node" onclick="CM.sel=${sel===k?'null':k};renderMap()" opacity="${dim?.35:1}"><circle cx="${x}" cy="${y}" r="${sel===k?27:23}" fill="${me?'#FFE04D':'#fff'}" stroke="#1B1433" stroke-width="${sel===k?3.5:2.5}"/><text x="${x}" y="${y+7}" text-anchor="middle" font-size="20">${STEM_INFO[m.stem].emoji}</text><text x="${x}" y="${y+40}" text-anchor="middle" font-size="12.5" font-weight="900" fill="#1B1433">${esc(m.nick)}</text><text x="${x}" y="${y+54}" text-anchor="middle" font-size="10.5" fill="#6E6189">${m.mbti}</text></g>`}).join('');
   const best=pairs[0], worst=pairs[pairs.length-1], star=n>2?avg.indexOf(Math.max(...avg)):-1;
   const nm=k=>esc(M[k].nick);
-  const sup=n>=2?`<div class="sec-t">🏆 우리 무리 어워즈</div><div class="cm-awards">
-    <div class="mini"><div class="k">💖 베스트 케미</div><div class="v">${nm(best.i)} × ${nm(best.j)}<small>${best.s}점 · ${chemWord(best.s)}</small></div></div>
-    ${pairs.length>1?`<div class="mini"><div class="k">🎢 롤러코스터 케미</div><div class="v">${nm(worst.i)} × ${nm(worst.j)}<small>${worst.s}점 · 서로에게 좋은 자극제</small></div></div>`:''}
-    ${star>=0?`<div class="mini"><div class="k">👑 우리 무리 인싸</div><div class="v">${nm(star)}<small>평균 ${Math.round(avg[star])}점 · 누구랑도 잘 맞음</small></div></div>`:''}
-    ${pairs.some(p=>p.hap)?`<div class="mini"><div class="k">🧲 천간합 커플</div><div class="v">${pairs.filter(p=>p.hap).slice(0,2).map(p=>nm(p.i)+' × '+nm(p.j)).join(', ')}<small>사주 일간이 서로 끌어당기는 드문 조합</small></div></div>`:''}</div>`:'';
-  const selInfo=sel!=null?`<div class="panel cm-sel"><b>${STEM_INFO[M[sel].stem].emoji} ${nm(sel)}</b>의 케미 순위<div class="cm-rank">${pairs.filter(p=>p.i===sel||p.j===sel).map(p=>{const o=p.i===sel?p.j:p.i;return `<div><span>${nm(o)} <small>${M[o].mbti}</small></span><b style="color:${chemCol(p.s)}">${p.s}</b><small>${chemWord(p.s)}</small></div>`}).join('')||'<p class="fit-s">아직 다른 멤버가 없어요</p>'}</div></div>`:'';
-  body.innerHTML=tabs+`<div class="panel cm-map"><div class="cm-head"><b>${esc(CM.data.title)}</b><small>${n}명 · ${n<2?'친구를 초대해봐요':'사람을 누르면 그 사람 기준으로 보여줘요'}</small></div>
+  const sup=n>=2?`<div class="sec-t">${TL('🏆 우리 무리 어워즈','🏆 Crew awards','🏆 仲間アワード')}</div><div class="cm-awards">
+    <div class="mini"><div class="k">${TL('💖 베스트 케미','💖 Best chemistry','💖 ベスト相性')}</div><div class="v">${nm(best.i)} × ${nm(best.j)}<small>${best.s}${TL('점','','点')} · ${chemWord(best.s)}</small></div></div>
+    ${pairs.length>1?`<div class="mini"><div class="k">${TL('🎢 롤러코스터 케미','🎢 Rollercoaster','🎢 ジェットコースター相性')}</div><div class="v">${nm(worst.i)} × ${nm(worst.j)}<small>${worst.s}${TL('점 · 서로에게 좋은 자극제',' · push each other to grow','点 · お互いにいい刺激')}</small></div></div>`:''}
+    ${star>=0?`<div class="mini"><div class="k">${TL('👑 우리 무리 인싸','👑 Crew social star','👑 仲間の人気者')}</div><div class="v">${nm(star)}<small>${TL(`평균 ${Math.round(avg[star])}점 · 누구랑도 잘 맞음`,`avg ${Math.round(avg[star])} · gets along with everyone`,`平均${Math.round(avg[star])}点 · 誰とでも合う`)}</small></div></div>`:''}
+    ${pairs.some(p=>p.hap)?`<div class="mini"><div class="k">${TL('🧲 천간합 커플','🧲 Heavenly bond pair','🧲 干合カップル')}</div><div class="v">${pairs.filter(p=>p.hap).slice(0,2).map(p=>nm(p.i)+' × '+nm(p.j)).join(', ')}<small>${TL('사주 일간이 서로 끌어당기는 드문 조합','A rare pair whose day masters pull together','日干どうしが引き合う珍しい組み合わせ')}</small></div></div>`:''}</div>`:'';
+  const selInfo=sel!=null?`<div class="panel cm-sel"><b>${STEM_INFO[M[sel].stem].emoji} ${nm(sel)}</b>${TL('의 케미 순위','\'s chemistry ranking','の相性ランキング')}<div class="cm-rank">${pairs.filter(p=>p.i===sel||p.j===sel).map(p=>{const o=p.i===sel?p.j:p.i;return `<div><span>${nm(o)} <small>${M[o].mbti}</small></span><b style="color:${chemCol(p.s)}">${p.s}</b><small>${chemWord(p.s)}</small></div>`}).join('')||`<p class="fit-s">${TL('아직 다른 멤버가 없어요','No other members yet','まだ他のメンバーがいません')}</p>`}</div></div>`:'';
+  body.innerHTML=tabs+`<div class="panel cm-map"><div class="cm-head"><b>${esc(CM.data.title)}</b><small>${TL(n+'명',n+' people',n+'人')} · ${n<2?TL('친구를 초대해봐요','Invite your friends','友達を招待してみて'):TL('사람을 누르면 그 사람 기준으로 보여줘요','Tap someone to see it from their side','人をタップするとその人基準で表示')}</small></div>
     <svg viewBox="0 0 340 360" class="cm-svg">${lines}${nodes}</svg>
-    <div class="cm-legend"><span><i style="background:#FF4FA8"></i>찰떡 85+</span><span><i style="background:#8B6CFF"></i>좋음 76+</span><span><i style="background:#B9B0CC"></i>무난</span><span><i class="dash" style="border-color:#3D9BFF"></i>티격태격</span></div>
-    ${n>6&&sel==null?`<button class="again" style="margin:6px 0 0" onclick="CM.all=!CM.all;renderMap()">${CM.all?'강한 선만 보기':'모든 선 보기'}</button>`:''}</div>
+    <div class="cm-legend"><span><i style="background:#FF4FA8"></i>${TL('찰떡','Perfect','抜群')} 85+</span><span><i style="background:#8B6CFF"></i>${TL('좋음','Good','良い')} 76+</span><span><i style="background:#B9B0CC"></i>${TL('무난','Okay','普通')}</span><span><i class="dash" style="border-color:#3D9BFF"></i>${TL('티격태격','Bickering','じゃれ合い')}</span></div>
+    ${n>6&&sel==null?`<button class="again" style="margin:6px 0 0" onclick="CM.all=!CM.all;renderMap()">${CM.all?TL('강한 선만 보기','Strong lines only','強い線だけ表示'):TL('모든 선 보기','Show all lines','すべての線を表示')}</button>`:''}</div>
     ${selInfo}
-    <button class="btn" style="margin-top:16px" onclick="cmInvite()">💌 친구 초대하기</button>
+    <button class="btn" style="margin-top:16px" onclick="cmInvite()">${TL('💌 친구 초대하기','💌 Invite friends','💌 友達を招待')}</button>
     ${sup}
-    <div class="sec-t">👥 멤버 ${n}명</div><div class="panel cm-members">${M.map((m,k)=>`<div><span>${STEM_INFO[m.stem].emoji} ${esc(m.nick)} <small>${m.mbti}</small>${m.id===mine.memberId?' <em>나</em>':''}</span>${mine.ownerToken&&m.id!==mine.memberId?`<button class="again" onclick="cmKick('${m.id}')">빼기</button>`:''}</div>`).join('')}</div>
-    <div class="cm-foot"><button class="again" onclick="renderMap()">🔄 새로고침</button>${mine.ownerToken?`<button class="again" onclick="cmDelete()">지도 삭제</button>`:mine.memberId?`<button class="again" onclick="cmLeave()">지도 나가기</button>`:''}</div>`;
+    <div class="sec-t">${TL(`👥 멤버 ${n}명`,`👥 ${n} members`,`👥 メンバー${n}人`)}</div><div class="panel cm-members">${M.map((m,k)=>`<div><span>${STEM_INFO[m.stem].emoji} ${esc(m.nick)} <small>${m.mbti}</small>${m.id===mine.memberId?` <em>${TL('나','me','私')}</em>`:''}</span>${mine.ownerToken&&m.id!==mine.memberId?`<button class="again" onclick="cmKick('${m.id}')">${TL('빼기','Remove','外す')}</button>`:''}</div>`).join('')}</div>
+    <div class="cm-foot"><button class="again" onclick="renderMap()">${TL('🔄 새로고침','🔄 Refresh','🔄 更新')}</button>${mine.ownerToken?`<button class="again" onclick="cmDelete()">${TL('지도 삭제','Delete map','マップを削除')}</button>`:mine.memberId?`<button class="again" onclick="cmLeave()">${TL('지도 나가기','Leave map','マップから抜ける')}</button>`:''}</div>`;
 }
 async function cmCreate(){
-  const title=($('cmTitle').value||'').trim(); if(!title){toast('지도 이름을 적어주세요');return}
+  const title=($('cmTitle').value||'').trim(); if(!title){toast(TL('지도 이름을 적어주세요','Please name your map','マップ名を入力してください'));return}
   try{const r=await cmApi('',{method:'POST',body:JSON.stringify({title,me:cmMe()})});
     cmSave([{code:r.code,title,ownerToken:r.ownerToken,memberId:r.memberId,memberToken:r.memberToken},...cmMaps()]);CM.cur=r.code;CM.sel=null;await renderMap();cmInvite()}
-  catch(e){toast('지도를 만들지 못했어요. 잠시 후 다시 시도해주세요')}
+  catch(e){toast(TL('지도를 만들지 못했어요. 잠시 후 다시 시도해주세요','Couldn\'t create the map. Please try again later','マップを作れませんでした。しばらくしてから再度お試しください'))}
 }
 async function cmInvite(){
   const m=cmMaps().find(x=>x.code===CM.cur); if(!m)return;
-  const url=`${location.origin}/?map=${m.code}`, text=`${profile.nick}님이 '${m.title}' 궁합 지도에 초대했어요 🗺️\n생일이랑 MBTI만 넣으면 우리 무리 케미가 한눈에 보여요!\n👉 ${url}`;
+  const url=`${location.origin}/?map=${m.code}`, text=TL(`${profile.nick}님이 '${m.title}' 궁합 지도에 초대했어요 🗺️\n생일이랑 MBTI만 넣으면 우리 무리 케미가 한눈에 보여요!\n👉 ${url}`,`${profile.nick} invited you to the '${m.title}' chemistry map 🗺️\nJust add your birthday and MBTI to see the whole crew's chemistry!\n👉 ${url}`,`${profile.nick}さんが「${m.title}」相性マップに招待しました 🗺️\n誕生日とMBTIを入れるだけで仲間の相性がひと目でわかる!\n👉 ${url}`);
   try{if(navigator.share){await navigator.share({text});return}}catch(e){return}
-  try{await navigator.clipboard.writeText(text);toast('초대 링크를 복사했어요! 단톡방에 붙여넣기 💌')}catch(e){prompt('이 링크를 복사해서 보내주세요',url)}
+  try{await navigator.clipboard.writeText(text);toast(TL('초대 링크를 복사했어요! 단톡방에 붙여넣기 💌','Invite link copied! Paste it in your group chat 💌','招待リンクをコピーしました!グループに貼り付けて 💌'))}catch(e){prompt(TL('이 링크를 복사해서 보내주세요','Copy and send this link','このリンクをコピーして送ってください'),url)}
 }
-async function cmKick(id){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm('이 멤버를 지도에서 뺄까요?'))return;
-  try{await cmApi(`/${m.code}/members/${id}`,{method:'DELETE',headers:{'x-map-token':m.ownerToken}});CM.sel=null;renderMap()}catch(e){toast('빼지 못했어요')}}
-async function cmLeave(){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm('이 지도에서 나갈까요? 내 정보가 지도에서 지워져요.'))return;
+async function cmKick(id){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm(TL('이 멤버를 지도에서 뺄까요?','Remove this member from the map?','このメンバーをマップから外しますか?')))return;
+  try{await cmApi(`/${m.code}/members/${id}`,{method:'DELETE',headers:{'x-map-token':m.ownerToken}});CM.sel=null;renderMap()}catch(e){toast(TL('빼지 못했어요','Couldn\'t remove','外せませんでした'))}}
+async function cmLeave(){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm(TL('이 지도에서 나갈까요? 내 정보가 지도에서 지워져요.','Leave this map? Your info will be removed from it.','このマップから抜けますか?あなたの情報はマップから消えます。')))return;
   try{await cmApi(`/${m.code}/members/${m.memberId}`,{method:'DELETE',headers:{'x-map-token':m.memberToken}})}catch(e){}
-  cmSave(cmMaps().filter(x=>x.code!==m.code));CM.cur=null;CM.sel=null;toast('지도에서 나왔어요');renderMap()}
-async function cmDelete(){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm(`'${m.title}' 지도를 삭제할까요? 모든 멤버에게서 사라져요.`))return;
-  try{await cmApi('/'+m.code,{method:'DELETE',headers:{'x-map-token':m.ownerToken}})}catch(e){toast('삭제하지 못했어요');return}
-  cmSave(cmMaps().filter(x=>x.code!==m.code));CM.cur=null;CM.sel=null;toast('지도를 삭제했어요');renderMap()}
+  cmSave(cmMaps().filter(x=>x.code!==m.code));CM.cur=null;CM.sel=null;toast(TL('지도에서 나왔어요','You left the map','マップから抜けました'));renderMap()}
+async function cmDelete(){const m=cmMaps().find(x=>x.code===CM.cur);if(!m||!confirm(TL(`'${m.title}' 지도를 삭제할까요? 모든 멤버에게서 사라져요.`,`Delete '${m.title}'? It will disappear for all members.`,`「${m.title}」を削除しますか?全メンバーから消えます。`)))return;
+  try{await cmApi('/'+m.code,{method:'DELETE',headers:{'x-map-token':m.ownerToken}})}catch(e){toast(TL('삭제하지 못했어요','Couldn\'t delete','削除できませんでした'));return}
+  cmSave(cmMaps().filter(x=>x.code!==m.code));CM.cur=null;CM.sel=null;toast(TL('지도를 삭제했어요','Map deleted','マップを削除しました'));renderMap()}
 async function cmJoinPrompt(){
   const code=store.get('soulcode.pendingMap'); if(!code||!profile)return;
   if(cmMaps().some(m=>m.code===code)){store.del('soulcode.pendingMap');openMap(code);return}
-  let info; try{info=await cmApi('/'+code)}catch(e){store.del('soulcode.pendingMap');toast('없어진 지도 링크예요');return}
+  let info; try{info=await cmApi('/'+code)}catch(e){store.del('soulcode.pendingMap');toast(TL('없어진 지도 링크예요','This map link no longer exists','なくなったマップのリンクです'));return}
   let m=$('wishM'); if(!m){openWish('x','moon');closeWish();m=$('wishM')}
   const host=info.members[0];
-  $('wishIn').innerHTML=`<div style="text-align:center"><div style="font-size:46px">🗺️</div><h3 class="h-display" style="font-size:22px;margin-top:6px">${host?esc(host.nick)+'님의 ':''}'${esc(info.title)}'<br>궁합 지도에 초대받았어요</h3><p class="fit-s" style="margin:10px 0 0">지금 ${info.members.length}명 참여 중 · 들어가면 모두와의 케미가 바로 보여요.<br>공유되는 건 <b>별명·MBTI·사주 일간·띠</b>뿐이고, 생년월일은 공유되지 않아요.</p></div>
-    <button class="btn" style="margin-top:16px" onclick="cmJoin('${code}')">참여하기 💞</button><button class="btn ghost" style="margin-top:10px" onclick="store.del('soulcode.pendingMap');closeWish()">다음에</button>`;
+  $('wishIn').innerHTML=`<div style="text-align:center"><div style="font-size:46px">🗺️</div><h3 class="h-display" style="font-size:22px;margin-top:6px">${TL(`${host?esc(host.nick)+'님의 ':''}'${esc(info.title)}'<br>궁합 지도에 초대받았어요`,`You're invited to ${host?esc(host.nick)+'\'s ':''}<br>'${esc(info.title)}' chemistry map`,`${host?esc(host.nick)+'さんの':''}「${esc(info.title)}」<br>相性マップに招待されました`)}</h3><p class="fit-s" style="margin:10px 0 0">${TL(`지금 ${info.members.length}명 참여 중 · 들어가면 모두와의 케미가 바로 보여요.<br>공유되는 건 <b>별명·MBTI·사주 일간·띠</b>뿐이고, 생년월일은 공유되지 않아요.`,`${info.members.length} people joined · join to see your chemistry with everyone.<br>Only your <b>nickname, MBTI, day master and zodiac</b> are shared, never your birthday.`,`今${info.members.length}人参加中 · 入るとみんなとの相性がすぐわかります。<br>共有されるのは<b>ニックネーム・MBTI・日干・干支</b>だけで、生年月日は共有されません。`)}</p></div>
+    <button class="btn" style="margin-top:16px" onclick="cmJoin('${code}')">${TL('참여하기 💞','Join 💞','参加する 💞')}</button><button class="btn ghost" style="margin-top:10px" onclick="store.del('soulcode.pendingMap');closeWish()">${TL('다음에','Later','また今度')}</button>`;
   m.classList.add('show');
 }
 async function cmJoin(code){
   try{const info=await cmApi('/'+code), r=await cmApi(`/${code}/join`,{method:'POST',body:JSON.stringify(cmMe())});
     cmSave([{code,title:info.title,memberId:r.memberId,memberToken:r.memberToken},...cmMaps().filter(m=>m.code!==code)]);
-    store.del('soulcode.pendingMap');closeWish();toast('지도에 들어왔어요! 🎉');openMap(code)}
-  catch(e){toast(e.code==='full'?'이 지도는 30명이 꽉 찼어요':'참여하지 못했어요. 잠시 후 다시 시도해주세요')}
+    store.del('soulcode.pendingMap');closeWish();toast(TL('지도에 들어왔어요! 🎉','You joined the map! 🎉','マップに参加しました! 🎉'));openMap(code)}
+  catch(e){toast(e.code==='full'?TL('이 지도는 30명이 꽉 찼어요','This map is full (30 people)','このマップは30人で満員です'):TL('참여하지 못했어요. 잠시 후 다시 시도해주세요','Couldn\'t join. Please try again later','参加できませんでした。しばらくしてから再度お試しください'))}
 }
 function cmEntry(){
   const f=$('mtForm'); if(!f||$('cmEntry')||!window.soulConfig)return;
-  f.insertAdjacentHTML('beforebegin',`<button class="panel cm-entry" id="cmEntry" onclick="openMap()"><span class="ev-e">🗺️</span><span class="ev-b"><b>친구들과 궁합 지도 만들기</b><small>링크 하나로 단톡방 전체 케미를 한 장에! 베스트 케미·인싸 어워즈까지</small></span><span style="font-size:22px">→</span></button>`);
+  f.insertAdjacentHTML('beforebegin',`<button class="panel cm-entry" id="cmEntry" onclick="openMap()"><span class="ev-e">🗺️</span><span class="ev-b"><b>${TL('친구들과 궁합 지도 만들기','Make a chemistry map with friends','友達と相性マップを作る')}</b><small>${TL('링크 하나로 단톡방 전체 케미를 한 장에! 베스트 케미·인싸 어워즈까지','Your whole group chat\'s chemistry on one page with one link! Plus best-pair and social-star awards','リンクひとつでグループ全体の相性を1枚に!ベスト相性・人気者アワードも')}</small></span><span style="font-size:22px">→</span></button>`);
 }
 
 
@@ -1683,7 +1685,7 @@ try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$
 {const pw=$('paywall'); if(pw&&window.soulPay){const pl=pw.querySelector('.plans'); pl&&pl.insertAdjacentHTML('afterend','<button class="again tk-link" onclick="closePaywall();openOffer(\'PRO 대신 필요한 것만 한 번\',null)">한 번만 필요해요? 1회 이용권 990원 →</button>')}}
 {const _fill=fillResult; fillResult=function(){_fill(); renderFit()};
  const _rt=renderTarot; renderTarot=function(){_rt(); renderYesterdayAsk(); renderEvents()};
- const _rm=renderMe; renderMe=function(){_rm(); renderDiary(); renderPushSetting(); const n=calcStreak(); if(unlocks().includes('strawberry'))$('stS').textContent="🍓 '딸기우유' 스킨 평생 해금 완료"; else $('stS').textContent=n>=7?'7일 달성! 스킨이 곧 해금돼요':`${7-n}일만 더 오면 '딸기우유' 스킨 평생 해금 🍓`}}
+ const _rm=renderMe; renderMe=function(){_rm(); renderDiary(); renderPushSetting(); const n=calcStreak(); if(unlocks().includes('strawberry'))$('stS').textContent=TL("🍓 '딸기우유' 스킨 평생 해금 완료","🍓 'Strawberry Milk' skin unlocked forever","🍓 「いちごミルク」スキン永久解放済み"); else $('stS').textContent=n>=7?TL('7일 달성! 스킨이 곧 해금돼요','7 days done! Skin unlocking soon','7日達成!スキンがもうすぐ解放'):TL(`${7-n}일만 더 오면 '딸기우유' 스킨 평생 해금 🍓`,`${7-n} more days to unlock 'Strawberry Milk' forever 🍓`,`あと${7-n}日で「いちごミルク」スキン永久解放 🍓`)}}
 
 /* ================= PRODUCTION HOOKS ================= */
 (function(){
@@ -1700,9 +1702,9 @@ try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$
     // 정식 버전: 프로토타입용 요소 정리 + 약관 링크·탈퇴 메뉴
     document.querySelectorAll('button.again[onclick="redraw()"]').forEach(b=>b.remove());
     const me=$('s-me'), dis=me.querySelector('.disclaimer');
-    [...me.querySelectorAll('.sec-t')].filter(h=>h.textContent.includes('정식 버전')).forEach(h=>{h.textContent='🚀 곧 추가될 기능';const nx=h.nextElementSibling;if(nx)nx.innerHTML=nx.innerHTML.replace(/<br>📲[^<]*/,'')});
-    dis.insertAdjacentHTML('afterend',`<div class="legal-links"><a href="/terms">이용약관</a>·<a href="/privacy"><b>개인정보처리방침</b></a>·<a href="/refund">환불정책</a>${window.soulConfig.serverPro?'<br><button onclick="deleteAccount()">회원 탈퇴</button>':''}</div>`);
-    const biz=(window.soulConfig.biz||[]).map(([k,v])=>`<span>${esc(k)}: ${esc(v)}</span>`).join('');
+    [...me.querySelectorAll('.sec-t')].filter(h=>(h.dataset.ko||h.textContent).includes('정식 버전')).forEach(h=>{h.textContent='🚀 곧 추가될 기능';const nx=h.nextElementSibling;if(nx)nx.innerHTML=nx.innerHTML.replace(/<br>📲[^<]*/,'')});
+    dis.insertAdjacentHTML('afterend',`<div class="legal-links"><a href="/terms">${TL('이용약관','Terms','利用規約')}</a>·<a href="/privacy"><b>${TL('개인정보처리방침','Privacy','プライバシーポリシー')}</b></a>·<a href="/refund">${TL('환불정책','Refunds','返金ポリシー')}</a>${window.soulConfig.serverPro?`<br><button onclick="deleteAccount()">${TL('회원 탈퇴','Delete account','退会')}</button>`:''}</div>`);
+    const biz=(window.soulConfig.biz||[]).map(([k,v])=>`<span>${esc(k==='문의'?TL(k,'Contact','お問い合わせ'):k)}: ${esc(v)}</span>`).join('');
     if(biz)me.querySelector('.legal-links').insertAdjacentHTML('afterend',`<p class="biz-info">${biz}</p>`);
   }
 })();
@@ -1734,9 +1736,9 @@ function setLang(k){store.set('soulcode.lang',k);location.href=location.pathname
 function tidyMe(){
   const me=$('s-me'); if(!me||!window.soulConfig)return;
   const heads=[...me.querySelectorAll(':scope > .sec-t')];
-  const find=t=>heads.find(h=>h.textContent.includes(t));
+  const find=t=>heads.find(h=>(h.dataset.ko||h.textContent).includes(t));
   // 예전 '곧 추가될 기능' 안내 제거 (알림·친구 초대는 이미 출시)
-  heads.filter(h=>h.textContent.includes('곧 추가될')||h.textContent.includes('정식 버전')).forEach(h=>{const nx=h.nextElementSibling;if(nx&&nx.classList.contains('panel'))nx.remove();h.remove()});
+  heads.filter(h=>{const x=h.dataset.ko||h.textContent;return x.includes('곧 추가될')||x.includes('정식 버전')}).forEach(h=>{const nx=h.nextElementSibling;if(nx&&nx.classList.contains('panel'))nx.remove();h.remove()});
   const group=(id,label,before)=>{if($(id)||!before)return;before.insertAdjacentHTML('beforebegin',`<div class="grp-t" id="${id}">${label}</div>`)};
   group('grpRecord','📚 내 기록',find('운세 리포트'));
   group('grpDeco','🎨 꾸미기',find('카드 덱 스킨'));
@@ -1745,7 +1747,7 @@ function tidyMe(){
   const gs=$('grpSet');
   if(gs&&!$('langSet')){
     const cur=window.soulLang||'ko';
-    gs.insertAdjacentHTML('afterend',`<div class="sec-t">🌐 언어</div><div class="panel lang-set" id="langSet">${[['ko','한국어'],['en','English'],['ja','日本語']].map(([k,n])=>`<button class="chip${k===cur?' sel':''}" onclick="setLang('${k}')">${n}</button>`).join('')}<p class="muted" style="font-size:12px;margin-top:8px">English · 日本語: beta (some content is still in Korean)</p></div>`);
+    gs.insertAdjacentHTML('afterend',`<div class="sec-t">🌐 언어</div><div class="panel lang-set" id="langSet">${[['ko','한국어'],['en','English'],['ja','日本語']].map(([k,n])=>`<button class="chip${k===cur?' sel':''}" onclick="setLang('${k}')">${n}</button>`).join('')}<p class="muted" style="font-size:12px;margin-top:8px">English · 日本語 beta</p></div>`);
   }
 }
 {const _go2=go; go=function(id){_go2(id); if(id==='s-match'||id==='s-soul'||id==='s-me'||id==='s-splash')setTimeout(tidyLayout,0)};}

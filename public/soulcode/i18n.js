@@ -93,6 +93,7 @@
     '썸·연인':['Crush·Lover','気になる人・恋人'], '친구':['Friend','友達'], '동료':['Coworker','同僚'],
     '양력':['Solar','新暦'], '음력':['Lunar','旧暦'],
     '🌐 언어':['🌐 Language','🌐 言語'],
+    '연간 운세':['Yearly fortune','年間運勢'], '12개월 흐름 그래프':['12-month trend','12か月の流れ'],
   };
   const L=['en','ja'];
   let lang='ko';
@@ -106,7 +107,7 @@
   const PFX={en:'/en',ja:'/ja'}[lang];
   function walk(root){
     if(!root)return;
-    if(root.nodeType===3){const r=tr(root.nodeValue);if(r!==null)root.nodeValue=r;return}
+    if(root.nodeType===3){const r=tr(root.nodeValue);if(r!==null){const pe=root.parentElement;if(pe&&!pe.dataset.ko)pe.dataset.ko=root.nodeValue;root.nodeValue=r}return}
     if(root.nodeType!==1)return;
     if(root.placeholder){const r=tr(root.placeholder);if(r!==null)root.placeholder=r}
     if(root.tagName==='A'){const h=root.getAttribute('href')||'';if(/^\/(wanted|ask)(\b|\?|$)/.test(h))root.setAttribute('href',PFX+h)}
