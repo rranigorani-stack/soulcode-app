@@ -241,6 +241,14 @@ export async function startSoulcode() {
   await initPayments(session);
   if (session) makeShop();
 
+  // 다국어 화면 뼈대 (app.js보다 먼저)
+  await new Promise<void>((resolve) => {
+    const s = document.createElement('script');
+    s.src = '/soulcode/i18n.js';
+    s.onload = () => resolve();
+    s.onerror = () => resolve();
+    document.body.appendChild(s);
+  });
   await new Promise<void>((resolve, reject) => {
     const s = document.createElement('script');
     s.src = '/soulcode/app.js';

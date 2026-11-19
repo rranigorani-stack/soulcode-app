@@ -1713,6 +1713,7 @@ function tidyLayout(){
   const sp=$('pastSplash'); if(sp&&!sp.classList.contains('hub-pills'))sp.className='past-splash hub-pills',sp.innerHTML='<a href="/wanted?utm_source=app_splash">🚨 수배전단</a><a href="/ask?utm_source=app_splash">💌 친구들이 보는 나</a>';
   tidyMe();
 }
+function setLang(k){store.set('soulcode.lang',k);location.href=location.pathname}
 function tidyMe(){
   const me=$('s-me'); if(!me||!window.soulConfig)return;
   const heads=[...me.querySelectorAll(':scope > .sec-t')];
@@ -1723,6 +1724,12 @@ function tidyMe(){
   group('grpRecord','📚 내 기록',find('운세 리포트'));
   group('grpDeco','🎨 꾸미기',find('카드 덱 스킨'));
   group('grpSet','⚙️ 설정',find('아침 알림')||find('동기화'));
+  // 🌐 언어 선택 (설정 그룹 맨 위)
+  const gs=$('grpSet');
+  if(gs&&!$('langSet')){
+    const cur=window.soulLang||'ko';
+    gs.insertAdjacentHTML('afterend',`<div class="sec-t">🌐 언어</div><div class="panel lang-set" id="langSet">${[['ko','한국어'],['en','English'],['ja','日本語']].map(([k,n])=>`<button class="chip${k===cur?' sel':''}" onclick="setLang('${k}')">${n}</button>`).join('')}<p class="muted" style="font-size:12px;margin-top:8px">English · 日本語: beta (some content is still in Korean)</p></div>`);
+  }
 }
 {const _go2=go; go=function(id){_go2(id); if(id==='s-match'||id==='s-soul'||id==='s-me'||id==='s-splash')setTimeout(tidyLayout,0)};}
 cmEntry=function(){tidyLayout()};
