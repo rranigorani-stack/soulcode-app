@@ -1,4 +1,5 @@
 'use client';
+import { BizInfo } from './BizInfo';
 import { useRef, useState } from 'react';
 import { EL, MBTI_BEST, wanted, type Wanted as W } from '@/lib/wanted';
 import { drawMontage, type Gender } from './montage';
@@ -209,7 +210,7 @@ export default function Wanted() {
             <button className="again" onClick={() => { setStage('form'); setImg(''); }}>다시 뽑기</button>
           </section>
         )}
-        <footer className="past-foot"><a href="/ask">💌 친구들이 보는 나</a> · <a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a></footer>
+        <footer className="past-foot"><a href="/ask">💌 친구들이 보는 나</a> · <a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a><BizInfo /></footer>
       </main>
     </div>
   );

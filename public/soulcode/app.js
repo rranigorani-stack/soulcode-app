@@ -1685,6 +1685,8 @@ try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$
     const me=$('s-me'), dis=me.querySelector('.disclaimer');
     [...me.querySelectorAll('.sec-t')].filter(h=>h.textContent.includes('정식 버전')).forEach(h=>{h.textContent='🚀 곧 추가될 기능';const nx=h.nextElementSibling;if(nx)nx.innerHTML=nx.innerHTML.replace(/<br>📲[^<]*/,'')});
     dis.insertAdjacentHTML('afterend',`<div class="legal-links"><a href="/terms">이용약관</a>·<a href="/privacy"><b>개인정보처리방침</b></a>·<a href="/refund">환불정책</a>${window.soulConfig.serverPro?'<br><button onclick="deleteAccount()">회원 탈퇴</button>':''}</div>`);
+    const biz=(window.soulConfig.biz||[]).map(([k,v])=>`<span>${esc(k)}: ${esc(v)}</span>`).join('');
+    if(biz)me.querySelector('.legal-links').insertAdjacentHTML('afterend',`<p class="biz-info">${biz}</p>`);
   }
 })();
 

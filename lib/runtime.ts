@@ -9,6 +9,7 @@
  */
 import { createClient, type Session, type SupabaseClient } from '@supabase/supabase-js';
 import * as Manseryeok from 'manseryeok';
+import { bizLines } from './legal';
 
 type Provider = 'kakao' | 'apple' | 'google';
 type SampleOpts = { onText?: (u: { text: string; delta: string }) => void; signal?: AbortSignal; ticket?: boolean };
@@ -17,7 +18,7 @@ declare global {
   interface Window {
     Manseryeok: typeof Manseryeok;
     claude?: { use: (name: string) => Promise<unknown> };
-    soulConfig: { devTestPro: boolean; serverPro: boolean; providers: Provider[]; emailLogin: boolean; payTest: boolean };
+    soulConfig: { devTestPro: boolean; serverPro: boolean; providers: Provider[]; emailLogin: boolean; payTest: boolean; biz: [string, string][] };
     soulAuth?: { signIn: (p: Provider) => void; emailPrompt: () => void; signOut: () => void; label: () => string; deleteAccount: () => Promise<boolean> };
     soulPay?: { start: (plan: 'month' | 'year' | 'ticket') => void };
     soulShop?: { unlockSkin: (skin: string) => Promise<{ ok: boolean; code?: string; skins?: string[] }> };
@@ -179,7 +180,7 @@ export async function startSoulcode() {
   if (window.__soulBooted) return;
   window.__soulBooted = true;
   window.Manseryeok = Manseryeok;
-  window.soulConfig = { devTestPro: DEV_TEST_PRO && !TOSS_CLIENT_KEY, serverPro: false, providers: PROVIDERS, emailLogin: EMAIL_LOGIN, payTest: TOSS_CLIENT_KEY.startsWith('test_') };
+  window.soulConfig = { devTestPro: DEV_TEST_PRO && !TOSS_CLIENT_KEY, serverPro: false, providers: PROVIDERS, emailLogin: EMAIL_LOGIN, payTest: TOSS_CLIENT_KEY.startsWith('test_'), biz: bizLines() };
 
   let session: Session | null = null;
   if (SUPABASE_URL && SUPABASE_ANON) {

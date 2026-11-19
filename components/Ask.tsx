@@ -1,4 +1,5 @@
 'use client';
+import { BizInfo } from './BizInfo';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { ANIMALS, CHARMS, ISLANDS, LOVES, MIN_REVEAL, topIdx, type AskAnswer, type AskResult } from '@/lib/askData';
 
@@ -99,7 +100,7 @@ function Shell({ children }: { children: React.ReactNode }) {
     <div className="wanted-wrap">
       <main className="past ask">
         {children}
-        <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a></footer>
+        <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a><BizInfo /></footer>
       </main>
     </div>
   );
