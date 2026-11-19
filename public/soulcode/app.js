@@ -1508,7 +1508,7 @@ function wishResult(id,kind,res){
 }
 
 async function shareWish(kind,card,verdict){
-  const c=TAROT[card], url=location.origin+'/?from=wish';
+  const c=TAROT[card], url=location.origin+(LG==='ko'?'/':'/'+LG)+'?from=wish';
   const text=`${kind==='birthday'?TL('🎂 생일 특별 카드','🎂 Birthday special card','🎂 誕生日の特別カード'):TL('🌕 보름 소원 카드','🌕 Full-moon wish card','🌕 満月の願いごとカード')}: ${c[2]} ${c[0]} — ${verdict}\n${TL('너도 뽑아봐','Draw yours too','あなたも引いてみて')} 👉 ${url}`;
   try{if(navigator.share){await navigator.share({text});return}}catch(e){return}
   try{await navigator.clipboard.writeText(text);toast(TL('복사했어요! 카톡에 붙여넣기 💌','Copied! Paste it in a chat 💌','コピーしました!LINEに貼り付けて 💌'))}catch(e){toast(TL('복사하지 못했어요','Couldn\'t copy','コピーできませんでした'))}
@@ -1585,7 +1585,7 @@ async function cmCreate(){
 }
 async function cmInvite(){
   const m=cmMaps().find(x=>x.code===CM.cur); if(!m)return;
-  const url=`${location.origin}/?map=${m.code}`, text=TL(`${profile.nick}님이 '${m.title}' 궁합 지도에 초대했어요 🗺️\n생일이랑 MBTI만 넣으면 우리 무리 케미가 한눈에 보여요!\n👉 ${url}`,`${profile.nick} invited you to the '${m.title}' chemistry map 🗺️\nJust add your birthday and MBTI to see the whole crew's chemistry!\n👉 ${url}`,`${profile.nick}さんが「${m.title}」相性マップに招待しました 🗺️\n誕生日とMBTIを入れるだけで仲間の相性がひと目でわかる!\n👉 ${url}`);
+  const url=`${location.origin}${LG==='ko'?'/':'/'+LG}?map=${m.code}`, text=TL(`${profile.nick}님이 '${m.title}' 궁합 지도에 초대했어요 🗺️\n생일이랑 MBTI만 넣으면 우리 무리 케미가 한눈에 보여요!\n👉 ${url}`,`${profile.nick} invited you to the '${m.title}' chemistry map 🗺️\nJust add your birthday and MBTI to see the whole crew's chemistry!\n👉 ${url}`,`${profile.nick}さんが「${m.title}」相性マップに招待しました 🗺️\n誕生日とMBTIを入れるだけで仲間の相性がひと目でわかる!\n👉 ${url}`);
   try{if(navigator.share){await navigator.share({text});return}}catch(e){return}
   try{await navigator.clipboard.writeText(text);toast(TL('초대 링크를 복사했어요! 단톡방에 붙여넣기 💌','Invite link copied! Paste it in your group chat 💌','招待リンクをコピーしました!グループに貼り付けて 💌'))}catch(e){prompt(TL('이 링크를 복사해서 보내주세요','Copy and send this link','このリンクをコピーして送ってください'),url)}
 }

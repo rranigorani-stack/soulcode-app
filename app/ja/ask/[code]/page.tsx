@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
   return {
     title, description: 'MBTI・肉食系/草食系・魅力ポイントを匿名で選んでね。誰が答えたかはわかりません 🤫',
     robots: { index: false },
-    openGraph: { title, description: '選んだ答えだけが匿名で届きます 🤫', images: [{ url: '/og.png' }], type: 'website', siteName: 'SOULCODE', locale: 'ja_JP' },
+    openGraph: { title, description: '選んだ答えだけが匿名で届きます 🤫', images: [{ url: '/og-ja.png' }], type: 'website', siteName: 'SOULCODE', locale: 'ja_JP' },
   };
 }
 

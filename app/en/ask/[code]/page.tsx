@@ -16,7 +16,7 @@ export async function generateMetadata({ params }: { params: Promise<{ code: str
   return {
     title, description: 'Pick their MBTI, Bold/Soft type and charm point. They will never know who answered 🤫',
     robots: { index: false },
-    openGraph: { title, description: 'Only your picks are sent, anonymously 🤫', images: [{ url: '/og.png' }], type: 'website', siteName: 'SOULCODE', locale: 'en_US' },
+    openGraph: { title, description: 'Only your picks are sent, anonymously 🤫', images: [{ url: '/og-en.png' }], type: 'website', siteName: 'SOULCODE', locale: 'en_US' },
   };
 }
 
