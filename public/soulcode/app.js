@@ -256,6 +256,7 @@ function go(id){
 
 /* ================= ONBOARDING ================= */
 const PAIRS=[['E','외향','사람 만나면 충전','I','내향','혼자 있어야 충전'],['S','감각','현실·경험파','N','직관','상상·가능성파'],['T','사고','팩트가 중요','F','감정','마음이 중요'],['J','판단','계획 세우는 편','P','인식','즉흥이 편한 편']];
+if(window.soulLang&&window.soulLang!=='ko'&&window.applyContentI18n){try{applyContentI18n()}catch(e){console.warn('i18n content',e)}}
 $('mbtiRows').innerHTML = PAIRS.map((p,i)=>`<div class="mbti-row">
   <button class="mbti-opt" data-i="${i}" data-v="${p[0]}"><b>${p[0]}</b><span>${p[1]} · ${p[2]}</span></button>
   <button class="mbti-opt" data-i="${i}" data-v="${p[3]}"><b>${p[3]}</b><span>${p[4]} · ${p[5]}</span></button></div>`).join('');
@@ -504,7 +505,7 @@ function openShare(){
 }
 function closeShare(){$('share').classList.remove('show')}
 function copyShare(){
-  navigator.clipboard.writeText(shareText()).then(()=>toast('복사 완료! 스토리에 붙여넣어 보세요 📋')).catch(()=>toast('이 환경에서는 복사가 막혀 있어요'));
+  navigator.clipboard.writeText(shareText()).then(()=>toast('복사 완료! 스토리에 붙여넣어 보세요 📋')).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));
 }
 $('share').onclick=e=>{if(e.target.id==='share')closeShare()};
 
@@ -647,7 +648,7 @@ function spRender(){
 }
 function spCopy(){
   const s=sp.last; const txt=`🔮 SOULCODE 고민 타로 | ${s.cat}\n${sp.q?`“${sp.q}”\n`:''}과거 ${s.cards[0]} → 현재 ${s.cards[1]} → 미래 ${s.cards[2]}\n결과: ${s.verdict}\n#소울코드 #고민타로`;
-  navigator.clipboard.writeText(txt).then(()=>toast('복사 완료! 📋')).catch(()=>toast('이 환경에서는 복사가 막혀 있어요'));
+  navigator.clipboard.writeText(txt).then(()=>toast(TL('복사 완료! 📋','Copied! 📋','コピーしました! 📋'))).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));
 }
 function spReset(){
   sp.picks=[]; $('spSetup').style.display='block'; $('spPick').style.display='none'; $('spResult').style.display='none';
@@ -669,9 +670,10 @@ const MT_TIP={
   work:['업무 스타일이 달라요. 역할과 마감을 미리 맞춰두기 📋','같이 프로젝트 하면 시너지 최고. 역할 분담만 확실히! 🚀'],
 };
 const mt={rel:'lover',last:null};
+if(window.soulLang&&window.soulLang!=='ko'&&window.applyContentI18n){try{applyContentI18n()}catch(e){console.warn('i18n content',e)}}
 $('mtRel').innerHTML=MT_REL.map(r=>`<button class="chip ${r.k==='lover'?'sel':''}" data-k="${r.k}">${r.e} ${r.n}</button>`).join('');
 document.querySelectorAll('#mtRel .chip').forEach(b=>b.onclick=()=>{mt.rel=b.dataset.k;document.querySelectorAll('#mtRel .chip').forEach(x=>x.classList.toggle('sel',x===b));$('mtTimeWrap').style.display=mt.rel==='lover'?'block':'none'});
-$('mtMbti').innerHTML='<option value="">MBTI 선택</option>'+Object.keys(MBTI).map(k=>`<option value="${k}">${k} · ${MBTI[k].nick}</option>`).join('');
+$('mtMbti').innerHTML=`<option value="">${TL('MBTI 선택','Choose MBTI','MBTIを選択')}</option>`+Object.keys(MBTI).map(k=>`<option value="${k}">${k} · ${MBTI[k].nick}</option>`).join('');
 function mtCheck(){$('mtGo').disabled=!($('mtNick').value.trim()&&$('mtBirth').value&&$('mtMbti').value)}
 ['mtNick','mtBirth','mtMbti'].forEach(id=>{$(id).oninput=mtCheck;$(id).onchange=mtCheck});
 const mtPicker=mountBirthPicker($('mtBirth'),mtCheck);
@@ -682,30 +684,30 @@ function mbtiMatch(a,b){
 }
 function mbtiLines(a,b){
   const L=[];
-  L.push(a[1]===b[1]?'세상을 보는 방식이 같아서 대화가 잘 통해요.':'보는 관점이 달라서 신기하지만, 가끔 대화가 엇갈릴 수 있어요.');
-  L.push(a[0]!==b[0]?'에너지 방향이 반대라 서로를 보완해줘요.':a[0]==='E'?'둘 다 밖으로! 같이 놀면 텐션 폭발 🎉':'둘 다 집순이·집돌이 모드, 조용한 만남이 찰떡 🏠');
-  L.push(a[2]!==b[2]?'한 명은 논리, 한 명은 공감 담당. 다툴 땐 서로 번역이 필요해요.':a[2]==='T'?'둘 다 팩트로 대화해서 깔끔해요.':'서로 감정을 잘 알아줘서 따뜻해요.');
-  L.push(a[3]!==b[3]?'계획러와 즉흥러 조합, 여행 갈 땐 역할 분담 필수!':a[3]==='J'?'둘 다 계획형이라 약속 시간은 칼같아요 ⏰':'둘 다 즉흥형이라 재밌지만, 일정은 누가 챙기죠? 🤔');
+  L.push(a[1]===b[1]?TL('세상을 보는 방식이 같아서 대화가 잘 통해요.','You see the world the same way, so talking is easy.','世界の見方が同じなので話がよく通じます。'):TL('보는 관점이 달라서 신기하지만, 가끔 대화가 엇갈릴 수 있어요.','Your viewpoints differ, which is fun, but conversations can sometimes miss.','視点が違って新鮮だけど、たまに会話がすれ違うかも。'));
+  L.push(a[0]!==b[0]?TL('에너지 방향이 반대라 서로를 보완해줘요.','Your energy points opposite ways, so you balance each other.','エネルギーの向きが逆だから、お互いを補い合えます。'):a[0]==='E'?TL('둘 다 밖으로! 같이 놀면 텐션 폭발 🎉','Both outgoing! Hanging out together is pure hype 🎉','ふたりとも外向き!一緒に遊ぶとテンション爆発 🎉'):TL('둘 다 집순이·집돌이 모드, 조용한 만남이 찰떡 🏠','Both homebodies: quiet hangouts are perfect 🏠','ふたりともおうち派、まったりデートがぴったり 🏠'));
+  L.push(a[2]!==b[2]?TL('한 명은 논리, 한 명은 공감 담당. 다툴 땐 서로 번역이 필요해요.','One brings logic, one brings empathy. In fights you need to translate for each other.','ひとりは論理、ひとりは共感担当。ケンカの時はお互い通訳が必要。'):a[2]==='T'?TL('둘 다 팩트로 대화해서 깔끔해요.','You both talk in facts, so things stay clean.','ふたりとも事実ベースで話すからスッキリ。'):TL('서로 감정을 잘 알아줘서 따뜻해요.','You both get each other\'s feelings, so it feels warm.','お互いの気持ちをわかり合えてあたたかい。'));
+  L.push(a[3]!==b[3]?TL('계획러와 즉흥러 조합, 여행 갈 땐 역할 분담 필수!','A planner and a go-with-the-flow type: split roles when you travel!','計画派と即興派のコンビ、旅行では役割分担が必須!'):a[3]==='J'?TL('둘 다 계획형이라 약속 시간은 칼같아요 ⏰','Both planners, so you\'re always on time ⏰','ふたりとも計画派だから時間ぴったり ⏰'):TL('둘 다 즉흥형이라 재밌지만, 일정은 누가 챙기죠? 🤔','Both spontaneous: fun, but who handles the schedule? 🤔','ふたりとも即興派で楽しいけど、予定は誰が管理する? 🤔'));
   return L;
 }
 function ttiMatch(a,b){
-  if((a+b)%12===1) return {s:92,t:'육합',d:'서로를 끌어당기는 띠 조합이에요.'};
-  if(a!==b&&a%4===b%4) return {s:88,t:'삼합',d:'같은 목표를 향해 뭉치는 띠 조합이에요.'};
-  if(Math.abs(a-b)===6) return {s:55,t:'충',d:'부딪히면 불꽃 튀는 조합. 대신 서로에게 좋은 자극제예요.'};
-  if(a===b) return {s:75,t:'같은 띠',d:'생활 리듬과 감성이 비슷해요.'};
-  return {s:70,t:'무난',d:'크게 부딪힐 일 없는 편안한 조합이에요.'};
+  if((a+b)%12===1) return {s:92,t:TL('육합','Perfect pair','六合'),d:TL('서로를 끌어당기는 띠 조합이에요.','Zodiac signs that pull each other in.','お互いを引き寄せる干支の組み合わせ。')};
+  if(a!==b&&a%4===b%4) return {s:88,t:TL('삼합','Team trio','三合'),d:TL('같은 목표를 향해 뭉치는 띠 조합이에요.','Signs that team up toward the same goal.','同じ目標に向かって団結する干支の組み合わせ。')};
+  if(Math.abs(a-b)===6) return {s:55,t:TL('충','Clash','冲'),d:TL('부딪히면 불꽃 튀는 조합. 대신 서로에게 좋은 자극제예요.','Sparks fly when you clash, but you push each other to grow.','ぶつかると火花が散る組み合わせ。でもいい刺激になる。')};
+  if(a===b) return {s:75,t:TL('같은 띠','Same sign','同じ干支'),d:TL('생활 리듬과 감성이 비슷해요.','Similar rhythms and vibes.','生活リズムや感性が似ています。')};
+  return {s:70,t:TL('무난','Easygoing','おだやか'),d:TL('크게 부딪힐 일 없는 편안한 조합이에요.','A comfortable match with few clashes.','大きくぶつかることのない気楽な組み合わせ。')};
 }
 function runMatch(){
   if(mt.rel==='lover') return runLovePro();
   const nick=$('mtNick').value.trim(), [y,m,d]=$('mtBirth').value.split('-').map(Number), mb=$('mtMbti').value;
-  if(y<1940||y>2025){toast('1940~2025년 사이로 입력해주세요');return}
+  if(y<1940||y>2025){toast(TL('1940~2025년 사이로 입력해주세요','Enter a year between 1940 and 2025','1940〜2025年の間で入力してください'));return}
   const them=calcSaju(y,m,d,''), a=saju.dayStem, b=them.dayStem;
   const ea=STEM_EL[a], eb=STEM_EL[b];
   let sj={...SAJU_MATCH[(eb-ea+5)%5]}, hap=Math.abs(a-b)===5;
   if(hap){sj.s=Math.max(sj.s,95)} else if(a%2!==b%2){sj.s+=4}
   const mm=mbtiMatch(profile.mbti,mb), tt=ttiMatch(saju.yearBranch,them.yearBranch);
   const total=Math.round(sj.s*0.45+mm.s*0.4+tt.s*0.15);
-  const verdict= total>=88?'천생연분 레벨 💖':total>=78?'찰떡 케미 ✨':total>=66?'노력하면 꿀케미 🍯':'롤러코스터 케미 🎢';
+  const verdict= total>=88?TL('천생연분 레벨 💖','Soulmate level 💖','運命の相手レベル 💖'):total>=78?TL('찰떡 케미 ✨','Perfect chemistry ✨','相性ばっちり ✨'):total>=66?TL('노력하면 꿀케미 🍯','Sweet with a little effort 🍯','歩み寄れば最高の相性 🍯'):TL('롤러코스터 케미 🎢','Rollercoaster chemistry 🎢','ジェットコースター相性 🎢');
   const rel=MT_REL.find(r=>r.k===mt.rel), tip=MT_TIP[mt.rel][total>=78?1:0];
   mt.last={nick,total,verdict,rel:rel.n,mb};
   const bar=(lab,v,col)=>`<div class="row"><span class="nm" style="width:76px">${lab}</span><div class="track"><div class="fill" data-w="${v}" style="background:${col}"></div></div><span class="ct">${v}</span></div>`;
@@ -713,33 +715,33 @@ function runMatch(){
     <div class="panel" style="margin-top:4px;padding-top:22px">
       <div class="match-top">
         <div class="avatar"><div class="e">${STEM_INFO[a].emoji}</div><b>${esc(profile.nick)}</b><small>${profile.mbti} · ${EL[ea].ko}</small></div>
-        <div class="heart holo-text">${total}<small>${rel.e} ${rel.n} 궁합</small></div>
+        <div class="heart holo-text">${total}<small>${rel.e} ${TL(rel.n+' 궁합',rel.n,rel.n+'の相性')}</small></div>
         <div class="avatar"><div class="e">${STEM_INFO[b].emoji}</div><b>${esc(nick)}</b><small>${mb} · ${EL[eb].ko}</small></div>
       </div>
       <div class="verdict h-display">${verdict}</div>
-      <div class="bars" style="margin-top:14px">${bar('☯︎ 사주',sj.s,'var(--lav)')}${bar('🧬 MBTI',mm.s,'var(--pink)')}${bar('🐾 띠',tt.s,'var(--cyan)')}</div>
+      <div class="bars" style="margin-top:14px">${bar(TL('☯︎ 사주','☯︎ Saju','☯︎ 四柱'),sj.s,'var(--lav)')}${bar('🧬 MBTI',mm.s,'var(--pink)')}${bar(TL('🐾 띠','🐾 Zodiac','🐾 干支'),tt.s,'var(--cyan)')}</div>
     </div>
-    <div class="sec-t">☯︎ 사주로 보면 · ${sj.t}</div>
+    <div class="sec-t">${TL('☯︎ 사주로 보면','☯︎ By Saju','☯︎ 四柱推命で見ると')} · ${sj.t}</div>
     <div class="panel line-list">
       <p><b style="color:${EL[ea].color}">${STEMS[a]}${EL[ea].ko}</b>(${STEM_INFO[a].img}) × <b style="color:${EL[eb].color}">${STEMS[b]}${EL[eb].ko}</b>(${STEM_INFO[b].img})</p>
       <p>${sj.d}</p>
-      ${hap?'<p>🧲 <b>천간합</b> 발견! 두 사람의 일간이 서로 합을 이루는 드문 조합이에요. 끌어당기는 힘이 강해요.</p>':''}
+      ${hap?TL('<p>🧲 <b>천간합</b> 발견! 두 사람의 일간이 서로 합을 이루는 드문 조합이에요. 끌어당기는 힘이 강해요.</p>','<p>🧲 <b>Heavenly bond</b> found! Your day masters combine, a rare match with a strong pull.</p>','<p>🧲 <b>干合</b>発見!ふたりの日干が合になる珍しい組み合わせ。引き合う力が強い。</p>'):''}
     </div>
-    <div class="sec-t">🧬 MBTI로 보면 · ${profile.mbti} × ${mb}</div>
-    <div class="panel line-list">${mm.best?'<p>✨ <b>찰떡 조합</b>으로 유명한 MBTI 궁합이에요!</p>':''}${mbtiLines(profile.mbti,mb).map(l=>`<p>${l}</p>`).join('')}</div>
-    <div class="sec-t">🐾 띠로 보면 · ${tt.t}</div>
-    <div class="panel line-list"><p>${ANIMALS[saju.yearBranch]}띠 × ${ANIMALS[them.yearBranch]}띠 · ${tt.d}</p></div>
-    <div class="sec-t">💡 케미 업 팁</div>
+    <div class="sec-t">${TL('🧬 MBTI로 보면','🧬 By MBTI','🧬 MBTIで見ると')} · ${profile.mbti} × ${mb}</div>
+    <div class="panel line-list">${mm.best?TL('<p>✨ <b>찰떡 조합</b>으로 유명한 MBTI 궁합이에요!</p>','<p>✨ A famously <b>perfect MBTI pair</b>!</p>','<p>✨ <b>相性抜群</b>で有名なMBTIの組み合わせ!</p>'):''}${mbtiLines(profile.mbti,mb).map(l=>`<p>${l}</p>`).join('')}</div>
+    <div class="sec-t">${TL('🐾 띠로 보면','🐾 By zodiac','🐾 干支で見ると')} · ${tt.t}</div>
+    <div class="panel line-list"><p>${TL(`${ANIMALS[saju.yearBranch]}띠 × ${ANIMALS[them.yearBranch]}띠`,`${ZOD_EN[saju.yearBranch]} × ${ZOD_EN[them.yearBranch]}`,`${ZOD_JA[saju.yearBranch]} × ${ZOD_JA[them.yearBranch]}`)} · ${tt.d}</p></div>
+    <div class="sec-t">${TL('💡 케미 업 팁','💡 Chemistry tip','💡 相性アップのコツ')}</div>
     <div class="msg-box" style="margin-top:0"><p class="msg" style="font-size:16px">${tip}</p></div>
-    <div class="row-btns"><button class="btn ghost" onclick="mtCopy()">결과 복사</button><button class="btn" onclick="mtReset()">다른 사람과 보기</button></div>
-    <p class="disclaimer">상대 태어난 시간 없이 계산했어요 · 재미로 보는 콘텐츠예요</p>`;
+    <div class="row-btns"><button class="btn ghost" onclick="mtCopy()">${TL('결과 복사','Copy result','結果をコピー')}</button><button class="btn" onclick="mtReset()">${TL('다른 사람과 보기','Try someone else','他の人と見る')}</button></div>
+    <p class="disclaimer">${TL('상대 태어난 시간 없이 계산했어요 · 재미로 보는 콘텐츠예요','Calculated without their birth time · just for fun','相手の生まれた時刻なしで計算 · お楽しみコンテンツです')}</p>`;
   $('mtForm').style.display='none'; $('mtResult').style.display='block';
   $('s-match').scrollTo({top:0}); refreshQuota();
   setTimeout(()=>document.querySelectorAll('#mtResult .fill').forEach(f=>f.style.width=f.dataset.w+'%'),120);
 }
 function mtCopy(){
-  const r=mt.last; if(r.pro){navigator.clipboard.writeText(r.pro).then(()=>toast('복사 완료! 걔한테 보내볼까? 💌')).catch(()=>toast('이 환경에서는 복사가 막혀 있어요'));return} const txt=`💞 SOULCODE 궁합 | ${profile.nick} × ${r.nick} (${r.rel})\n${profile.mbti} × ${r.mb} → ${r.total}점 · ${r.verdict}\n너도 궁합 봐볼래? #소울코드 #사주궁합 #MBTI궁합`;
-  navigator.clipboard.writeText(txt).then(()=>toast('복사 완료! 친구에게 보내보세요 💌')).catch(()=>toast('이 환경에서는 복사가 막혀 있어요'));
+  const r=mt.last; if(r.pro){navigator.clipboard.writeText(r.pro).then(()=>toast(TL('복사 완료! 걔한테 보내볼까? 💌','Copied! Send it to them? 💌','コピー完了!相手に送ってみる? 💌'))).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));return} const txt=TL(`💞 SOULCODE 궁합 | ${profile.nick} × ${r.nick} (${r.rel})\n${profile.mbti} × ${r.mb} → ${r.total}점 · ${r.verdict}\n너도 궁합 봐볼래? #소울코드 #사주궁합 #MBTI궁합`,`💞 SOULCODE match | ${profile.nick} × ${r.nick} (${r.rel})\n${profile.mbti} × ${r.mb} → ${r.total} pts · ${r.verdict}\nCheck yours too? #soulcode #MBTI #saju`,`💞 SOULCODE 相性 | ${profile.nick} × ${r.nick} (${r.rel})\n${profile.mbti} × ${r.mb} → ${r.total}点 · ${r.verdict}\nあなたも相性見てみる? #ソウルコード #MBTI相性 #四柱推命`);
+  navigator.clipboard.writeText(txt).then(()=>toast(TL('복사 완료! 친구에게 보내보세요 💌','Copied! Send it to a friend 💌','コピー完了!友達に送ってみて 💌'))).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));
 }
 function mtReset(){
   $('mtForm').style.display='block'; $('mtResult').style.display='none';
@@ -941,7 +943,7 @@ async function initAI(){try{if(!window.claude||!claude.use)return;AI=await claud
 const aiUsed=()=>store.get('soulcode.ai.'+todayKey())||0;
 const freeLimit=()=>{const n=store.get('soulcode.freeLimit');return typeof n==='number'?n:3};
 const aiLeft=()=>isPro()?Infinity:Math.max(0,freeLimit()-aiUsed());
-function quotaText(){return isPro()?'💎 PRO · AI 해석 무제한':`오늘 무료 AI 해석 ${aiLeft()}/${freeLimit()}회 남음`}
+function quotaText(){return isPro()?TL('💎 PRO · AI 해석 무제한','💎 PRO · unlimited AI readings','💎 PRO · AI解説無制限'):TL(`오늘 무료 AI 해석 ${aiLeft()}/${freeLimit()}회 남음`,`Free AI readings left today: ${aiLeft()}/${freeLimit()}`,`今日の無料AI解説 残り${aiLeft()}/${freeLimit()}回`)}
 function refreshQuota(){document.querySelectorAll('.ai-quota').forEach(e=>e.textContent=quotaText())}
 const AI_RULES=`너는 젠지를 위한 '사주 × MBTI × 타로' 앱 「소울코드」의 해석가야.
 - 말투: 친근한 존댓말 + 위트. 짧은 문장. 이모지는 전체에서 2~4개만.
@@ -949,6 +951,11 @@ const AI_RULES=`너는 젠지를 위한 '사주 × MBTI × 타로' 앱 「소울
 - 사주 용어를 쓰면 괄호로 쉽게 풀어줘. 예: 정재(안정적인 실속 기운)
 - 단정적인 예언, 불안 조장, 의료·투자·법률 조언은 하지 마. 재미로 보는 콘텐츠 톤을 지켜.
 - 마크다운 기호(#, *, -)는 쓰지 말고 아래 [형식] 그대로 써.`;
+function AI_LANG(){
+  if(LG==='en') return `\n\n[LANGUAGE] Write the whole answer in natural, casual English for Gen Z readers (friendly, witty, short sentences). Translate every section heading in [형식] into English too. Explain saju terms in plain English, e.g. "Direct Wealth (steady, practical money energy)". Do not use any Korean.`;
+  if(LG==='ja') return `\n\n[言語] 回答はすべて自然な日本語で書いて。Z世代向けの親しみやすい「です・ます」+ちょっとユーモアのある口調、短い文で。[형식]の見出しもすべて日本語にして。四柱推命の用語はかっこで分かりやすく説明して(例: 正財(安定した実りの気))。韓国語は使わないで。`;
+  return '';
+}
 function personaData(){
   const S=saju, el=EL[STEM_EL[S.dayStem]], mx=Math.max(...S.counts), mn=Math.min(...S.counts);
   const P=['year','month','day','hour'].map(k=>S.pillars[k]?STEMS[S.pillars[k].s]+BRANCHES[S.pillars[k].b]:'모름');
@@ -968,7 +975,7 @@ async function runAI(prompt,box,btn,opts={}){
   if(!opts.ticket&&aiLeft()<=0){openOffer(`오늘 무료 AI 해석 ${freeLimit()}회를 다 썼어요`,retry);return null}
   btn.disabled=true; box.className='ai-box show thinking'; box.textContent='🔮 사주랑 카드를 엮어서 쓰는 중... (보통 10~40초)';
   try{
-    const {text,truncated}=await AI(AI_RULES+'\n\n'+prompt,{cache:false,ticket:!!(opts.ticket&&!isPro()),onText:({text})=>{box.className='ai-box show';box.textContent=text;aiBadge(box)}});
+    const {text,truncated}=await AI(AI_RULES+'\n\n'+prompt+AI_LANG(),{cache:false,ticket:!!(opts.ticket&&!isPro()),onText:({text})=>{box.className='ai-box show';box.textContent=text;aiBadge(box)}});
     box.className='ai-box show'; box.textContent=text+(truncated?'\n\n(내용이 길어서 일부가 잘렸어요)':''); aiBadge(box);
     if(opts.ticket&&!isPro()) store.set('soulcode.tickets',Math.max(0,tickets()-1)); else if(!isPro()) store.set('soulcode.ai.'+todayKey(),aiUsed()+1);
     return text;
@@ -1325,11 +1332,11 @@ function renderFit(){
   const h=new Date().getHours(), s=fitStats();
   if(draw.fit!=null){
     const f=FIT.find(x=>x.v===draw.fit);
-    box.innerHTML=`<div class="fit-t">🌙 오늘 카드 체크 완료 ${f.e}</div><div class="fit-s">지금까지 ${s.checked}일 기록 · 적중률 <b>${s.rate}%</b></div><button class="again" style="margin:8px 0 0" onclick="go('s-me');setTimeout(()=>$('diaryBox')&&$('diaryBox').scrollIntoView({behavior:'smooth'}),80)">📔 운세 일기 보기</button>`;
+    box.innerHTML=`<div class="fit-t">${TL('🌙 오늘 카드 체크 완료','🌙 Today\'s card checked','🌙 今日のカード、チェック完了')} ${f.e}</div><div class="fit-s">${TL(`지금까지 ${s.checked}일 기록 · 적중률 <b>${s.rate}%</b>`,`${s.checked} days logged · hit rate <b>${s.rate}%</b>`,`これまで${s.checked}日記録 · 的中率 <b>${s.rate}%</b>`)}</div><button class="again" style="margin:8px 0 0" onclick="go('s-me');setTimeout(()=>$('diaryBox')&&$('diaryBox').scrollIntoView({behavior:'smooth'}),80)">${TL('📔 운세 일기 보기','📔 See my fortune diary','📔 運勢日記を見る')}</button>`;
   }else if(h<18){
-    box.innerHTML=`<div class="fit-t">🌙 저녁에 다시 와서 체크해줘</div><div class="fit-s">오늘 카드가 맞았는지 <b>오후 6시부터</b> 기록할 수 있어요.<br>기록이 쌓이면 나만의 적중률과 AI 주간 리포트가 열려요.</div>`;
+    box.innerHTML=TL(`<div class="fit-t">🌙 저녁에 다시 와서 체크해줘</div><div class="fit-s">오늘 카드가 맞았는지 <b>오후 6시부터</b> 기록할 수 있어요.<br>기록이 쌓이면 나만의 적중률과 AI 주간 리포트가 열려요.</div>`,`<div class="fit-t">🌙 Come back tonight to check in</div><div class="fit-s">From <b>6 p.m.</b> you can log whether today's card was right.<br>Keep logging to unlock your hit rate and a weekly AI report.</div>`,`<div class="fit-t">🌙 夜にまたチェックしに来てね</div><div class="fit-s">今日のカードが当たったか、<b>18時から</b>記録できます。<br>記録がたまると的中率とAI週間レポートが見られます。</div>`);
   }else{
-    box.innerHTML=`<div class="fit-t">🌙 오늘 카드, 맞았어?</div><div class="fit-btns">${FIT.map(f=>`<button onclick="setFit('${draw.date}',${f.v})"><span>${f.e}</span>${f.n}</button>`).join('')}</div><div class="fit-s">${s.checked?`지금까지 ${s.checked}일 기록 · 적중률 ${s.rate}%`:'첫 기록을 남겨봐요'}</div>`;
+    box.innerHTML=`<div class="fit-t">${TL('🌙 오늘 카드, 맞았어?','🌙 Was today\'s card right?','🌙 今日のカード、当たった?')}</div><div class="fit-btns">${FIT.map(f=>`<button onclick="setFit('${draw.date}',${f.v})"><span>${f.e}</span>${f.n}</button>`).join('')}</div><div class="fit-s">${s.checked?TL(`지금까지 ${s.checked}일 기록 · 적중률 ${s.rate}%`,`${s.checked} days logged · hit rate ${s.rate}%`,`これまで${s.checked}日記録 · 的中率 ${s.rate}%`):TL('첫 기록을 남겨봐요','Leave your first log','最初の記録を残そう')}</div>`;
   }
   renderPushAsk();
 }
@@ -1445,18 +1452,18 @@ function evMark(id,v){const e=store.get('soulcode.events')||{};e[id]=v||Date.now
 function unlocks(){return store.get('soulcode.unlocks')||[]}
 function activeEvents(){
   const d=new Date(), k=dateKey(d), ev=[], l=lunarOf(d);
-  if(profile&&profile.birth&&profile.birth.slice(5)===k.slice(5)) ev.push({id:'bday-'+k,e:'🎂',t:`생일 축하해, ${esc(profile.nick)}!`,s:'생일에만 뽑을 수 있는 특별 카드가 기다려요',cta:'생일 카드 뽑기',fn:`openWish('bday-${k}','birthday')`});
-  if(l&&l.day===15) ev.push({id:'moon-'+k,e:'🌕',t:'오늘은 음력 보름, 소원 카드 데이',s:'보름달에 소원을 빌고 카드 한 장으로 답을 들어봐요',cta:'소원 카드 뽑기',fn:`openWish('moon-${k}','moon')`});
+  if(profile&&profile.birth&&profile.birth.slice(5)===k.slice(5)) ev.push({id:'bday-'+k,e:'🎂',t:TL(`생일 축하해, ${esc(profile.nick)}!`,`Happy birthday, ${esc(profile.nick)}!`,`お誕生日おめでとう、${esc(profile.nick)}!`),s:TL('생일에만 뽑을 수 있는 특별 카드가 기다려요','A special card you can only draw on your birthday is waiting','誕生日だけ引ける特別なカードが待ってるよ'),cta:TL('생일 카드 뽑기','Draw birthday card','誕生日カードを引く'),fn:`openWish('bday-${k}','birthday')`});
+  if(l&&l.day===15) ev.push({id:'moon-'+k,e:'🌕',t:TL('오늘은 음력 보름, 소원 카드 데이','Full moon today: wish card day','今日は満月、願いごとカードの日'),s:TL('보름달에 소원을 빌고 카드 한 장으로 답을 들어봐요','Make a wish on the full moon and get your answer from one card','満月に願いをかけて、カード1枚で答えを聞こう'),cta:TL('소원 카드 뽑기','Draw wish card','願いごとカードを引く'),fn:`openWish('moon-${k}','moon')`});
   const tm=termToday(d); if(tm) ev.push({id:'term-'+k,e:'🌿',t:`오늘은 ${tm.name}(${tm.hanja})`,s:TERM_TIP[tm.name]||'계절이 바뀌는 날이에요',info:true});
   const m=d.getMonth()+1, Y=reportYear();
-  if(m===12||m===1) ev.push({id:'ny-'+Y,e:'🎍',t:`${Y} 신년운세 오픈`,s:`${Y}년 12개월 흐름 그래프와 AI 풀이를 미리 봐요`,cta:`${Y} 운세 보기`,fn:`openReport('year')`,keep:true});
-  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:'7일 연속 출석 이벤트',s:`7일 연속 오면 PRO 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,prog:Math.min(n,7)/7,info:true,keep:true})}
+  if(m===12||m===1) ev.push({id:'ny-'+Y,e:'🎍',t:TL(`${Y} 신년운세 오픈`,`${Y} yearly fortune is open`,`${Y}年の運勢オープン`),s:TL(`${Y}년 12개월 흐름 그래프와 AI 풀이를 미리 봐요`,`Preview your ${Y} month-by-month graph and AI reading`,`${Y}年12か月の流れグラフとAI解説を先取り`),cta:TL(`${Y} 운세 보기`,`See ${Y}`,`${Y}年の運勢を見る`),fn:`openReport('year')`,keep:true});
+  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:TL('7일 연속 출석 이벤트','7-day streak event','7日連続ログインイベント'),s:TL(`7일 연속 오면 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,`Visit 7 days in a row to unlock the 'Strawberry Milk' skin forever · now <b>${Math.min(n,7)}/7</b>`,`7日連続で来るとスキン「いちごミルク」が永久解放 · 今 <b>${Math.min(n,7)}/7</b>`),prog:Math.min(n,7)/7,info:true,keep:true})}
   return ev.filter(e=>e.keep||e.info||!evDone(e.id));
 }
 function checkStreakReward(){
   if(unlocks().includes('strawberry')||calcStreak()<7)return;
   store.set('soulcode.unlocks',[...unlocks(),'strawberry']);
-  setTimeout(()=>toast("🎉 7일 연속 출석! '딸기우유' 스킨이 평생 해금됐어요"),600);
+  setTimeout(()=>toast(TL("🎉 7일 연속 출석! '딸기우유' 스킨이 평생 해금됐어요","🎉 7-day streak! 'Strawberry Milk' skin unlocked forever","🎉 7日連続! 「いちごミルク」スキンが永久解放されました")),600);
 }
 function renderEvents(){
   if(!$('evBox')) renderYesterdayAsk();
@@ -1464,7 +1471,7 @@ function renderEvents(){
   checkStreakReward();
   const all=activeEvents(), fm=nextFullMoon(), ev=all.slice(0,2);
   box.innerHTML=ev.map(e=>`<div class="ev-card${e.info?' info':''}"><div class="ev-e">${e.e}</div><div class="ev-b"><b>${e.t}</b><small>${e.s}</small>${e.prog!=null?`<i class="ev-bar"><i style="width:${e.prog*100}%"></i></i>`:''}${e.cta?`<button onclick="${e.fn}">${e.cta} →</button>`:''}</div></div>`).join('')
-    +(all.length>2?`<div class="ev-next">${all.slice(2).map(e=>e.e+' '+e.t.replace(/<[^>]+>/g,'')).join(' · ')}</div>`:'')+(fm&&!all.some(e=>e.id.startsWith('moon-'))?`<div class="ev-next">다음 이벤트 · 🌕 보름 소원 카드 D-${fm}</div>`:'');
+    +(all.length>2?`<div class="ev-next">${all.slice(2).map(e=>e.e+' '+e.t.replace(/<[^>]+>/g,'')).join(' · ')}</div>`:'')+(fm&&!all.some(e=>e.id.startsWith('moon-'))?`<div class="ev-next">${TL('다음 이벤트 · 🌕 보름 소원 카드','Next event · 🌕 Full-moon wish card','次のイベント · 🌕 満月の願いごとカード')} D-${fm}</div>`:'');
 }
 function openWish(id,kind){
   let m=$('wishM');
@@ -1747,16 +1754,16 @@ tidyLayout();
   const P=store.get('soulcode.pro')||{};
   if(!beta){ if(P.beta) store.del('soulcode.pro'); return; } // 베타 끝나면 베타용 PRO 표시 정리
   if(!P.active||P.beta) store.set('soulcode.pro',{active:true,beta:true,test:true});
-  const msg=()=>`🧪 지금은 무료 베타라 다 열려 있어요! AI 해석만 하루 ${freeLimit()}회예요`;
+  const msg=()=>TL(`🧪 지금은 무료 베타라 다 열려 있어요! AI 해석만 하루 ${freeLimit()}회예요`,`🧪 Free beta: everything is open! Only AI readings are limited to ${freeLimit()} a day`,`🧪 今は無料ベータなので全部使えます!AI解説だけ1日${freeLimit()}回です`);
   openPaywall=function(){toast(msg())};
-  openOffer=function(reason){toast(/다 썼|마감/.test(reason||'')?`오늘 AI 해석 ${freeLimit()}회를 다 썼어요. 내일 또 와요! 🌙`:msg())};
-  quotaText=function(){return `🧪 무료 베타 · 오늘 AI 해석 ${Math.max(0,freeLimit()-aiUsed())}/${freeLimit()}회 남음`};
-  renderProBanner=function(){$('proBanner').innerHTML=`<div class="t">🧪 무료 베타 기간<small>연간 상세 리포트 · 덱 스킨 · AI 연애 상담까지 전부 무료! (AI 해석은 하루 ${freeLimit()}회)</small></div>`};
+  openOffer=function(reason){toast(/다 썼|마감/.test(reason||'')?TL(`오늘 AI 해석 ${freeLimit()}회를 다 썼어요. 내일 또 와요! 🌙`,`You've used all ${freeLimit()} AI readings today. See you tomorrow! 🌙`,`今日のAI解説${freeLimit()}回を使い切りました。また明日! 🌙`):msg())};
+  quotaText=function(){const n=Math.max(0,freeLimit()-aiUsed());return TL(`🧪 무료 베타 · 오늘 AI 해석 ${n}/${freeLimit()}회 남음`,`🧪 Free beta · AI readings left today: ${n}/${freeLimit()}`,`🧪 無料ベータ · 今日のAI解説 残り${n}/${freeLimit()}回`)};
+  renderProBanner=function(){$('proBanner').innerHTML=TL(`<div class="t">🧪 무료 베타 기간<small>연간 상세 리포트 · 덱 스킨 · AI 연애 상담까지 전부 무료! (AI 해석은 하루 ${freeLimit()}회)</small></div>`,`<div class="t">🧪 Free beta<small>Yearly report, deck skins and AI love advice are all free! (AI readings: ${freeLimit()} a day)</small></div>`,`<div class="t">🧪 無料ベータ期間<small>年間詳細レポート・デッキスキン・AI恋愛相談まで全部無料!(AI解説は1日${freeLimit()}回)</small></div>`)};
   // 화면의 PRO 표시 지우기
   document.documentElement.classList.add('free-beta');
-  try{MT_REL[0].n='썸·연인'}catch(e){}
+  try{MT_REL[0].n=TL('썸·연인','Crush·Partner','気になる人·恋人')}catch(e){}
   document.querySelectorAll('#mtRel button').forEach(b=>{b.innerHTML=b.innerHTML.replace(/\s*PRO/,'')});
-  const tw=$('mtTimeWrap'); tw&&tw.querySelector('.lb')&&(tw.querySelector('.lb').textContent='상대 태어난 시간 (선택 · 알면 정확도 UP)');
+  const tw=$('mtTimeWrap'); tw&&tw.querySelector('.lb')&&(tw.querySelector('.lb').textContent=TL('상대 태어난 시간 (선택 · 알면 정확도 UP)','Their birth time (optional · more accurate)','相手の生まれた時刻(任意 · わかると精度UP)'));
   // AI 사용 횟수는 베타에서도 기기에 기록 (화면 표시용, 실제 한도는 서버가 지켜요)
   const _run=runAI; runAI=async function(prompt,box,btn,opts={}){const r=await _run(prompt,box,btn,{...opts,ticket:false}); if(r) store.set('soulcode.ai.'+todayKey(),aiUsed()+1); refreshQuota&&refreshQuota(); return r};
 })();

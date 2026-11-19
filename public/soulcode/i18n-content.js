@@ -44,6 +44,19 @@ window.SOUL_CONTENT = {
       { name: 'Responsibility Day', desc: 'Energy that shapes you comes in. Keep your promises and you will be recognized. Might feel a bit tiring.' },
       { name: 'Recharge Day', desc: 'Supporting energy comes in. Perfect for studying, resting and listening to advice.' },
     ],
+    MT_REL: ['Crush·Partner PRO', 'Friend', 'Coworker'],
+    SAJU_MATCH: [
+      { t: 'Mirror match', d: 'Same element, so you understand each other without words. But when you both get stubborn, nobody backs down.' },
+      { t: 'I take care of them', d: 'Your energy helps them grow. Caring feels good, just don\'t burn out from only giving.' },
+      { t: 'I lead', d: 'Your energy steers theirs, so the lead naturally comes to you. Asking their opinion first boosts the chemistry.' },
+      { t: 'They shape me', d: 'They train and refine you. It may feel like nagging, but they help you grow.' },
+      { t: 'They fill me up', d: 'Their energy boosts yours. Being together feels comfy and recharging!' },
+    ],
+    MT_TIP: {
+      lover: ['Your differences can be your charm. Try talking in their MBTI style once 💬', 'Great chemistry! Text first and the odds are good 💌'],
+      friend: ['Different tastes, but you can show each other new worlds 🌏', 'Friends for life. Take a trip together ✈️'],
+      work: ['Your work styles differ. Agree on roles and deadlines early 📋', 'Amazing synergy on projects. Just split roles clearly! 🚀'],
+    },
     SCORE_CATS: ['Love', 'Work·Study', 'Money', 'Energy'],
     STAMPS_UP: ['LUCKY! 🍀', 'Even better 👍', 'Let’s go 🔥', 'So lucky ✨', 'WOW!', 'Energy is wild ⚡'],
     STAMPS_REV: ['It’s okay 🫶', 'Plot twist ahead 🙃', 'Take a breath 🫧', 'Resting is OK ☁️'],
@@ -115,6 +128,19 @@ window.SOUL_CONTENT = {
       { name: '責任デー', desc: '自分を磨く気が入る日。約束を守ると認められる。少し疲れやすいかも。' },
       { name: '充電デー', desc: '自分を助ける気が入る日。勉強・休息・アドバイスを聞くのに最適。' },
     ],
+    MT_REL: ['気になる人·恋人 PRO', '友達', '同僚'],
+    SAJU_MATCH: [
+      { t: '似た者どうし', d: '同じ五行だから言わなくても通じ合う。でも、ふたりとも意地を張ると一歩も引かないかも。' },
+      { t: '私が世話をする関係', d: 'あなたの気が相手を育てる流れ。尽くすのは楽しいけど、与えるばかりで疲れないように。' },
+      { t: '私がリードする関係', d: 'あなたの気が相手を動かす構造で、主導権は自然とあなたに。先に相手の意見を聞くと相性UP。' },
+      { t: '私を磨いてくれる関係', d: '相手があなたを鍛える構造。小言に感じても、結局あなたを成長させてくれる人。' },
+      { t: '私を満たしてくれる関係', d: '相手の気があなたを元気にする流れ。一緒にいると楽で充電される感じ!' },
+    ],
+    MT_TIP: {
+      lover: ['違いがむしろ魅力に。相手のMBTIっぽい話し方を一度試してみて 💬', '相性十分!先に連絡すると反応いい確率高め 💌'],
+      friend: ['好みは違っても、お互いに新しい世界を見せ合える友達 🌏', '一生の友達の予感。一緒に旅行してみて ✈️'],
+      work: ['仕事のスタイルが違うかも。役割と締め切りを先にすり合わせて 📋', '一緒にプロジェクトをやると相乗効果抜群。役割分担だけはっきりと! 🚀'],
+    },
     SCORE_CATS: ['恋愛', '仕事・勉強', '金運', 'コンディション'],
     STAMPS_UP: ['LUCKY! 🍀', 'むしろ最高 👍', 'いっちゃえ 🔥', '超ラッキー ✨', 'WOW!', '運気やばい ⚡'],
     STAMPS_REV: ['大丈夫だよ 🫶', 'どんでん返し注意 🙃', 'ひと呼吸 🫧', '休んでもOK ☁️'],
@@ -151,13 +177,16 @@ window.applyContentI18n = function () {
   if (!C) return;
   /* eslint-disable no-undef */
   const ALT = { en: ['tree', 'flame', 'soil', 'steel', 'sea'], ja: ['き', 'ひ', 'つち', 'かね', 'みず'] }[lang];
-  C.EL.forEach((e, i) => { const { name, ...rest } = e; Object.assign(EL[i], rest, { ko: name, name: ALT[i] }); });
-  C.STEM_INFO.forEach((e, i) => Object.assign(STEM_INFO[i], e));
-  Object.keys(C.MBTI).forEach((k) => Object.assign(MBTI[k], C.MBTI[k]));
-  Object.assign(SYNERGY, C.SYNERGY);
-  C.RELATION.forEach((e, i) => Object.assign(RELATION[i], e));
-  C.SCORE_CATS.forEach((n, i) => { SCORE_CATS[i][1] = n; });
-  STAMPS_UP.splice(0, STAMPS_UP.length, ...C.STAMPS_UP);
-  STAMPS_REV.splice(0, STAMPS_REV.length, ...C.STAMPS_REV);
-  C.TAROT.forEach((t, i) => { const r = TAROT[i]; r[0] = t[0]; r[3] = t[1]; r[4] = t[2]; r[5] = t[3]; r[6] = t[4]; r[7] = t[5]; r[8] = t[6]; });
+  try { C.EL.forEach((e, i) => { const { name, ...rest } = e; Object.assign(EL[i], rest, { ko: name, name: ALT[i] }); }); } catch (e) { /* 아직 정의 전 */ }
+  try { C.STEM_INFO.forEach((e, i) => Object.assign(STEM_INFO[i], e)); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.keys(C.MBTI).forEach((k) => Object.assign(MBTI[k], C.MBTI[k])); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.assign(SYNERGY, C.SYNERGY); } catch (e) { /* 아직 정의 전 */ }
+  try { C.RELATION.forEach((e, i) => Object.assign(RELATION[i], e)); } catch (e) { /* 아직 정의 전 */ }
+  try { C.MT_REL.forEach((n, i) => { MT_REL[i].n = n; }); } catch (e) { /* 아직 정의 전 */ }
+  try { C.SAJU_MATCH.forEach((e, i) => Object.assign(SAJU_MATCH[i], e)); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.assign(MT_TIP, C.MT_TIP); } catch (e) { /* 아직 정의 전 */ }
+  try { C.SCORE_CATS.forEach((n, i) => { SCORE_CATS[i][1] = n; }); } catch (e) { /* 아직 정의 전 */ }
+  try { STAMPS_UP.splice(0, STAMPS_UP.length, ...C.STAMPS_UP); } catch (e) { /* 아직 정의 전 */ }
+  try { STAMPS_REV.splice(0, STAMPS_REV.length, ...C.STAMPS_REV); } catch (e) { /* 아직 정의 전 */ }
+  try { C.TAROT.forEach((t, i) => { const r = TAROT[i]; r[0] = t[0]; r[3] = t[1]; r[4] = t[2]; r[5] = t[3]; r[6] = t[4]; r[7] = t[5]; r[8] = t[6]; }); } catch (e) { /* 아직 정의 전 */ }
 };
