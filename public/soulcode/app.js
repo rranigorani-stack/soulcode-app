@@ -531,7 +531,7 @@ function renderMe(){
   $('dexCount').textContent=TL(`· ${got} / 22 수집`,`· ${got} / 22 collected`,`· ${got} / 22 収集`);
   renderProBanner(); renderSkins(); renderSync(); $('yrLabel').textContent=TL(reportYear()+'년',String(reportYear()),reportYear()+'年');
   $('dex').innerHTML=TAROT.map((c,i)=>col[i]
-    ?`<button style="background:linear-gradient(165deg,${CARD_BG[i]})" onclick="toast('${ROMAN[i]} ${c[0]} · ${c[3]} · ${TL(col[i]+'회 뽑음','drawn '+col[i]+'x',col[i]+'回引いた')}')">${c[2]}<small>${c[0]}</small></button>`
+    ?`<button style="background:linear-gradient(165deg,${CARD_BG[i]})" onclick="toast('${ROMAN[i]} ${c[0]} · ${c[3]} · ${TL(col[i]+'회 뽑음','drawn '+col[i]+'x',col[i]+'回引いた')}')">${c[2]}${(n=>`<small${LG!=='ko'&&Math.max(...n.split(' ').map(w=>w.length))>=8?' style="font-size:6.6px"':''}>${n}</small>`)(LG==='en'?c[0].replace(/^The /,''):c[0])}</button>`
     :`<button class="lock" onclick="toast('${TL('아직 못 만난 카드예요 🔒','Not met yet 🔒','まだ出会っていないカード 🔒')}')">?<small>${ROMAN[i]}</small></button>`).join('');
 }
 function resetAll(){
