@@ -1,12 +1,13 @@
 'use client';
 import { BizInfo } from './BizInfo';
 import { useRef, useState } from 'react';
-import { EL, EL_EN, MBTI_BEST, wanted, type Lang, type Wanted as W } from '@/lib/wanted';
+import { EL, EL_EN, EL_JA, MBTI_BEST, wanted, type Lang, type Wanted as W } from '@/lib/wanted';
 import { drawMontage, type Gender } from './montage';
 
 const CW = 1080, CH = 1920, INK = '#1B1433', PAPER = '#FFFDF8', PINK = '#FF8AD0', YEL = '#FFE04D', MUTED = '#6E6189';
 const SANS = '"Noto Sans KR", sans-serif', DISPLAY = '"Black Han Sans", sans-serif', JUA = '"Jua", sans-serif', ARCHIVO = '"Archivo Black", sans-serif';
 const MBTIS = Object.keys(MBTI_BEST);
+const JA_DISPLAY = '"Dela Gothic One", "Black Han Sans", sans-serif', JA_ROUND = '"Zen Maru Gothic", "Jua", sans-serif';
 
 function wrap(c: CanvasRenderingContext2D, t: string, max: number) {
   const out: string[] = []; let line = '';
@@ -23,7 +24,16 @@ const SERIF = '"Nanum Myeongjo", "Noto Serif KR", serif';
 const BROWN = '#3B2414', BROWN2 = '#6B4A2C';
 const TYPE_KO = (t: 'teto' | 'egen', g: Gender) => `${t === 'teto' ? '테토' : '에겐'}${g === 'f' ? '녀' : '남'}`;
 const TYPE_EN = (t: 'teto' | 'egen', g: Gender) => `${t === 'teto' ? 'Bold' : 'Soft'} ${g === 'f' ? 'Girl' : 'Boy'}`;
+const TYPE_JA = (t: 'teto' | 'egen', g: Gender) => `${t === 'teto' ? '肉食系' : '草食系'}${g === 'f' ? '女子' : '男子'}`;
 const TX = {
+  ja: {
+    type: TYPE_JA, sub: '💘 運命の相手を探しています 💘', el: (i: number) => `${EL[i].emoji} ${EL_JA[i].name}の気`,
+    bounty: '★ 懸賞金', reward: (n: number) => `恋愛運 +${n}%`,
+    rows: (r: W) => [['命式の手がかり', `日干 ${r.stem}${r.stemHap ? '(干合)' : ''} · ${r.animal}`], ['人相', `${r.looks[0]}、${r.looks[1]}`], ['出没エリア', `${r.day} ${r.time} · ${r.place}`], ['注意事項', r.warn]],
+    labW: 200, rowFont: 25,
+    basis: (r: W, nick: string) => `✦ 手配の根拠: ${nick ? nick + 'さん' : '私'}の命式に${EL_JA[r.lackEl].name}が${r.counts[r.lackEl]}つ · 陽${r.yang}/6 · 事件番号 ${r.caseNo} ✦`,
+    foot: (h: string) => `${h}/ja/wanted · 韓国の四柱推命コンテンツ`,
+  },
   ko: {
     type: TYPE_KO, sub: '💘 운명의 상대를 찾습니다 💘', el: (i: number) => `${EL[i].emoji} ${EL[i].ko} 기운`,
     bounty: '★ 현상금', reward: (n: number) => `연애운 +${n}%`,
@@ -46,8 +56,8 @@ function loadImg(src: string): Promise<HTMLImageElement | null> {
   return new Promise((ok) => { const im = new Image(); im.onload = () => ok(im); im.onerror = () => ok(null); im.src = src; });
 }
 
-function sticker(c: CanvasRenderingContext2D, x: number, y: number, t: string, bg: string, rot: number, size = 34) {
-  c.save(); c.translate(x, y); c.rotate(rot); c.font = `${size}px ${JUA}`;
+function sticker(c: CanvasRenderingContext2D, x: number, y: number, t: string, bg: string, rot: number, size = 34, font = JUA) {
+  c.save(); c.translate(x, y); c.rotate(rot); c.font = `${size}px ${font}`;
   const w = c.measureText(t).width + 44, h = size + 30;
   rr(c, -w / 2, -h / 2, w, h, h / 2, bg, INK, 4, 5);
   c.fillStyle = INK; c.textAlign = 'center'; c.textBaseline = 'middle'; c.fillText(t, 0, 2); c.restore();
@@ -60,7 +70,8 @@ function star(c: CanvasRenderingContext2D, x: number, y: number, r: number, fill
 
 async function draw(r: W, nick: string, myMbti: string, gender: Gender, lang: Lang = 'ko') {
   const T = TX[lang];
-  await Promise.all([`150px ${ARCHIVO}`, `60px ${DISPLAY}`, `40px ${JUA}`, `500 30px ${SANS}`, `700 30px ${SANS}`].map((f) => document.fonts.load(f, '수배 WANTED 가나다')));
+  const FD = lang === 'ja' ? JA_DISPLAY : DISPLAY, FR = lang === 'ja' ? JA_ROUND : JUA;
+  await Promise.all([`150px ${ARCHIVO}`, `60px ${FD}`, `40px ${FR}`, `500 30px ${SANS}`, `700 30px ${SANS}`].map((f) => document.fonts.load(f, '수배 WANTED 가나다 運命の相手')));
   const art = (await loadImg(`/wanted/${gender}-${r.type}-${r.group.toLowerCase()}.webp`)) ?? (await loadImg(`/wanted/${gender}-${r.type}.webp`)) ?? (await loadImg(`/wanted/${gender}.webp`));
   const cv = document.createElement('canvas'); cv.width = CW; cv.height = CH;
   const c = cv.getContext('2d')!;
@@ -87,7 +98,7 @@ async function draw(r: W, nick: string, myMbti: string, gender: Gender, lang: La
   c.fillStyle = PINK; c.fillText('WANTED', CW / 2 + 9, 300 + 9);
   c.lineWidth = 12; c.strokeStyle = INK; c.strokeText('WANTED', CW / 2, 300);
   c.fillStyle = '#fff'; c.fillText('WANTED', CW / 2, 300);
-  c.font = `36px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.sub, CW / 2, 360);
+  c.font = `36px ${FR}`; c.fillStyle = MUTED; c.fillText(T.sub, CW / 2, 360);
 
   // 사진 프레임 (둥근 카드)
   const fx = 160, fy = 400, fw = CW - 320, fh = 780;
@@ -105,23 +116,23 @@ async function draw(r: W, nick: string, myMbti: string, gender: Gender, lang: La
   // 스티커들
   star(c, fx + 10, fy + 20, 46, YEL);
   star(c, fx + fw - 6, fy + fh - 150, 34, '#7FE3F0');
-  sticker(c, fx + fw - 120, fy + 60, `${T.type(r.type, gender)} ♡`, PINK, 0.14, lang === 'en' ? 36 : 42);
-  sticker(c, fx + 130, fy + fh - 10, r.mbti, YEL, -0.08, 44);
-  sticker(c, fx + fw - 150, fy + fh - 10, T.el(r.el), '#fff', 0.07, 36);
+  sticker(c, fx + fw - 120, fy + 60, `${T.type(r.type, gender)} ♡`, PINK, 0.14, lang === 'en' ? 36 : lang === 'ja' ? 34 : 42, FR);
+  sticker(c, fx + 130, fy + fh - 10, r.mbti, YEL, -0.08, 44, FR);
+  sticker(c, fx + fw - 150, fy + fh - 10, T.el(r.el), '#fff', 0.07, 36, FR);
 
   // 이름 + 현상금
   c.textAlign = 'center'; c.fillStyle = INK;
-  c.font = `76px ${DISPLAY}`; c.fillText(`${T.type(r.type, gender)} · ${r.mbti}`, CW / 2, 1300);
+  c.font = `76px ${FD}`; c.fillText(`${T.type(r.type, gender)} · ${r.mbti}`, CW / 2, 1300);
   const bw = 640, bx = (CW - bw) / 2, by = 1330;
   rr(c, bx, by, bw, 100, 50, YEL, INK, 5, 6);
-  c.fillStyle = INK; c.font = `36px ${JUA}`; c.textAlign = 'left'; c.fillText(T.bounty, bx + 40, by + 64);
-  c.font = `${lang === 'en' ? 40 : 50}px ${DISPLAY}`; c.textAlign = 'right'; c.fillText(T.reward(r.reward), bx + bw - 40, by + (lang === 'en' ? 65 : 68));
+  c.fillStyle = INK; c.font = `36px ${FR}`; c.textAlign = 'left'; c.fillText(T.bounty, bx + 40, by + 64);
+  c.font = `${lang === 'en' ? 40 : 50}px ${FD}`; c.textAlign = 'right'; c.fillText(T.reward(r.reward), bx + bw - 40, by + (lang === 'en' ? 65 : 68));
 
   // 단서 카드 (귀여운 메모지 스타일)
   const cx = 120, cy = 1462, cwid = CW - 240;
   const COLS = [YEL, PINK, '#7FE3F0', '#B9A6FF'];
   const rows = T.rows(r).map(([a, b], i) => [a, b, COLS[i]] as [string, string, string]);
-  c.font = `${T.rowFont}px ${JUA}`;
+  c.font = `${T.rowFont}px ${FR}`;
   const labW = T.labW, txtX = cx + 40 + labW + 16, txtW = cx + cwid - 34 - txtX;
   const laid = rows.map(([lab, t, col]) => ({ lab, col, lines: wrap(c, t, txtW) }));
   const rowH = (n: number) => Math.max(52, n * 36 + 16);
@@ -133,7 +144,7 @@ async function draw(r: W, nick: string, myMbti: string, gender: Gender, lang: La
   for (const l of laid) {
     const h = rowH(l.lines.length), mid = y + 34;
     star(c, cx + 46, mid - 6, 15, l.col);
-    c.font = `${T.rowFont}px ${JUA}`; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
+    c.font = `${T.rowFont}px ${FR}`; c.textAlign = 'left'; c.textBaseline = 'alphabetic';
     c.fillStyle = MUTED; c.fillText(l.lab, cx + 72, mid + 4);
     c.fillStyle = INK;
     l.lines.forEach((w, i) => c.fillText(w, txtX, mid + 4 + i * 36));
@@ -143,18 +154,34 @@ async function draw(r: W, nick: string, myMbti: string, gender: Gender, lang: La
   star(c, cx + cwid - 8, cy + 6, 22, YEL);
   star(c, cx + 10, cy + chh - 6, 16, PINK);
 
-  c.textAlign = 'center'; c.font = `22px ${JUA}`; c.fillStyle = MUTED;
+  c.textAlign = 'center'; c.font = `22px ${FR}`; c.fillStyle = MUTED;
   y = cy + chh + 40;
   c.fillText(T.basis(r, nick), CW / 2, y);
   // 하단 CTA (카드 밖)
   c.font = `38px ${ARCHIVO}`; c.fillStyle = '#fff'; c.lineWidth = 7; c.strokeStyle = INK;
   c.strokeText('SOULCODE', CW / 2, CH - 52); c.fillText('SOULCODE', CW / 2, CH - 52);
-  c.font = `26px ${JUA}`; c.fillStyle = INK; c.fillText(T.foot(location.host), CW / 2, CH - 16);
+  c.font = `26px ${FR}`; c.fillStyle = INK; c.fillText(T.foot(location.host), CW / 2, CH - 16);
   void myMbti; void SERIF; void BROWN; void BROWN2;
   return cv;
 }
 
 const UI = {
+  ja: {
+    badge: '🚨 韓国式四柱推命 指名手配システム', h1: ['運命の相手', '指名手配書'],
+    sub: <>あなたの命式に<b>足りない気</b>と<b>MBTIの相性</b>から<br />あなたを満たしてくれる人の似顔絵を描きます。</>,
+    birth: '生年月日', mbti: 'わたしのMBTI', want: '探している相手', wantOpts: [['f', '👩 女性'], ['m', '👨 男性'], ['any', '🌈 どちらでも']] as const,
+    nick: 'わたしの名前 (任意)', nickPh: '例: はる', go: '手配書を発行する 🚨',
+    note: '生年月日はこの端末の中だけで計算し、サーバーには送りません · 占いエンタメです',
+    badYear: '1940〜2025年の生年月日を入れてください',
+    loading: <>命式の手がかりから似顔絵を作成中...<br /><small>足りない五行を追跡中 🕵️</small></>,
+    save: '📸 手配書を保存 · ストーリーにシェア', report: '', reportHref: '',
+    spread: '💌 友達に手配書を回す', ask: '🤔 友達は私を肉食系だと思ってる? 聞いてみる', askHref: '/ja/ask?utm_source=wanted_done', again: 'もう一度',
+    file: (m: string) => `運命の相手_手配書_${m}.png`,
+    shareText: (r: W, o: string) => `運命の相手を指名手配中 🚨 ${EL_JA[r.el].name}の気 · ${r.mbti}… これってあの人? やってみて 👉 ${o}/ja/wanted?utm_source=wanted_share`,
+    linkText: (o: string) => `生年月日+MBTIで運命の相手の手配書が出る 🚨 ${o}/ja/wanted?utm_source=wanted_link`,
+    copied: 'リンクをコピーしました! グループLINEで回してね 🚨', copyPrompt: 'このリンクをコピーしてください', path: '/ja/wanted',
+    alt: (r: W) => `運命の相手の手配書: ${EL_JA[r.el].name}の気 ${r.mbti}`,
+  },
   ko: {
     badge: '🚨 사주 정밀 분석 수배 시스템', h1: ['운명의 상대', '수배전단 뽑기'],
     sub: <>내 사주에 <b>부족한 기운</b>과 <b>MBTI 찰떡 궁합</b>으로<br />나를 채워줄 사람의 몽타주를 그려드려요.</>,
@@ -226,7 +253,7 @@ export default function Wanted({ lang = 'ko' }: { lang?: Lang }) {
 
   return (
     <div className="wanted-wrap">
-      <main className="past">
+      <main className={'past' + (lang === 'ja' ? ' ja' : '')}>
         {stage === 'form' && (
           <section>
             <div className="past-badge wanted-badge">{U.badge}</div>
@@ -262,9 +289,11 @@ export default function Wanted({ lang = 'ko' }: { lang?: Lang }) {
             <button className="again" onClick={() => { setStage('form'); setImg(''); }}>{U.again}</button>
           </section>
         )}
-        {lang === 'ko'
-          ? <footer className="past-foot"><a href="/ask">💌 친구들이 보는 나</a> · <a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a> · <a href="/en/wanted">English</a><BizInfo /></footer>
-          : <footer className="past-foot"><a href="/en/ask">💌 How friends see me</a> · <a href="/wanted">한국어</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
+        {lang === 'ja'
+          ? <footer className="past-foot"><a href="/ja/ask">💌 友達から見た私</a> · <a href="/wanted">한국어</a> · <a href="/en/wanted">English</a><br /><a href="/terms">利用規約 (韓国語)</a> · <a href="/privacy">プライバシー (韓国語)</a></footer>
+          : lang === 'ko'
+          ? <footer className="past-foot"><a href="/ask">💌 친구들이 보는 나</a> · <a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a> · <a href="/en/wanted">English</a> · <a href="/ja/wanted">日本語</a><BizInfo /></footer>
+          : <footer className="past-foot"><a href="/en/ask">💌 How friends see me</a> · <a href="/wanted">한국어</a> · <a href="/ja/wanted">日本語</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
       </main>
     </div>
   );

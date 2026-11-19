@@ -534,3 +534,7 @@ label.lb{display:block;font-size:14px;color:var(--ink);margin:20px 0 8px;font-fa
 .biz-info{font-size:11px;color:var(--muted);text-align:center;line-height:1.7;margin:10px auto 0;max-width:360px;word-break:keep-all}
 .biz-info span{display:inline-block;margin:0 5px}
 .free-beta .pro-chip,.free-beta .tk-link{display:none!important}
+/* 日本語ページ */
+.past.ja{font-family:'Zen Maru Gothic','Noto Sans KR',sans-serif}
+.past.ja h1,.past.ja .h-display{font-family:'Dela Gothic One','Black Han Sans',sans-serif;letter-spacing:0;line-height:1.25}
+.past.ja .chip,.past.ja .btn,.past.ja .ask-preview span{font-family:'Zen Maru Gothic','Jua',sans-serif;font-weight:700}

@@ -7,7 +7,12 @@ export const CHARMS_EN = ['😆 Laugh', '👀 Eyes', '🙌 Reactions', '🧠 Wit
 export const LOVES_EN = ['💘 Confesses first', '🙄 Tsundere', '🎣 Push & pull master', '🐶 Golden retriever', '📵 Bad texter', '🎁 Surprise planner'];
 export const ANIMALS_EN = ['🐶 Puppy face', '🐱 Cat face', '🦊 Fox face', '🐻 Bear face', '🐰 Bunny face', '🦌 Deer face', '🦖 Dino face', '🐹 Hamster face'];
 export const ISLANDS_EN = ['👑 The leader', '🍳 The cook', '🎉 Mood maker', '🏕️ Survival expert', '🚤 Escapes alone first', '😴 Just sleeps'];
-export function askOptions(lang: 'ko' | 'en') {
+export const CHARMS_JA = ['😆 笑い声', '👀 目力', '🙌 リアクション', '🧠 センス', '🫶 やさしさ', '👗 ファッション', '🎙️ 声', '🤝 義理堅さ'];
+export const LOVES_JA = ['💘 自分から告白派', '🙄 ツンデレ', '🎣 駆け引き上手', '🐶 尽くすワンコ系', '📵 連絡めんどくさい派', '🎁 サプライズ職人'];
+export const ANIMALS_JA = ['🐶 犬顔', '🐱 猫顔', '🦊 キツネ顔', '🐻 クマ顔', '🐰 うさぎ顔', '🦌 シカ顔', '🦖 恐竜顔', '🐹 ハムスター顔'];
+export const ISLANDS_JA = ['👑 リーダー', '🍳 料理担当', '🎉 ムードメーカー', '🏕️ サバイバルのプロ', '🚤 ひとりで先に脱出', '😴 ただ寝てる'];
+export function askOptions(lang: 'ko' | 'en' | 'ja') {
+  if (lang === 'ja') return { charms: CHARMS_JA, loves: LOVES_JA, animals: ANIMALS_JA, islands: ISLANDS_JA };
   return lang === 'en'
     ? { charms: CHARMS_EN, loves: LOVES_EN, animals: ANIMALS_EN, islands: ISLANDS_EN }
     : { charms: CHARMS, loves: LOVES, animals: ANIMALS, islands: ISLANDS };

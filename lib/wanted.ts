@@ -56,7 +56,7 @@ const SEASON = ['이번 겨울', '2027년 봄', '2027년 여름', '2027년 가�
 const SAJU_S = [76, 84, 66, 62, 90];
 
 /* ───────── English ───────── */
-export type Lang = 'ko' | 'en';
+export type Lang = 'ko' | 'en' | 'ja';
 export const EL_EN = [
   { name: 'Wood', day: 'Thursday' },
   { name: 'Fire', day: 'Tuesday' },
@@ -96,6 +96,46 @@ const LETTER_EN: Record<string, string> = {
 const LAST_SEEN_EN = ["a friend of a friend's birthday party", 'a club after-party', 'replying under a group chat notice', 'the same bus stop', 'an office elevator', 'the comments of a Reel the algorithm showed you', 'a line at a dessert shop', 'a group project chat'];
 const SEASON_EN = ['This winter', 'Spring 2027', 'Summer 2027', 'Fall 2027'];
 
+/* ───────── 日本語 ───────── */
+export const EL_JA = [
+  { name: '木', day: '木曜日' },
+  { name: '火', day: '火曜日' },
+  { name: '土', day: '土曜日' },
+  { name: '金', day: '金曜日' },
+  { name: '水', day: '水曜日' },
+];
+const ANIMAL_JA = ['🐭 子(ねずみ)年', '🐮 丑(うし)年', '🐯 寅(とら)年', '🐰 卯(うさぎ)年', '🐲 辰(たつ)年', '🐍 巳(へび)年', '🐴 午(うま)年', '🐑 未(ひつじ)年', '🐵 申(さる)年', '🐔 酉(とり)年', '🐶 戌(いぬ)年', '🐷 亥(いのしし)年'];
+const LOOKS_JA = [
+  ['背が高くて手足が長い', '笑うと目尻が下がる', '緑系の服が似合う', 'いつもタンブラーを持ってる', '歩くのが速い', '声が落ち着いてる'],
+  ['笑うと目がなくなる', 'リアクションが2倍大きい', 'すぐ顔が赤くなる', '明るい色の服が好き', '身振りが大きい', '写真の表情が豊か'],
+  ['笑顔がほっこり', 'ベージュ・ブラウン系コーデ', '手があったかい', 'カバンにいつもおやつ', '話し方がのんびり', '聞くときの顔が真剣'],
+  ['目鼻立ちがはっきり', 'シャツがいつもピシッと', 'シルバーアクセ', '腕時計は必須', '話し方がスマート', '姿勢がいい'],
+  ['目つきがミステリアス', '黒い服が多い', '声が低い', 'いつもイヤホン', '表情があまり変わらない', '深夜に返信してくる'],
+];
+const PLACE_JA = [
+  ['近所の植物屋さん', '公園の散歩道', '個人経営の本屋', '登山口'],
+  ['ライブの最前列', 'カラオケ', '話題のポップアップ', 'ジム'],
+  ['行きつけのラーメン屋', 'パン屋の行列', 'キャンプ場', '図書館の自習室'],
+  ['カフェの窓際の席', '美術展', 'セレクトショップ', '自習カフェ'],
+  ['深夜のコンビニ', '海辺', 'レイトショー', 'プール'],
+];
+const TIME_JA = ['朝8時ごろ', '昼1時ごろ', '午後4時ごろ', '夜7時ごろ', '夜11時ごろ'];
+const WARN_JA = [
+  '頑固なので負けたフリをすること',
+  '急にキレるけど5分後に先に謝る',
+  '決めるのが遅い、急かすの禁止',
+  '正論パンチ注意、傷つかないこと',
+  '返信が遅くても気持ちは本物',
+];
+const LETTER_JA: Record<string, string> = {
+  E: '初対面でも10年来の友達みたいに話す', I: '仲良くなると3倍しゃべる',
+  N: '会話が急に宇宙に飛ぶ', S: 'おいしい店情報が正確',
+  T: '相談すると解決策から言う', F: '気分の変化にすぐ気づく',
+  J: '待ち合わせ場所を事前に調べてくる', P: '30分前に場所を変える',
+};
+const LAST_SEEN_JA = ['友達の友達の誕生日会', 'サークルの打ち上げ', 'グループLINEのお知らせの下', '同じバス停', '会社のエレベーター', 'おすすめに出たリールのコメント欄', '行列のできるスイーツ店', 'グループ課題のLINE'];
+const SEASON_JA = ['この冬', '2027年春', '2027年夏', '2027年秋'];
+
 function hash(s: string) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -112,7 +152,8 @@ export type Wanted = {
 };
 
 export function wanted(y: number, m: number, d: number, myMbti: string, lang: Lang = 'ko'): Wanted {
-  const en = lang === 'en';
+  const en = lang === 'en', ja = lang === 'ja';
+  const pick = <T,>(ko: T, e: T, j: T) => (ja ? j : en ? e : ko);
   const o = Manseryeok.calculateFourPillars({ year: y, month: m, day: d, hour: 12, minute: 0, trueSolarTime: { longitude: 126.978 }, dayBoundary: 'jasi' }).toObject() as unknown as Record<string, string>;
   const P = ['year', 'month', 'day'].map((k) => ({ s: SK.indexOf(o[k][0]), b: BK.indexOf(o[k][1]) }));
   const counts = [0, 0, 0, 0, 0];
@@ -131,21 +172,21 @@ export function wanted(y: number, m: number, d: number, myMbti: string, lang: La
   const yb = P[0].b, partnerYb = (13 - yb) % 12; // 육합
   const mbti = MBTI_BEST[myMbti] || 'ENFP';
   const h = hash(`${y}-${m}-${d}-${myMbti}`);
-  const L = (en ? LOOKS_EN : LOOKS)[lackEl];
+  const L = pick(LOOKS, LOOKS_EN, LOOKS_JA)[lackEl];
   const looks = [L[h % L.length], L[(h >>> 4) % L.length]];
   if (looks[0] === looks[1]) looks[1] = L[(h % L.length + 1) % L.length];
   const rel = (lackEl - myEl + 5) % 5;
   const reward = Math.min(99, Math.round(SAJU_S[rel] * 0.55 + 96 * 0.45) + (stemHap ? 4 : 0));
   return {
     myEl, myStem: SK_H[ds], counts, lackEl,
-    el: lackEl, stem: en ? `${SK_H[stemIdx]} (${EL_EN[STEM_EL[stemIdx]].name})` : SK_H[stemIdx] + EL[STEM_EL[stemIdx]].ko, stemHap,
-    animal: (en ? ANIMAL_EN : ANIMAL)[partnerYb], mbti,
+    el: lackEl, stem: pick(SK_H[stemIdx] + EL[STEM_EL[stemIdx]].ko, `${SK_H[stemIdx]} (${EL_EN[STEM_EL[stemIdx]].name})`, `${SK_H[stemIdx]}(${EL_JA[STEM_EL[stemIdx]].name})`), stemHap,
+    animal: pick(ANIMAL, ANIMAL_EN, ANIMAL_JA)[partnerYb], mbti,
     looks,
-    habits: en ? [LETTER_EN[mbti[0]], LETTER_EN[mbti[2]]] : [LETTER[mbti[0]], LETTER[mbti[2]]],
-    place: (en ? PLACE_EN : PLACE)[lackEl][(h >>> 8) % 4],
-    time: (en ? TIME_EN : TIME)[lackEl], day: en ? EL_EN[lackEl].day : EL[lackEl].day,
-    warn: (en ? WARN_EN : WARN)[lackEl],
-    lastSeen: `${(en ? SEASON_EN : SEASON)[(h >>> 11) % 4]} · ${(en ? LAST_SEEN_EN : LAST_SEEN)[(h >>> 13) % LAST_SEEN.length]}`,
+    habits: ((L2) => [L2[mbti[0]], L2[mbti[2]]])(pick(LETTER, LETTER_EN, LETTER_JA)),
+    place: pick(PLACE, PLACE_EN, PLACE_JA)[lackEl][(h >>> 8) % 4],
+    time: pick(TIME, TIME_EN, TIME_JA)[lackEl], day: pick(EL[lackEl].day, EL_EN[lackEl].day, EL_JA[lackEl].day),
+    warn: pick(WARN, WARN_EN, WARN_JA)[lackEl],
+    lastSeen: `${pick(SEASON, SEASON_EN, SEASON_JA)[(h >>> 11) % 4]} · ${pick(LAST_SEEN, LAST_SEEN_EN, LAST_SEEN_JA)[(h >>> 13) % LAST_SEEN.length]}`,
     reward,
     caseNo: `${String(y).slice(2)}${String(h % 9000 + 1000)}`,
     seed: h,

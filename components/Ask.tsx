@@ -6,6 +6,7 @@ import type { Lang } from '@/lib/wanted';
 
 const CW = 1080, CH = 1920, INK = '#1B1433', PAPER = '#FFFDF8', PINK = '#FF8AD0', YEL = '#FFE04D', MUTED = '#6E6189', SKY = '#7FE3F0', LAV = '#B9A6FF';
 const DISPLAY = '"Black Han Sans", sans-serif', JUA = '"Jua", sans-serif', ARCHIVO = '"Archivo Black", sans-serif';
+const JA_DISPLAY = '"Dela Gothic One", "Black Han Sans", sans-serif', JA_ROUND = '"Zen Maru Gothic", "Jua", sans-serif';
 
 /* ───────── 기기 저장 (보드 주인 키, 답변 기기 id) ───────── */
 const KEYS = 'soulcode.ask.keys';
@@ -18,6 +19,38 @@ const answeredKey = (code: string) => 'soulcode.ask.answered.' + code;
 
 /* ───────── 문구 (한국어 / English) ───────── */
 const TX = {
+  ja: {
+    cardTop: (n: number) => `友達${n}人が匿名で答えました 💌`, cardH1: '友達から見た', cardH2: (nm: string) => `${nm}の本当の姿`,
+    cardMbti: '友達の投票で決まった私のMBTI', teto: (p: number) => `💪 肉食系 ${p}%`, egen: (p: number) => `草食系 ${p}% 🌸`,
+    cardItems: ['魅力ポイント1位', '恋愛するとこのタイプ', '友達から見た動物顔', '無人島での役割'], picked: (p: number) => `友達の${p}%が選びました`,
+    cardCta: '✦ あなたも友達に聞いてみて ✦', cardFoot: (h: string) => `${h}/ja/ask · 占いエンタメ`,
+    badge: '💌 匿名・友達投票', h1: ['友達から見た', '私ってどんな人?'],
+    sub: <>リンクをグループLINEに送ると、友達が<b>匿名で</b><br />私のMBTI・肉食系/草食系・魅力ポイントを選んでくれます。</>,
+    preview: ['🧬 友達から見たMBTI', '💪 肉食系 vs 草食系 🌸', '✨ 魅力ポイント1位', '💘 恋愛タイプ', '🐶 動物顔', '🏝️ 無人島の役割'],
+    nickLb: '友達からの呼び名', nickPh: '例: はる', create: '質問リンクを作る 💌', creating: '作成中...',
+    createNote: <>友達は決まった選択肢から選ぶだけ (悪口なし)<br />{MIN_REVEAL}人以上答えると結果が開きます · 占いエンタメです</>,
+    mine: '作ったリンク', mineGo: '結果を見る →', oops: '問題が起きました。もう一度押してください!',
+    notFound: 'リンクが見つかりません 🥲', notFoundSub: '削除されたか、アドレスが間違っています。', makeMine: '質問リンクを作る 💌', lost: '接続が切れました', retry: 'もう一度', loading: '読み込み中...',
+    ownerBadge: (n: string) => `💌 ${n}の質問リンク`, answered: (n: number) => `友達${n}人が答えました!`, drawing: '結果カードを作成中...',
+    shareCard: '📸 結果カードを保存 · ストーリーにシェア', askMore: '💌 もっと友達に聞く', checkNew: '🔄 新しい回答をチェック',
+    ready: 'リンク完成! 🎉', now: (n: number) => `いま${n}人が回答`,
+    pending: (l: number) => <>このリンクをグループLINEやストーリーに載せてね。<br />あと<b>{l}人</b>答えると結果が開きます! 🔓</>,
+    shareLink: '💌 リンクをシェア', refresh: '🔄 回答数を更新', soul: '🚨 運命の相手の手配書を作る', soulHref: '/ja/wanted?utm_source=ask_owner',
+    secret: '📱 他の端末で結果を見る (秘密リンクをコピー)', del: '🗑️ このリンクを削除',
+    secretCopied: '結果が見られる秘密リンクをコピーしました。\n自分の端末だけで使って、友達には送らないでね! 🤫', secretPrompt: '秘密リンク (友達に送らないで)',
+    delConfirm: 'このリンクと友達の回答をすべて削除しますか? 元に戻せません。', linkCopied: 'リンクをコピーしました! グループLINEに貼ってね 💌', copyPrompt: 'このリンクをコピーしてください',
+    linkShare: (u: string) => `私について匿名で選んで 💌 MBTI、肉食系か草食系か、魅力ポイント… 友達から見た私は? 👉 ${u}?utm_source=ask_share`,
+    cardShare: (r: AskResult, o: string) => `友達から見た私は${r.mbti}・肉食系${r.tetoPct}%らしい笑 あなたも聞いてみて 👉 ${o}/ja/ask?utm_source=ask_card`,
+    cardFile: (m: string) => `友達から見た私_${m}.png`,
+    sentH: (n: string) => `${n}に匿名で届けました!`, sentSub: (n: string) => <>誰が何を選んだかは{n}にもわかりません 🤫<br />次はあなたの番! 友達はあなたをどう見てる?</>,
+    mineToo: '私も友達に聞いてみる 💌', wanted: '🚨 運命の相手の手配書を作る', wantedHref: '/ja/wanted?utm_source=ask_answered',
+    anon: (n: string) => `💌 匿名 · ${n}には誰が答えたかわかりません`, qH: (n: string) => <>{n}って<br />どんな人?</>, qSub: (c: number) => `正直に選んでね! いままで${c}人が回答。`,
+    q1: '1. 肉食系? 草食系?', tetoOpt: '💪 肉食系 (積極的・リーダー・クール)', egenOpt: '🌸 草食系 (繊細・やさしい・感性派)', q2: (n: string) => `2. ${n}のMBTIを当てて`,
+    axes: { ei: ['🎉 人が多いほどテンションUP', '🏠 家が最高、充電が必要'], sn: ['📏 現実的でていねい', '🌈 想像力が爆発'], tf: ['🧠 事実で話すタイプ', '💗 まず共感するタイプ'], jp: ['📅 計画を立てる派', '🎲 その場のノリ派'] },
+    q3: '3. いちばんの魅力ポイントは?', q4: '4. 恋愛するとどんなタイプ?', q5: '5. 動物顔でいうと?', q6: (n: string) => `6. 無人島に行ったら${n}の役割は?`,
+    send: '匿名で送る 💌', sending: '送信中...', sendNote: '名前や連絡先は送られず、選んだ答えだけが届きます · 占いエンタメです', full: 'このリンクは回答がいっぱいです!',
+    base: '/ja/ask', other: '/ja/wanted',
+  },
   ko: {
     cardTop: (n: number) => `친구 ${n}명이 익명으로 답했어요 💌`, cardH1: '친구들이 보는', cardH2: (nm: string) => `${nm}의 진짜 모습`,
     cardMbti: '친구들 투표로 정해진 내 MBTI', teto: (p: number) => `💪 테토 ${p}%`, egen: (p: number) => `에겐 ${p}% 🌸`,
@@ -100,7 +133,8 @@ const emo = (s: string) => s.split(' ')[0];
 
 async function drawCard(nick: string, r: AskResult, lang: Lang) {
   const T = TX[lang], O = askOptions(lang);
-  await Promise.all([`120px ${ARCHIVO}`, `60px ${DISPLAY}`, `40px ${JUA}`].map((f) => document.fonts.load(f, '친구들 보는 나 ABC')));
+  const FD = lang === 'ja' ? JA_DISPLAY : DISPLAY, FR = lang === 'ja' ? JA_ROUND : JUA;
+  await Promise.all([`120px ${ARCHIVO}`, `60px ${FD}`, `40px ${FR}`].map((f) => document.fonts.load(f, '친구들 보는 나 ABC 友達から見た')));
   const cv = document.createElement('canvas'); cv.width = CW; cv.height = CH;
   const c = cv.getContext('2d')!;
   const bg = c.createLinearGradient(0, 0, CW, CH);
@@ -112,9 +146,9 @@ async function drawCard(nick: string, r: AskResult, lang: Lang) {
   const px = 70, py = 90, pw = CW - 140, ph = CH - 200;
   rr(c, px, py, pw, ph, 48, PAPER, 6, 14);
   c.textAlign = 'center'; c.textBaseline = 'alphabetic';
-  c.font = `40px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.cardTop(r.count), CW / 2, 190);
-  c.font = `78px ${DISPLAY}`; c.fillStyle = INK; c.fillText(T.cardH1, CW / 2, 290);
-  c.font = `96px ${DISPLAY}`; c.fillStyle = INK;
+  c.font = `40px ${FR}`; c.fillStyle = MUTED; c.fillText(T.cardTop(r.count), CW / 2, 190);
+  c.font = `${lang === 'ja' ? 64 : 78}px ${FD}`; c.fillStyle = INK; c.fillText(T.cardH1, CW / 2, 290);
+  c.font = `${lang === 'ja' ? 76 : 96}px ${FD}`; c.fillStyle = INK;
   const nm = nick.length > 6 ? nick.slice(0, 6) + '…' : nick;
   c.fillText(T.cardH2(nm), CW / 2, 400);
   star(c, 150, 230, 30, YEL); star(c, CW - 150, 340, 24, PINK);
@@ -125,12 +159,12 @@ async function drawCard(nick: string, r: AskResult, lang: Lang) {
   c.fillStyle = PINK; c.fillText(r.mbti, CW / 2 + 10, 640);
   c.lineWidth = 14; c.strokeStyle = INK; c.strokeText(r.mbti, CW / 2, 630);
   c.fillStyle = '#fff'; c.fillText(r.mbti, CW / 2, 630);
-  c.font = `34px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.cardMbti, CW / 2, 690);
+  c.font = `34px ${FR}`; c.fillStyle = MUTED; c.fillText(T.cardMbti, CW / 2, 690);
 
   // 테토 vs 에겐 막대
   const bx = 150, bw = CW - 300, by = 750;
   const teto = r.tetoPct;
-  c.font = `38px ${JUA}`; c.textAlign = 'left'; c.fillStyle = INK; c.fillText(T.teto(teto), bx, by);
+  c.font = `38px ${FR}`; c.textAlign = 'left'; c.fillStyle = INK; c.fillText(T.teto(teto), bx, by);
   c.textAlign = 'right'; c.fillText(T.egen(100 - teto), bx + bw, by);
   rr(c, bx, by + 22, bw, 54, 27, '#fff', 4);
   if (teto > 0) { c.save(); c.beginPath(); c.roundRect(bx, by + 22, bw, 54, 27); c.clip(); c.fillStyle = YEL; c.fillRect(bx, by + 22, (bw * teto) / 100, 54); c.fillStyle = PINK; c.fillRect(bx + (bw * teto) / 100, by + 22, bw - (bw * teto) / 100, 54); c.restore(); c.strokeStyle = INK; c.lineWidth = 4; c.beginPath(); c.roundRect(bx, by + 22, bw, 54, 27); c.stroke(); }
@@ -148,17 +182,17 @@ async function drawCard(nick: string, r: AskResult, lang: Lang) {
     const top = topIdx(tally), pct = Math.round((tally[top] / Math.max(1, r.count)) * 100);
     rr(c, x, y, gw, gh, 32, '#fff', 4, 6);
     c.save(); c.beginPath(); c.roundRect(x + 14, y + 14, gw - 28, 56, 28); c.fillStyle = col; c.fill(); c.restore();
-    c.textAlign = 'center'; c.font = `${lang === 'en' ? 27 : 30}px ${JUA}`; c.fillStyle = INK; c.fillText(title, x + gw / 2, y + 53);
-    c.font = `96px ${JUA}`; c.fillText(emo(opts[top]), x + gw / 2, y + 180);
-    c.font = `${lang === 'en' ? 38 : 44}px ${DISPLAY}`; c.fillText(strip(opts[top]), x + gw / 2, y + 250, gw - 30);
-    c.font = `28px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.picked(pct), x + gw / 2, y + 296, gw - 30);
+    c.textAlign = 'center'; c.font = `${lang === 'ko' ? 30 : 27}px ${FR}`; c.fillStyle = INK; c.fillText(title, x + gw / 2, y + 53);
+    c.font = `96px ${FR}`; c.fillText(emo(opts[top]), x + gw / 2, y + 180);
+    c.font = `${lang === 'ko' ? 44 : lang === 'ja' ? 34 : 38}px ${FD}`; c.fillText(strip(opts[top]), x + gw / 2, y + 250, gw - 30);
+    c.font = `28px ${FR}`; c.fillStyle = MUTED; c.fillText(T.picked(pct), x + gw / 2, y + 296, gw - 30);
   });
 
-  c.textAlign = 'center'; c.font = `32px ${JUA}`; c.fillStyle = MUTED;
+  c.textAlign = 'center'; c.font = `32px ${FR}`; c.fillStyle = MUTED;
   c.fillText(T.cardCta, CW / 2, 1690);
   c.font = `38px ${ARCHIVO}`; c.fillStyle = '#fff'; c.lineWidth = 7; c.strokeStyle = INK;
   c.strokeText('SOULCODE', CW / 2, CH - 52); c.fillText('SOULCODE', CW / 2, CH - 52);
-  c.font = `26px ${JUA}`; c.fillStyle = INK; c.fillText(T.cardFoot(location.host), CW / 2, CH - 16);
+  c.font = `26px ${FR}`; c.fillStyle = INK; c.fillText(T.cardFoot(location.host), CW / 2, CH - 16);
   return cv;
 }
 
@@ -168,11 +202,13 @@ type Board = { nick: string; count: number; owner: boolean; result?: AskResult |
 function Shell({ children, lang = 'ko' }: { children: React.ReactNode; lang?: Lang }) {
   return (
     <div className="wanted-wrap">
-      <main className="past ask">
+      <main className={'past ask' + (lang === 'ja' ? ' ja' : '')}>
         {children}
-        {lang === 'ko'
-          ? <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a> · <a href="/en/ask">English</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a><BizInfo /></footer>
-          : <footer className="past-foot"><a href="/en/wanted">🚨 Soulmate WANTED poster</a> · <a href="/ask">한국어</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
+        {lang === 'ja'
+          ? <footer className="past-foot"><a href="/ja/wanted">🚨 運命の相手の手配書</a> · <a href="/ask">한국어</a> · <a href="/en/ask">English</a><br /><a href="/terms">利用規約 (韓国語)</a> · <a href="/privacy">プライバシー (韓国語)</a></footer>
+          : lang === 'ko'
+          ? <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a> · <a href="/en/ask">English</a> · <a href="/ja/ask">日本語</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a><BizInfo /></footer>
+          : <footer className="past-foot"><a href="/en/wanted">🚨 Soulmate WANTED poster</a> · <a href="/ask">한국어</a> · <a href="/ja/ask">日本語</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
       </main>
     </div>
   );
