@@ -44,6 +44,42 @@ window.SOUL_CONTENT = {
       { name: 'Responsibility Day', desc: 'Energy that shapes you comes in. Keep your promises and you will be recognized. Might feel a bit tiring.' },
       { name: 'Recharge Day', desc: 'Supporting energy comes in. Perfect for studying, resting and listening to advice.' },
     ],
+    SKINS: ['Hologram', 'Starry Night', 'Strawberry Milk', 'Y2K Chrome', 'Matcha Latte'],
+    BR_REL: {
+      yukhap: ['Six Harmony', 'Your spouse palaces form a Six Harmony! A magnet couple that pulls each other in.'],
+      samhap: ['Triple Harmony', 'Your spouse palaces form a Triple Harmony. A team couple walking in the same direction.'],
+      same: ['Same sign', 'Same character in your spouse palaces. Your routines sync up, but being too alike may cool the butterflies.'],
+      none: ['Peace mode', 'No big clashes or pulls. You two build the chemistry together.'],
+      hae: ['Harm', 'Small hurt feelings can pile up. Talk things out as they come and you\'re fine.'],
+      wonjin: ['Love-hate', 'Upset for no reason yet somehow can\'t let go… love-hate chemistry alert! Accepting your differences is key.'],
+      chung: ['Clash', 'Sparks fly when you collide. But it\'s also an intense bond that can change you both.'],
+    },
+    TEN_INFO: {
+      비견: 'A partner who feels like a friend. Easy and equal, but you have to create the butterflies yourselves.',
+      겁재: 'A stimulating rival type. Together, your competitive side turns ON 🔥',
+      식신: 'Someone you keep wanting to take care of. You want to feed them good food 🍰',
+      상관: 'Playful banter buddy. Even arguments feel like a date 😝',
+      편재: 'The thrill-maker. Free, event-like romance 🎢',
+      정재: 'A realistic, stable match. Built to last 🏡',
+      편관: 'Someone you\'re intensely drawn to. Attraction MAX, but watch the push-and-pull fatigue ⚡',
+      정관: 'Reliable and upright. A partner you want to show off 🎖️',
+      편인: 'Someone who gets your unique side. Conversations go deep 🔭',
+      정인: 'Always on your side. Being together puts your mind at ease 🫶',
+    },
+    PAIRS: [['Extravert', 'Recharges with people', 'Introvert', 'Recharges alone'], ['Sensing', 'Real-world, experience', 'Intuition', 'Imagination, possibilities'], ['Thinking', 'Facts matter', 'Feeling', 'Feelings matter'], ['Judging', 'Likes plans', 'Perceiving', 'Likes going with the flow']],
+    SP_CATS: ['Love', 'Career·Study', 'Relationships', 'Money'],
+    SP_POS: ['Past', 'Present', 'Future'],
+    VERDICT: {
+      go: { t: 'GO signal 🟢', d: 'The flow is on your side. If you\'ve been hesitating, now is a good time to move.' },
+      wait: { t: 'Hold on 🟡', d: 'Right direction, but watch the timing a bit more. The more you prepare, the better.' },
+      turn: { t: 'Change course 🔴', d: 'Keeping the same approach may take a lot out of you. Try a different angle.' },
+    },
+    SP_ACTION: {
+      love: { go: 'Be brave and message first. Keep it short and light!', wait: 'Focus on your own day instead of reply times', turn: 'First figure out what you really want from this relationship' },
+      career: { go: 'Send that application or start that challenge this week', wait: 'Gather more info. Ask a senior or someone in the field', turn: 'Lower the goal one step and restart small' },
+      people: { go: 'Reach out first to someone you\'re grateful for', wait: 'If there\'s a misunderstanding, talk after emotions cool down', turn: 'Take some distance from relationships that drain you' },
+      money: { go: 'Go ahead with planned buys or savings, within budget', wait: 'Delay big spending 2 weeks and track your expenses', turn: 'Start by cancelling subscriptions. Plug the leaks!' },
+    },
     MT_REL: ['Crush·Partner PRO', 'Friend', 'Coworker'],
     SAJU_MATCH: [
       { t: 'Mirror match', d: 'Same element, so you understand each other without words. But when you both get stubborn, nobody backs down.' },
@@ -128,6 +164,42 @@ window.SOUL_CONTENT = {
       { name: '責任デー', desc: '自分を磨く気が入る日。約束を守ると認められる。少し疲れやすいかも。' },
       { name: '充電デー', desc: '自分を助ける気が入る日。勉強・休息・アドバイスを聞くのに最適。' },
     ],
+    SKINS: ['ホログラム', '星空', 'いちごミルク', 'Y2Kクローム', '抹茶ラテ'],
+    BR_REL: {
+      yukhap: ['六合', '配偶者の座どうしが六合!お互い引き寄せ合う磁石カップル。'],
+      samhap: ['三合', '配偶者の座が三合。同じ方向を見て歩くチームカップル。'],
+      same: ['同じ字', '配偶者の座が同じ字。生活リズムのシンクロ率は高いけど、似すぎてときめきが減るかも。'],
+      none: ['平和モード', '特にぶつかりも引き合いもしない仲。相性はふたりで作っていくタイプ。'],
+      hae: ['害', '小さな寂しさがたまりやすい組み合わせ。その都度言葉にすれば問題なし。'],
+      wonjin: ['怨嗔', '理由もなく寂しいのに、なぜか離れられない…愛憎相性に注意!違いを認めるのがポイント。'],
+      chung: ['冲', 'ぶつかると火花が散る。でもお互いをガラッと変える強烈な縁でもある。'],
+    },
+    TEN_INFO: {
+      비견: '友達みたいな恋人。気楽で対等だけど、ときめきは自分たちで作らないと。',
+      겁재: '刺激をくれるライバル型。一緒にいると負けず嫌いがON 🔥',
+      식신: 'つい世話を焼きたくなる人。おいしいものを食べさせたくなる 🍰',
+      상관: 'じゃれ合いの名コンビ。口ゲンカもデートみたいに楽しい 😝',
+      편재: 'ときめき担当。自由でイベントみたいな恋 🎢',
+      정재: '現実的で安定したパートナー。長続きする恋の予感 🏡',
+      편관: '強烈に惹かれる人。引力MAX、でも駆け引き疲れに注意 ⚡',
+      정관: '頼もしくてきちんとした人。自慢したくなる恋人 🎖️',
+      편인: '独特なあなたを理解してくれる人。会話が深まる仲 🔭',
+      정인: '無条件であなたの味方。一緒にいると安心する人 🫶',
+    },
+    PAIRS: [['外向', '人と会って充電', '内向', 'ひとりで充電'], ['感覚', '現実・経験派', '直観', '想像・可能性派'], ['思考', '事実が大事', '感情', '気持ちが大事'], ['判断', '計画を立てる派', '知覚', '即興が楽な派']],
+    SP_CATS: ['恋愛', '進路・勉強', '人間関係', 'お金'],
+    SP_POS: ['過去', '現在', '未来'],
+    VERDICT: {
+      go: { t: 'GOサイン 🟢', d: '流れはあなたの味方。迷っていたことなら、今動いても大丈夫。' },
+      wait: { t: 'ちょっと待機 🟡', d: '方向は合ってるけど、タイミングをもう少し見て。準備するほど有利に。' },
+      turn: { t: '方向転換 🔴', d: '今のやり方のままだとかなり大変かも。アプローチを変えてみて。' },
+    },
+    SP_ACTION: {
+      love: { go: '勇気を出して先に話しかけよう。短く軽く!', wait: '返信の間隔より自分の毎日に集中', turn: 'この関係で本当に望んでいることを先に整理しよう' },
+      career: { go: '後回しにしていた応募・挑戦を今週中に実行', wait: '情報をもっと集めよう。先輩や現役の人に聞いてみて', turn: '目標を一段下げて、小さく再スタート' },
+      people: { go: '感謝している人に先に連絡してみよう', wait: '誤解があるなら気持ちが落ち着いてから話そう', turn: '疲れる関係とは少し距離を置こう' },
+      money: { go: '計画した買い物・貯金は実行OK、ただし予算内で', wait: '大きな出費は2週間延期して家計簿をつけてみて', turn: 'まずサブスクの整理から!漏れるお金をストップ' },
+    },
     MT_REL: ['気になる人·恋人 PRO', '友達', '同僚'],
     SAJU_MATCH: [
       { t: '似た者どうし', d: '同じ五行だから言わなくても通じ合う。でも、ふたりとも意地を張ると一歩も引かないかも。' },
@@ -182,6 +254,14 @@ window.applyContentI18n = function () {
   try { Object.keys(C.MBTI).forEach((k) => Object.assign(MBTI[k], C.MBTI[k])); } catch (e) { /* 아직 정의 전 */ }
   try { Object.assign(SYNERGY, C.SYNERGY); } catch (e) { /* 아직 정의 전 */ }
   try { C.RELATION.forEach((e, i) => Object.assign(RELATION[i], e)); } catch (e) { /* 아직 정의 전 */ }
+  try { C.SKINS.forEach((n, i) => { SKINS[i].n = n; }); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.keys(C.BR_REL).forEach((k) => { BR_REL[k].n = C.BR_REL[k][0]; BR_REL[k].d = C.BR_REL[k][1]; }); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.keys(C.TEN_INFO).forEach((k) => { TEN_INFO[k].d = C.TEN_INFO[k]; }); } catch (e) { /* 아직 정의 전 */ }
+  try { C.PAIRS.forEach((t, i) => { const r = PAIRS[i]; r[1] = t[0]; r[2] = t[1]; r[4] = t[2]; r[5] = t[3]; }); } catch (e) { /* 아직 정의 전 */ }
+  try { C.SP_CATS.forEach((n, i) => { SP_CATS[i].n = n; }); } catch (e) { /* 아직 정의 전 */ }
+  try { C.SP_POS.forEach((n, i) => { SP_POS[i].k = n; }); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.keys(C.VERDICT).forEach((k) => Object.assign(VERDICT[k], C.VERDICT[k])); } catch (e) { /* 아직 정의 전 */ }
+  try { Object.assign(SP_ACTION, C.SP_ACTION); } catch (e) { /* 아직 정의 전 */ }
   try { C.MT_REL.forEach((n, i) => { MT_REL[i].n = n; }); } catch (e) { /* 아직 정의 전 */ }
   try { C.SAJU_MATCH.forEach((e, i) => Object.assign(SAJU_MATCH[i], e)); } catch (e) { /* 아직 정의 전 */ }
   try { Object.assign(MT_TIP, C.MT_TIP); } catch (e) { /* 아직 정의 전 */ }

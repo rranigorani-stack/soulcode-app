@@ -278,7 +278,7 @@ function setStep(n){
   $('prog').style.width=(n*33.4)+'%'; $('stepLabel').textContent=`STEP ${n} / 3`;
 }
 function nextStep(){
-  if(ob.step===2){const y=+$('birth').value.slice(0,4);if(y<1940||y>2025){toast('1940~2025년 사이로 입력해주세요');return}}
+  if(ob.step===2){const y=+$('birth').value.slice(0,4);if(y<1940||y>2025){toast(TL('1940~2025년 사이로 입력해주세요','Enter a year between 1940 and 2025','1940〜2025年の間で入力してください'));return}}
   setStep(ob.step+1)
 }
 function prevStep(){setStep(ob.step-1)}
@@ -287,9 +287,9 @@ function finishOnb(){
   store.set('soulcode.profile',profile);
   logVisit();
   go('s-loading');
-  const msgs=['우주에서 너의 좌표 검색 중... 🛰️','오행 밸런스 체크 중... 물 한 잔 하고 와 💧','MBTI랑 사주 소개팅 시키는 중 💞','찾았다, 너의 소울코드! ✨'];
+  const msgs=TL(['우주에서 너의 좌표 검색 중... 🛰️','오행 밸런스 체크 중... 물 한 잔 하고 와 💧','MBTI랑 사주 소개팅 시키는 중 💞','찾았다, 너의 소울코드! ✨'],['Searching for your coordinates in space... 🛰️','Checking your five-element balance... grab some water 💧','Setting your MBTI up on a blind date with your saju 💞','Found it, your Soulcode! ✨'],['宇宙であなたの座標を検索中... 🛰️','五行バランスをチェック中... お水でも飲んでて 💧','MBTIと四柱推命をお見合い中 💞','見つけた、あなたのソウルコード! ✨']);
   msgs.forEach((m,i)=>setTimeout(()=>$('loadTxt').textContent=m,i*650));
-  setTimeout(()=>{const t=store.get('soulcode.afterOnb');if(t){store.del('soulcode.afterOnb');go(t);toast('궁합 볼 상대의 생일을 넣어봐요 🔎')}else go('s-soul')},2700);
+  setTimeout(()=>{const t=store.get('soulcode.afterOnb');if(t){store.del('soulcode.afterOnb');go(t);toast(TL('궁합 볼 상대의 생일을 넣어봐요 🔎','Enter the birthday of the person you want to match 🔎','相性を見たい相手の誕生日を入れてみて 🔎'))}else go('s-soul')},2700);
 }
 
 /* ================= SOUL ================= */
@@ -512,27 +512,27 @@ $('share').onclick=e=>{if(e.target.id==='share')closeShare()};
 /* ================= ME ================= */
 function renderMe(){
   if(!profile) return; getSaju();
-  $('meName').textContent=`${profile.nick}님`;
-  const ht=!profile.btime?'모름':`${profile.btime} (${BRANCHES_KO[saju.pillars.hour.b]}시 ${BRANCHES[saju.pillars.hour.b]})`;
-  $('meInfo').innerHTML=`<div class="sheet-row"><span class="muted">생년월일</span><span>${profile.birth.replace(/-/g,'.')}${profile.lunar?` <small class="muted">(음력 ${profile.lunar.y}.${profile.lunar.m}.${profile.lunar.d}${profile.lunar.leap?' 윤달':''})</small>`:''}</span></div>
-    <div class="sheet-row"><span class="muted">태어난 시간</span><span>${ht}</span></div>
+  $('meName').textContent=TL(`${profile.nick}님`,profile.nick,`${profile.nick}さん`);
+  const ht=!profile.btime?TL('모름','Unknown','不明'):LG==='ko'?`${profile.btime} (${BRANCHES_KO[saju.pillars.hour.b]}시 ${BRANCHES[saju.pillars.hour.b]})`:`${profile.btime} (${BRANCHES[saju.pillars.hour.b]})`;
+  $('meInfo').innerHTML=`<div class="sheet-row"><span class="muted">${TL('생년월일','Birthday','生年月日')}</span><span>${profile.birth.replace(/-/g,'.')}${profile.lunar?` <small class="muted">(${TL('음력','lunar','旧暦')} ${profile.lunar.y}.${profile.lunar.m}.${profile.lunar.d}${profile.lunar.leap?TL(' 윤달',' leap',' 閏月'):''})</small>`:''}</span></div>
+    <div class="sheet-row"><span class="muted">${TL('태어난 시간','Birth time','生まれた時刻')}</span><span>${ht}</span></div>
     <div class="sheet-row"><span class="muted">MBTI</span><span>${profile.mbti}</span></div>
-    <div class="sheet-row"><span class="muted">일간</span><span>${STEMS[saju.dayStem]} ${STEMS_KO[saju.dayStem]}${EL[STEM_EL[saju.dayStem]].ko}</span></div>`;
+    <div class="sheet-row"><span class="muted">${TL('일간','Day master','日干')}</span><span>${STEMS[saju.dayStem]} ${LG==='ko'?STEMS_KO[saju.dayStem]:''}${EL[STEM_EL[saju.dayStem]].ko}</span></div>`;
   // streak
   const n=calcStreak(), visits=new Set(getVisits());
   $('stN').textContent=n;
-  $('stT').textContent= n>=7?'일주일 넘게 출석 중 👑': n>=3?'불타는 중! 🔥':'오늘도 출석 완료 ✅';
-  $('stS').textContent= n>=7?'카드 덱 스킨 해금 조건 달성 (정식 버전)':`${7-n}일만 더 오면 7일 연속 배지 획득`;
-  const days=['일','월','화','수','목','금','토'], now=new Date(), wk=[];
+  $('stT').textContent= n>=7?TL('일주일 넘게 출석 중 👑','Over a week straight 👑','1週間以上連続 👑'): n>=3?TL('불타는 중! 🔥','On fire! 🔥','燃えてる! 🔥'):TL('오늘도 출석 완료 ✅','Checked in today ✅','今日もログイン完了 ✅');
+  $('stS').textContent= n>=7?TL('카드 덱 스킨 해금 조건 달성 (정식 버전)','Deck skin unlock reached','デッキスキン解放条件達成'):TL(`${7-n}일만 더 오면 7일 연속 배지 획득`,`${7-n} more days for the 7-day badge`,`あと${7-n}日で7日連続バッジ獲得`);
+  const days=TL(['일','월','화','수','목','금','토'],['S','M','T','W','T','F','S'],['日','月','火','水','木','金','土']), now=new Date(), wk=[];
   for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);wk.push(d)}
   $('stWeek').innerHTML=wk.map((d,i)=>`<div><i class="${visits.has(dateKey(d))?'on':''} ${i===6?'today':''}">${visits.has(dateKey(d))?'🔥':''}</i>${days[d.getDay()]}</div>`).join('');
   // dex
   const col=getCollect(), got=Object.keys(col).length;
-  $('dexCount').textContent=`· ${got} / 22 수집`;
-  renderProBanner(); renderSkins(); renderSync(); $('yrLabel').textContent=reportYear()+'년';
+  $('dexCount').textContent=TL(`· ${got} / 22 수집`,`· ${got} / 22 collected`,`· ${got} / 22 収集`);
+  renderProBanner(); renderSkins(); renderSync(); $('yrLabel').textContent=TL(reportYear()+'년',String(reportYear()),reportYear()+'年');
   $('dex').innerHTML=TAROT.map((c,i)=>col[i]
-    ?`<button style="background:linear-gradient(165deg,${CARD_BG[i]})" onclick="toast('${ROMAN[i]} ${c[0]} · ${c[3]} · ${col[i]}회 뽑음')">${c[2]}<small>${c[0]}</small></button>`
-    :`<button class="lock" onclick="toast('아직 못 만난 카드예요 🔒')">?<small>${ROMAN[i]}</small></button>`).join('');
+    ?`<button style="background:linear-gradient(165deg,${CARD_BG[i]})" onclick="toast('${ROMAN[i]} ${c[0]} · ${c[3]} · ${TL(col[i]+'회 뽑음','drawn '+col[i]+'x',col[i]+'回引いた')}')">${c[2]}<small>${c[0]}</small></button>`
+    :`<button class="lock" onclick="toast('${TL('아직 못 만난 카드예요 🔒','Not met yet 🔒','まだ出会っていないカード 🔒')}')">?<small>${ROMAN[i]}</small></button>`).join('');
 }
 function resetAll(){
   store.del('soulcode.profile'); store.del('soulcode.draw.'+todayKey());
@@ -576,6 +576,7 @@ const SP_ACTION={
   money:{go:'계획한 구매·저축 실행해도 OK, 단 예산 안에서',wait:'큰 지출은 2주 미루고 가계부 써보기',turn:'구독 서비스 정리부터! 새는 돈 막기'},
 };
 const sp={cat:null,deck:[],picks:[],q:''};
+if(window.soulLang&&window.soulLang!=='ko'&&window.applyContentI18n){try{applyContentI18n()}catch(e){console.warn('i18n content',e)}}
 $('spCats').innerHTML=SP_CATS.map(c=>`<button class="chip" data-k="${c.k}">${c.e} ${c.n}</button>`).join('');
 document.querySelectorAll('#spCats .chip').forEach(b=>b.onclick=()=>{
   sp.cat=b.dataset.k; document.querySelectorAll('#spCats .chip').forEach(x=>x.classList.toggle('sel',x===b)); $('spGo').disabled=false;
@@ -590,7 +591,7 @@ function spStart(){
   spHint();
   const fan=$('spFan'); fan.innerHTML='';
   for(let i=0;i<9;i++){
-    const c=document.createElement('button'); c.className='cback'; c.setAttribute('aria-label',`카드 ${i+1}`);
+    const c=document.createElement('button'); c.className='cback'; c.setAttribute('aria-label',TL(`카드 ${i+1}`,`Card ${i+1}`,`カード${i+1}`));
     const o=i-4; c.style.width='78px'; c.style.height='128px'; c.style.left='-39px';
     c.style.transform=`translateX(${o*28}px) rotate(${o*7}deg)`; c._base=c.style.transform;
     c.onmouseenter=()=>{if(!c._used)c.style.transform=c._base+' translateY(-14px)'};
@@ -602,7 +603,7 @@ function spStart(){
 }
 function spHint(){
   const n=sp.picks.length;
-  $('spHint').innerHTML=n<3?`<b style="color:var(--text)">${SP_POS[n].k}</b>를 보여줄 카드를 골라주세요 (${n+1}/3)`:'카드를 펼치는 중...';
+  $('spHint').innerHTML=n<3?TL(`<b style="color:var(--text)">${SP_POS[n].k}</b>를 보여줄 카드를 골라주세요 (${n+1}/3)`,`Pick a card for your <b style="color:var(--text)">${SP_POS[n].k}</b> (${n+1}/3)`,`<b style="color:var(--text)">${SP_POS[n].k}</b>を表すカードを選んでね (${n+1}/3)`):TL('카드를 펼치는 중...','Laying out the cards...','カードを広げています...');
 }
 function spPick(el){
   if(el._used||sp.picks.length>=3) return;
@@ -619,7 +620,7 @@ function spPick(el){
     [0,1,2].forEach(k=>setTimeout(()=>{
       $('slot'+k).querySelector('.sflip').classList.add('flipped');
       setTimeout(()=>burst($('slot'+k),8),380);
-      $('sCap'+k).textContent=`${SP_POS[k].k}${sp.picks[k].rev?' · 역':''}`;
+      $('sCap'+k).textContent=`${SP_POS[k].k}${sp.picks[k].rev?TL(' · 역',' · rev.',' · 逆'):''}`;
     },500+k*450));
     setTimeout(spRender,500+3*450+400);
   }
@@ -630,24 +631,24 @@ function spRender(){
   const blocks=sp.picks.map((p,i)=>{
     const c=TAROT[p.card], kw=p.rev?c[4]:c[3], v=LUCK[p.card];
     score+=(p.rev?(v>0?-1:v<0?1:-1):v)*SP_POS[i].w;
-    const lead=[`${cat.n}에서 지나온 흐름은 「${kw}」였어요.`,`지금 ${cat.n}의 핵심 키워드는 「${kw}」.`,`앞으로는 「${kw}」 쪽으로 흘러갈 가능성이 높아요.`][i];
+    const lead=TL([`${cat.n}에서 지나온 흐름은 「${kw}」였어요.`,`지금 ${cat.n}의 핵심 키워드는 「${kw}」.`,`앞으로는 「${kw}」 쪽으로 흘러갈 가능성이 높아요.`],[`In ${cat.n.toLowerCase()}, the road behind you was “${kw}”.`,`Right now your ${cat.n.toLowerCase()} keyword is “${kw}”.`,`Things are likely to flow toward “${kw}”.`],[`${cat.n}でこれまでの流れは「${kw}」でした。`,`今の${cat.n}のキーワードは「${kw}」。`,`これからは「${kw}」の方向へ流れそう。`])[i];
     const msg=p.rev?(t==='T'?c[7]:c[8]):(t==='T'?c[5]:c[6]);
-    return `<div class="panel pos"><div class="hd"><span class="p">${SP_POS[i].k}</span><b>${c[2]} ${c[0]}</b>${p.rev?'<span class="r">역방향</span>':''}</div><p class="kwl">${lead}</p><p>${msg}</p></div>`;
+    return `<div class="panel pos"><div class="hd"><span class="p">${SP_POS[i].k}</span><b>${c[2]} ${c[0]}</b>${p.rev?`<span class="r">${TL('역방향','Reversed','逆位置')}</span>`:''}</div><p class="kwl">${lead}</p><p>${msg}</p></div>`;
   }).join('');
   const vk=score>=3?'go':score>=0?'wait':'turn', V=VERDICT[vk];
-  sp.last={cat:cat.n,verdict:V.t,cards:sp.picks.map(p=>TAROT[p.card][0]+(p.rev?'(역)':''))};
+  sp.last={cat:cat.n,verdict:V.t,cards:sp.picks.map(p=>TAROT[p.card][0]+(p.rev?TL('(역)','(rev.)','(逆)'):''))};
   $('spResult').innerHTML=`${sp.q?`<p class="q-echo"><span>“${esc(sp.q)}”</span></p>`:'<div style="height:14px"></div>'}
     ${blocks}
-    <div class="sec-t">🧭 종합 리딩 · ${cat.e} ${cat.n}</div>
+    <div class="sec-t">${TL('🧭 종합 리딩','🧭 Overall reading','🧭 総合リーディング')} · ${cat.e} ${cat.n}</div>
     <div class="msg-box" style="margin-top:0"><div class="h-display" style="font-size:24px;margin-bottom:8px">${V.t}</div><p style="font-size:15px;line-height:1.65">${V.d}</p>
-      <p style="font-size:15px;line-height:1.65;margin-top:12px"><b>👉 이번 주 액션</b><br>${SP_ACTION[sp.cat][vk]}</p></div>
-    <div class="ai-only"><button class="btn pink ai-btn" id="aiSpBtn" onclick="aiSpread()">🤖 AI 종합 리딩 받기</button><div class="ai-box" id="aiSp"></div><p class="ai-quota"></p></div>
-    <div class="row-btns"><button class="btn ghost" onclick="spCopy()">결과 복사</button><button class="btn" onclick="spReset()">다른 고민 보기</button></div>
-    <p class="disclaimer">${t==='T'?'🧠 T버전':'💗 F버전'} 해석이에요 · 재미로 보는 콘텐츠예요</p>`;
+      <p style="font-size:15px;line-height:1.65;margin-top:12px"><b>${TL('👉 이번 주 액션','👉 This week\'s action','👉 今週のアクション')}</b><br>${SP_ACTION[sp.cat][vk]}</p></div>
+    <div class="ai-only"><button class="btn pink ai-btn" id="aiSpBtn" onclick="aiSpread()">${TL('🤖 AI 종합 리딩 받기','🤖 Get AI overall reading','🤖 AI総合リーディングを受ける')}</button><div class="ai-box" id="aiSp"></div><p class="ai-quota"></p></div>
+    <div class="row-btns"><button class="btn ghost" onclick="spCopy()">${TL('결과 복사','Copy result','結果をコピー')}</button><button class="btn" onclick="spReset()">${TL('다른 고민 보기','Ask something else','別の悩みを見る')}</button></div>
+    <p class="disclaimer">${t==='T'?TL('🧠 T버전','🧠 T-mode','🧠 Tモード'):TL('💗 F버전','💗 F-mode','💗 Fモード')}${TL(' 해석이에요 · 재미로 보는 콘텐츠예요',' reading · just for fun','の解釈です · お楽しみコンテンツです')}</p>`;
   $('spResult').style.display='block'; refreshQuota();
 }
 function spCopy(){
-  const s=sp.last; const txt=`🔮 SOULCODE 고민 타로 | ${s.cat}\n${sp.q?`“${sp.q}”\n`:''}과거 ${s.cards[0]} → 현재 ${s.cards[1]} → 미래 ${s.cards[2]}\n결과: ${s.verdict}\n#소울코드 #고민타로`;
+  const s=sp.last; const txt=TL(`🔮 SOULCODE 고민 타로 | ${s.cat}\n${sp.q?`“${sp.q}”\n`:''}과거 ${s.cards[0]} → 현재 ${s.cards[1]} → 미래 ${s.cards[2]}\n결과: ${s.verdict}\n#소울코드 #고민타로`,`🔮 SOULCODE tarot | ${s.cat}\n${sp.q?`“${sp.q}”\n`:''}Past ${s.cards[0]} → Present ${s.cards[1]} → Future ${s.cards[2]}\nResult: ${s.verdict}\n#soulcode #tarot`,`🔮 SOULCODE 悩みタロット | ${s.cat}\n${sp.q?`“${sp.q}”\n`:''}過去 ${s.cards[0]} → 現在 ${s.cards[1]} → 未来 ${s.cards[2]}\n結果: ${s.verdict}\n#ソウルコード #タロット`);
   navigator.clipboard.writeText(txt).then(()=>toast(TL('복사 완료! 📋','Copied! 📋','コピーしました! 📋'))).catch(()=>toast(TL('이 환경에서는 복사가 막혀 있어요','Copying is blocked here','この環境ではコピーできません')));
 }
 function spReset(){
@@ -750,7 +751,9 @@ function mtReset(){
 }
 
 /* ================= LOVE PRO ================= */
-const PIL_KEYS=['year','month','day','hour'], PIL_KO=['년','월','일','시'];
+const PIL_KEYS=['year','month','day','hour'], PIL_KO=['년','월','일','시'], PIL_EN=['Year','Month','Day','Hour'], PIL_JA=['年','月','日','時'];
+const TEN_N={비견:['Peer','比肩'],겁재:['Rival','劫財'],식신:['Nurturer','食神'],상관:['Free Talker','傷官'],편재:['Thrill','偏財'],정재:['Steady Partner','正財'],편관:['Intense Pull','偏官'],정관:['Upright One','正官'],편인:['Unique Mentor','偏印'],정인:['Safe Harbor','印綬']};
+const tn=k=>LG==='ko'?k:TEN_N[k][LG==='en'?0:1];
 const WONJIN=[[0,7],[1,6],[2,9],[3,8],[4,11],[5,10]], HAE=[[0,7],[1,6],[2,5],[3,4],[8,11],[9,10]];
 const inPairs=(P,a,b)=>P.some(([x,y])=>(x===a&&y===b)||(x===b&&y===a));
 function brRel(a,b){
@@ -809,11 +812,11 @@ function crossScan(A,B){
   const PA=pillarsArr(A), PB=pillarsArr(B), items=[]; let hap=0,chung=0,won=0,shap=0;
   PA.forEach((pa,i)=>{if(!pa)return; PB.forEach((pb,j)=>{if(!pb)return;
     const r=brRel(pa.b,pb.b), dayInv=(i===2||j===2);
-    if(r==='yukhap'){hap++;items.push({w:dayInv?3:1,t:`${PIL_KO[i]}지 ${BRANCHES[pa.b]} × ${PIL_KO[j]}지 ${BRANCHES[pb.b]} · 육합 🧲`,c:'var(--green)'})}
+    if(r==='yukhap'){hap++;items.push({w:dayInv?3:1,t:TL(`${PIL_KO[i]}지 ${BRANCHES[pa.b]} × ${PIL_KO[j]}지 ${BRANCHES[pb.b]} · 육합 🧲`,`${PIL_EN[i]} ${BRANCHES[pa.b]} × ${PIL_EN[j]} ${BRANCHES[pb.b]} · Six Harmony 🧲`,`${PIL_JA[i]}支 ${BRANCHES[pa.b]} × ${PIL_JA[j]}支 ${BRANCHES[pb.b]} · 六合 🧲`),c:'var(--green)'})}
     if(r==='samhap'){hap+=0.5}
-    if(r==='chung'){chung++;items.push({w:dayInv?3:1,t:`${PIL_KO[i]}지 ${BRANCHES[pa.b]} × ${PIL_KO[j]}지 ${BRANCHES[pb.b]} · 충 ⚡`,c:'var(--orange)'})}
-    if(r==='wonjin'){won++;items.push({w:dayInv?2.5:0.8,t:`${PIL_KO[i]}지 ${BRANCHES[pa.b]} × ${PIL_KO[j]}지 ${BRANCHES[pb.b]} · 원진 🌀`,c:'var(--blue)'})}
-    if(Math.abs(pa.s-pb.s)===5){shap++;items.push({w:dayInv?3.5:1.2,t:`${PIL_KO[i]}간 ${STEMS[pa.s]} × ${PIL_KO[j]}간 ${STEMS[pb.s]} · 천간합 💞`,c:'var(--pink)'})}
+    if(r==='chung'){chung++;items.push({w:dayInv?3:1,t:TL(`${PIL_KO[i]}지 ${BRANCHES[pa.b]} × ${PIL_KO[j]}지 ${BRANCHES[pb.b]} · 충 ⚡`,`${PIL_EN[i]} ${BRANCHES[pa.b]} × ${PIL_EN[j]} ${BRANCHES[pb.b]} · Clash ⚡`,`${PIL_JA[i]}支 ${BRANCHES[pa.b]} × ${PIL_JA[j]}支 ${BRANCHES[pb.b]} · 冲 ⚡`),c:'var(--orange)'})}
+    if(r==='wonjin'){won++;items.push({w:dayInv?2.5:0.8,t:TL(`${PIL_KO[i]}지 ${BRANCHES[pa.b]} × ${PIL_KO[j]}지 ${BRANCHES[pb.b]} · 원진 🌀`,`${PIL_EN[i]} ${BRANCHES[pa.b]} × ${PIL_EN[j]} ${BRANCHES[pb.b]} · Love-hate 🌀`,`${PIL_JA[i]}支 ${BRANCHES[pa.b]} × ${PIL_JA[j]}支 ${BRANCHES[pb.b]} · 怨嗔 🌀`),c:'var(--blue)'})}
+    if(Math.abs(pa.s-pb.s)===5){shap++;items.push({w:dayInv?3.5:1.2,t:TL(`${PIL_KO[i]}간 ${STEMS[pa.s]} × ${PIL_KO[j]}간 ${STEMS[pb.s]} · 천간합 💞`,`${PIL_EN[i]} ${STEMS[pa.s]} × ${PIL_EN[j]} ${STEMS[pb.s]} · Heavenly bond 💞`,`${PIL_JA[i]}干 ${STEMS[pa.s]} × ${PIL_JA[j]}干 ${STEMS[pb.s]} · 干合 💞`),c:'var(--pink)'})}
   })});
   items.sort((a,b)=>b.w-a.w);
   const score=Math.max(35,Math.min(98,Math.round(62+6*hap+8*shap-6*chung-5*won)));
@@ -834,7 +837,7 @@ function coupleMonths(A,B){
 }
 function runLovePro(){
   const nick=$('mtNick').value.trim(), [y,m,d]=$('mtBirth').value.split('-').map(Number), mb=$('mtMbti').value, hb=$('mtTime').value;
-  if(y<1940||y>2025){toast('1940~2025년 사이로 입력해주세요');return}
+  if(y<1940||y>2025){toast(TL('1940~2025년 사이로 입력해주세요','Enter a year between 1940 and 2025','1940〜2025年の間で入力してください'));return}
   const A=saju, B=calcSaju(y,m,d,hb), me=esc(profile.nick), them=esc(nick);
   // 1 spouse palace
   const sp=BR_REL[brRel(A.pillars.day.b,B.pillars.day.b)];
@@ -844,59 +847,60 @@ function runLovePro(){
   // 3 cross scan, 4 complement, 5 mbti
   const cs=crossScan(A,B), cp=complement(A,B), mm=mbtiMatch(profile.mbti,mb);
   const total=Math.round(sp.s*0.25+cs.score*0.15+cp.score*0.2+tgScore*0.2+mm.s*0.2);
-  const verdict= total>=86?'운명 레벨 케미 💖':total>=77?'설렘 확정 커플 ✨':total>=67?'노력하면 꿀케미 🍯':'롤러코스터 케미 🎢';
+  const verdict= total>=86?TL('운명 레벨 케미 💖','Destiny-level chemistry 💖','運命レベルの相性 💖'):total>=77?TL('설렘 확정 커플 ✨','Butterflies guaranteed ✨','ときめき確定カップル ✨'):total>=67?TL('노력하면 꿀케미 🍯','Sweet with a little effort 🍯','歩み寄れば最高の相性 🍯'):TL('롤러코스터 케미 🎢','Rollercoaster chemistry 🎢','ジェットコースター相性 🎢');
   const chA=charmCheck(A), chB=charmCheck(B), mo=coupleMonths(A,B);
   const elRow=(i)=>`<div class="row"><span class="nm">${EL[i].emoji} ${EL[i].ko}</span><div style="flex:1;display:flex;flex-direction:column;gap:4px"><div class="track" style="height:12px;flex:none"><div class="fill" data-w="${Math.min(100,A.counts[i]/4*100)}" style="background:var(--pink)"></div></div><div class="track" style="height:12px;flex:none"><div class="fill" data-w="${Math.min(100,B.counts[i]/4*100)}" style="background:var(--blue)"></div></div></div><span class="ct" style="width:34px">${A.counts[i]}·${B.counts[i]}</span></div>`;
-  const fillTxt=(arr,who,to)=>arr.length?`<p><b>${who}</b>님이 ${to}님에게 부족한 <b>${arr.map(i=>EL[i].emoji+EL[i].ko).join(' · ')}</b> 기운을 채워줘요.</p>`:'';
-  const cpLines=fillTxt(cp.meFilled,them,me)+fillTxt(cp.themFilled,me,them)||'<p>서로의 부족한 기운을 채우기보단, 각자 비슷한 결로 살아가는 조합이에요.</p>';
-  const charmLine=(n,c)=>`<p><b>${n}</b> · ${c.dohwa?'🌸 <b>도화살</b> 있음: 존재만으로 사람을 끄는 매력캐':'🌸 도화살 없음: 은근히 스며드는 매력'}${c.hong?' / 💋 <b>홍염살</b> 있음: 분위기 있는 섹시함':''}</p>`;
-  const mLabel=o=>`${o.y!==new Date().getFullYear()?o.y+'년 ':''}${o.m}월 <small class="muted">(${STEMS[o.mp.s]}${BRANCHES[o.mp.b]}월)</small>`;
+  const fillTxt=(arr,who,to)=>{if(!arr.length)return '';const e=arr.map(i=>EL[i].emoji+EL[i].ko).join(' · ');return TL(`<p><b>${who}</b>님이 ${to}님에게 부족한 <b>${e}</b> 기운을 채워줘요.</p>`,`<p><b>${who}</b> fills ${to}'s missing <b>${e}</b> energy.</p>`,`<p><b>${who}</b>さんが${to}さんに足りない<b>${e}</b>の気を補ってくれます。</p>`)};
+  const cpLines=fillTxt(cp.meFilled,them,me)+fillTxt(cp.themFilled,me,them)||TL('<p>서로의 부족한 기운을 채우기보단, 각자 비슷한 결로 살아가는 조합이에요.</p>','<p>Rather than filling each other\'s gaps, you two move through life in a similar way.</p>','<p>足りない気を補い合うより、似たリズムでそれぞれ生きる組み合わせです。</p>');
+  const charmLine=(n,c)=>`<p><b>${n}</b> · ${c.dohwa?TL('🌸 <b>도화살</b> 있음: 존재만으로 사람을 끄는 매력캐','🌸 <b>Peach Blossom</b> star: draws people in just by being there','🌸 <b>桃花</b>あり: いるだけで人を惹きつける魅力'):TL('🌸 도화살 없음: 은근히 스며드는 매력','🌸 No Peach Blossom: a charm that slowly sinks in','🌸 桃花なし: じわじわ染みる魅力')}${c.hong?TL(' / 💋 <b>홍염살</b> 있음: 분위기 있는 섹시함',' / 💋 <b>Red Flame</b> star: magnetic, moody allure',' / 💋 <b>紅艶</b>あり: 雰囲気のある色気'):''}</p>`;
+  const MON_EN=['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
+  const mLabel=o=>{const yy=o.y!==new Date().getFullYear();return TL(`${yy?o.y+'년 ':''}${o.m}월 <small class="muted">(${STEMS[o.mp.s]}${BRANCHES[o.mp.b]}월)</small>`,`${MON_EN[o.m-1]}${yy?' '+o.y:''} <small class="muted">(${STEMS[o.mp.s]}${BRANCHES[o.mp.b]})</small>`,`${yy?o.y+'年':''}${o.m}月 <small class="muted">(${STEMS[o.mp.s]}${BRANCHES[o.mp.b]}月)</small>`)};
   const bar=(lab,v,col)=>`<div class="row"><span class="nm" style="width:118px;white-space:nowrap;font-size:14.5px">${lab}</span><div class="track"><div class="fill" data-w="${v}" style="background:${col}"></div></div><span class="ct">${v}</span></div>`;
-  const tip= total>=77?'케미 충분! 아래 추천 달에 먼저 연락하면 반응 좋을 확률 높아요 💌':'다름이 매력이 될 수 있어요. 상대 MBTI 화법으로 한 번 말해보기 💬';
+  const tip= total>=77?TL('케미 충분! 아래 추천 달에 먼저 연락하면 반응 좋을 확률 높아요 💌','Great chemistry! Reach out first in the recommended months below 💌','相性十分!下のおすすめ月に先に連絡すると反応いい確率高め 💌'):TL('다름이 매력이 될 수 있어요. 상대 MBTI 화법으로 한 번 말해보기 💬','Your differences can be your charm. Try talking in their MBTI style once 💬','違いがむしろ魅力に。相手のMBTIっぽい話し方を一度試してみて 💬');
   mt.loveData={them:nick,mb,themDay:STEMS[B.dayStem]+BRANCHES[B.pillars.day.b],total,verdict,sp:`${sp.n} — ${sp.d}`,tgThem:`${tgThem}(${TEN_INFO[tgThem].d})`,tgMe:`${tgMe}(${TEN_INFO[tgMe].d})`,cp:cp.score,
     fill:[cp.meFilled.length?`상대가 나의 부족한 ${cp.meFilled.map(i=>EL[i].ko).join('·')} 기운을 채워줌`:'',cp.themFilled.length?`내가 상대의 부족한 ${cp.themFilled.map(i=>EL[i].ko).join('·')} 기운을 채워줌`:''].filter(Boolean).join(', '),
     cross:cs.items.map(it=>it.t).join(', '),charm:`나: 도화살 ${chA.dohwa?'있음':'없음'}${chA.hong?', 홍염살 있음':''} / 상대: 도화살 ${chB.dohwa?'있음':'없음'}${chB.hong?', 홍염살 있음':''}`,
     best:mo.best.map(o=>`${o.y}년 ${o.m}월`).join(', '),worst:`${mo.worst.y}년 ${mo.worst.m}월`,mbtiLines:`${profile.mbti} × ${mb}: `+mbtiLines(profile.mbti,mb).join(' ')};
-  mt.last={nick,total,verdict,rel:'썸·연인 PRO',mb,pro:`💘 SOULCODE 연애 궁합 PRO | ${profile.nick} × ${nick}\n${total}점 · ${verdict}\n배우자 자리: ${sp.n} · ${nick}님은 나에게 '${tgThem}'\n추천 달: ${mo.best.map(o=>o.m+'월').join(', ')}\n#소울코드 #연애궁합`};
+  mt.last={nick,total,verdict,rel:MT_REL[0].n,mb,pro:TL(`💘 SOULCODE 연애 궁합 PRO | ${profile.nick} × ${nick}\n${total}점 · ${verdict}\n배우자 자리: ${sp.n} · ${nick}님은 나에게 '${tgThem}'\n추천 달: ${mo.best.map(o=>o.m+'월').join(', ')}\n#소울코드 #연애궁합`,`💘 SOULCODE love match | ${profile.nick} × ${nick}\n${total} pts · ${verdict}\nSpouse palace: ${sp.n} · ${nick} is my '${tn(tgThem)}'\nBest months: ${mo.best.map(o=>MON_EN[o.m-1]).join(', ')}\n#soulcode #lovematch`,`💘 SOULCODE 恋愛相性 | ${profile.nick} × ${nick}\n${total}点 · ${verdict}\n配偶者の座: ${sp.n} · ${nick}さんは私にとって「${tn(tgThem)}」\nおすすめ月: ${mo.best.map(o=>o.m+'月').join(', ')}\n#ソウルコード #恋愛相性`)};
   $('mtResult').innerHTML=`
     <div class="panel" style="margin-top:4px;padding-top:22px;position:relative">
       <span class="pop-sticker" style="--rot:-10deg;top:-14px;left:-8px;background:var(--pink)">LOVE PRO 💘</span>
       <div class="match-top">
         <div class="avatar"><div class="e">${STEM_INFO[A.dayStem].emoji}</div><b>${me}</b><small>${profile.mbti} · ${STEMS[A.dayStem]}${BRANCHES[A.pillars.day.b]}</small></div>
-        <div class="heart holo-text">${total}<small>연애 궁합</small></div>
+        <div class="heart holo-text">${total}<small>${TL('연애 궁합','Love match','恋愛相性')}</small></div>
         <div class="avatar"><div class="e">${STEM_INFO[B.dayStem].emoji}</div><b>${them}</b><small>${mb} · ${STEMS[B.dayStem]}${BRANCHES[B.pillars.day.b]}</small></div>
       </div>
       <div class="verdict h-display">${verdict}</div>
-      <div class="bars" style="margin-top:14px">${bar('💍 배우자 자리',sp.s,'var(--pink)')}${bar('💘 서로의 존재',tgScore,'var(--lav)')}${bar('🧩 오행 보완',cp.score,'var(--green)')}${bar('🔗 합·충',cs.score,'var(--orange)')}${bar('🧬 MBTI',mm.s,'var(--blue)')}</div>
+      <div class="bars" style="margin-top:14px">${bar(TL('💍 배우자 자리','💍 Spouse palace','💍 配偶者の座'),sp.s,'var(--pink)')}${bar(TL('💘 서로의 존재','💘 What you are','💘 お互いの存在'),tgScore,'var(--lav)')}${bar(TL('🧩 오행 보완','🧩 Elements','🧩 五行の補完'),cp.score,'var(--green)')}${bar(TL('🔗 합·충','🔗 Bonds·Clashes','🔗 合・冲'),cs.score,'var(--orange)')}${bar('🧬 MBTI',mm.s,'var(--blue)')}</div>
     </div>
-    <div class="sec-t">💍 배우자 자리(일지) · ${sp.n} ${sp.i}</div>
-    <div class="panel line-list"><p>${me}님 <b>${BRANCHES[A.pillars.day.b]}</b> × ${them}님 <b>${BRANCHES[B.pillars.day.b]}</b></p><p>${sp.d}</p></div>
-    <div class="sec-t">💘 서로에게 어떤 존재?</div>
+    <div class="sec-t">${TL('💍 배우자 자리(일지)','💍 Spouse palace (day branch)','💍 配偶者の座(日支)')} · ${sp.n} ${sp.i}</div>
+    <div class="panel line-list"><p>${me}${TL('님','','さん')} <b>${BRANCHES[A.pillars.day.b]}</b> × ${them}${TL('님','','さん')} <b>${BRANCHES[B.pillars.day.b]}</b></p><p>${sp.d}</p></div>
+    <div class="sec-t">${TL('💘 서로에게 어떤 존재?','💘 What are you to each other?','💘 お互いにとってどんな存在?')}</div>
     <div class="grid2">
-      <div class="mini"><div class="k">${them}님은 나에게</div><div class="v"><span class="tag" style="margin:0 0 6px">${tgThem}</span><br>${TEN_INFO[tgThem].d}</div></div>
-      <div class="mini"><div class="k">나는 ${them}님에게</div><div class="v"><span class="tag" style="margin:0 0 6px">${tgMe}</span><br>${TEN_INFO[tgMe].d}</div></div>
+      <div class="mini"><div class="k">${TL(them+'님은 나에게',them+' to me',them+'さんは私にとって')}</div><div class="v"><span class="tag" style="margin:0 0 6px">${tn(tgThem)}</span><br>${TEN_INFO[tgThem].d}</div></div>
+      <div class="mini"><div class="k">${TL('나는 '+them+'님에게','Me to '+them,'私は'+them+'さんにとって')}</div><div class="v"><span class="tag" style="margin:0 0 6px">${tn(tgMe)}</span><br>${TEN_INFO[tgMe].d}</div></div>
     </div>
-    <div class="sec-t">🧩 오행 보완도 · ${cp.score}점</div>
+    <div class="sec-t">${TL(`🧩 오행 보완도 · ${cp.score}점`,`🧩 Element balance · ${cp.score}`,`🧩 五行の補完度 · ${cp.score}点`)}</div>
     <div class="panel"><div class="muted" style="font-size:12.5px;margin-bottom:4px"><span style="color:var(--pink)">■</span> ${me} &nbsp; <span style="color:var(--blue)">■</span> ${them}</div>
       <div class="bars">${[0,1,2,3,4].map(elRow).join('')}</div><div class="line-list" style="margin-top:10px">${cpLines}</div></div>
-    <div class="sec-t">🔗 사주 전체 합·충 스캔</div>
-    <div class="panel"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><span class="tag">합 ${cs.hap+cs.shap}</span><span class="tag">충 ${cs.chung}</span><span class="tag">원진 ${cs.won}</span></div>
-      <div class="line-list">${cs.items.length?cs.items.map(it=>`<p><span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid var(--ink);background:${it.c};margin-right:8px"></span>${it.t}</p>`).join(''):'<p>눈에 띄는 합·충 없이 잔잔한 조합이에요.</p>'}</div>
-      <p class="muted" style="font-size:12px;margin-top:8px">일(日) 기둥이 낀 관계일수록 연애에 더 크게 작용해요.</p></div>
-    <div class="sec-t">🌸 매력 신살 체크</div>
+    <div class="sec-t">${TL('🔗 사주 전체 합·충 스캔','🔗 Full chart bonds & clashes','🔗 命式全体の合・冲スキャン')}</div>
+    <div class="panel"><div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:10px"><span class="tag">${TL('합','Bonds','合')} ${cs.hap+cs.shap}</span><span class="tag">${TL('충','Clashes','冲')} ${cs.chung}</span><span class="tag">${TL('원진','Love-hate','怨嗔')} ${cs.won}</span></div>
+      <div class="line-list">${cs.items.length?cs.items.map(it=>`<p><span style="display:inline-block;width:10px;height:10px;border-radius:50%;border:2px solid var(--ink);background:${it.c};margin-right:8px"></span>${it.t}</p>`).join(''):TL('<p>눈에 띄는 합·충 없이 잔잔한 조합이에요.</p>','<p>A calm match with no notable bonds or clashes.</p>','<p>目立つ合・冲のない穏やかな組み合わせです。</p>')}</div>
+      <p class="muted" style="font-size:12px;margin-top:8px">${TL('일(日) 기둥이 낀 관계일수록 연애에 더 크게 작용해요.','Links involving the Day pillar matter most for love.','日柱が絡む関係ほど恋愛に大きく影響します。')}</p></div>
+    <div class="sec-t">${TL('🌸 매력 신살 체크','🌸 Charm stars','🌸 魅力の神殺チェック')}</div>
     <div class="panel line-list">${charmLine(me,chA)}${charmLine(them,chB)}</div>
-    <div class="sec-t">📅 둘의 타이밍</div>
+    <div class="sec-t">${TL('📅 둘의 타이밍','📅 Your timing','📅 ふたりのタイミング')}</div>
     <div class="grid2">
-      <div class="mini"><div class="k">💌 고백·데이트 추천 달</div><div class="v">${mo.best.map(mLabel).join('<br>')}</div></div>
-      <div class="mini"><div class="k">🙅 큰 결정은 미뤄요</div><div class="v">${mLabel(mo.worst)}<br><small class="muted">다툼 나기 쉬운 달</small></div></div>
+      <div class="mini"><div class="k">${TL('💌 고백·데이트 추천 달','💌 Best months to confess or date','💌 告白・デートにおすすめの月')}</div><div class="v">${mo.best.map(mLabel).join('<br>')}</div></div>
+      <div class="mini"><div class="k">${TL('🙅 큰 결정은 미뤄요','🙅 Hold off on big decisions','🙅 大きな決断は先送り')}</div><div class="v">${mLabel(mo.worst)}<br><small class="muted">${TL('다툼 나기 쉬운 달','Fights more likely','ケンカしやすい月')}</small></div></div>
     </div>
-    <div class="sec-t">🧬 MBTI로 보면 · ${profile.mbti} × ${mb}</div>
-    <div class="panel line-list">${mm.best?'<p>✨ <b>찰떡 조합</b>으로 유명한 MBTI 궁합이에요!</p>':''}${mbtiLines(profile.mbti,mb).map(l=>`<p>${l}</p>`).join('')}</div>
-    <div class="sec-t">💡 케미 업 팁</div>
+    <div class="sec-t">${TL('🧬 MBTI로 보면','🧬 By MBTI','🧬 MBTIで見ると')} · ${profile.mbti} × ${mb}</div>
+    <div class="panel line-list">${mm.best?TL('<p>✨ <b>찰떡 조합</b>으로 유명한 MBTI 궁합이에요!</p>','<p>✨ A famously <b>perfect MBTI pair</b>!</p>','<p>✨ <b>相性抜群</b>で有名なMBTIの組み合わせ!</p>'):''}${mbtiLines(profile.mbti,mb).map(l=>`<p>${l}</p>`).join('')}</div>
+    <div class="sec-t">${TL('💡 케미 업 팁','💡 Chemistry tip','💡 相性アップのコツ')}</div>
     <div class="msg-box" style="margin-top:0"><p class="msg" style="font-size:16px">${tip}</p></div>
-    <div class="ai-only"><button class="btn pink ai-btn" id="aiLvBtn" onclick="aiLove()">🤖 AI 연애 상담 리포트 ${isPro()?'':'(PRO)'}</button><div class="ai-box" id="aiLv"></div><p class="ai-quota"></p></div>
-    <div class="row-btns"><button class="btn ghost" onclick="mtCopy()">결과 복사</button><button class="btn" onclick="mtReset()">다른 사람과 보기</button></div>
-    <p class="disclaimer">${!hb?'상대 태어난 시간 없이 계산했어요 · ':''}KASI 정본 만세력 기준 · 재미로 보는 콘텐츠예요</p>`;
+    <div class="ai-only"><button class="btn pink ai-btn" id="aiLvBtn" onclick="aiLove()">${TL('🤖 AI 연애 상담 리포트','🤖 AI love advice report','🤖 AI恋愛相談レポート')} ${isPro()?'':'(PRO)'}</button><div class="ai-box" id="aiLv"></div><p class="ai-quota"></p></div>
+    <div class="row-btns"><button class="btn ghost" onclick="mtCopy()">${TL('결과 복사','Copy result','結果をコピー')}</button><button class="btn" onclick="mtReset()">${TL('다른 사람과 보기','Try someone else','他の人と見る')}</button></div>
+    <p class="disclaimer">${!hb?TL('상대 태어난 시간 없이 계산했어요 · ','Calculated without their birth time · ','相手の生まれた時刻なしで計算 · '):''}${TL('KASI 정본 만세력 기준 · 재미로 보는 콘텐츠예요','Based on KASI calendar data · just for fun','韓国天文研究院の暦データ基準 · お楽しみコンテンツです')}</p>`;
   $('mtForm').style.display='none'; $('mtResult').style.display='block';
   $('s-match').scrollTo({top:0}); refreshQuota();
   setTimeout(()=>document.querySelectorAll('#mtResult .fill').forEach(f=>f.style.width=f.dataset.w+'%'),120);
