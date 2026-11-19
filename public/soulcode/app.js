@@ -1688,6 +1688,44 @@ try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$
   }
 })();
 
+/* ================= LAYOUT: 화면 정리 (놀거리 모음 · MY 그룹) ================= */
+const HUB={
+  wanted:{e:'🚨',t:'운명의 상대 수배전단',s:'사주로 그린 그 사람',href:'/wanted?utm_source=app_hub'},
+  ask:{e:'💌',t:'친구들이 보는 나',s:'익명으로 물어보기',href:'/ask?utm_source=app_hub'},
+  map:{e:'🗺️',t:'친구 궁합 지도',s:'단톡방 케미 한 장에',on:'openMap()'},
+};
+function hubHTML(id,keys,title){
+  return `<div id="${id}" class="hub-wrap"><div class="sec-t hub-t">${title}</div><div class="hub hub-${keys.length}">${keys.map(k=>{const h=HUB[k];const inner=`<span class="hub-e">${h.e}</span><b>${h.t}</b><small>${h.s}</small>`;return h.on?`<button class="hub-tile" onclick="${h.on}">${inner}</button>`:`<a class="hub-tile" href="${h.href}">${inner}</a>`}).join('')}</div></div>`;
+}
+function tidyLayout(){
+  if(!window.soulConfig)return;
+  // 흩어져 있던 홍보 카드 제거
+  ['pastLink','wantedLink','cmEntry'].forEach(id=>{const el=$(id);el&&el.remove()});
+  // 궁합 탭: 친구랑 놀기 3칸 + 1:1 궁합 제목
+  const f=$('mtForm');
+  if(f&&!$('hubMatch')){f.insertAdjacentHTML('beforebegin',hubHTML('hubMatch',['wanted','ask','map'],'👯 친구랑 같이 놀기')+'<div class="sec-t hub-t">💞 1:1 궁합 보기</div>')}
+  // 소울 탭: 결과 아래 2칸
+  const soul=$('s-soul'), dis=soul&&soul.querySelector('.disclaimer');
+  if(dis&&!$('hubSoul'))dis.insertAdjacentHTML('beforebegin',hubHTML('hubSoul',['wanted','ask'],'👯 이 결과로 친구랑 놀기'));
+  // 첫 화면: 밑줄 링크 → 작은 버튼 2개
+  const sp=$('pastSplash'); if(sp&&!sp.classList.contains('hub-pills'))sp.className='past-splash hub-pills',sp.innerHTML='<a href="/wanted?utm_source=app_splash">🚨 수배전단</a><a href="/ask?utm_source=app_splash">💌 친구들이 보는 나</a>';
+  tidyMe();
+}
+function tidyMe(){
+  const me=$('s-me'); if(!me||!window.soulConfig)return;
+  const heads=[...me.querySelectorAll(':scope > .sec-t')];
+  const find=t=>heads.find(h=>h.textContent.includes(t));
+  // 예전 '곧 추가될 기능' 안내 제거 (알림·친구 초대는 이미 출시)
+  heads.filter(h=>h.textContent.includes('곧 추가될')||h.textContent.includes('정식 버전')).forEach(h=>{const nx=h.nextElementSibling;if(nx&&nx.classList.contains('panel'))nx.remove();h.remove()});
+  const group=(id,label,before)=>{if($(id)||!before)return;before.insertAdjacentHTML('beforebegin',`<div class="grp-t" id="${id}">${label}</div>`)};
+  group('grpRecord','📚 내 기록',find('운세 리포트'));
+  group('grpDeco','🎨 꾸미기',find('카드 덱 스킨'));
+  group('grpSet','⚙️ 설정',find('아침 알림')||find('동기화'));
+}
+{const _go2=go; go=function(id){_go2(id); if(id==='s-match'||id==='s-soul'||id==='s-me'||id==='s-splash')setTimeout(tidyLayout,0)};}
+cmEntry=function(){tidyLayout()};
+tidyLayout();
+
 /* ================= BOOT ================= */
 applySkin(store.get('soulcode.skin'));
 if(profile && MBTI[profile.mbti]){ logVisit(); const t=store.get('soulcode.afterOnb'); if(t){store.del('soulcode.afterOnb');go(t)} else go('s-tarot'); }

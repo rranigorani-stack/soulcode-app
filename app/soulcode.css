@@ -516,3 +516,18 @@ label.lb{display:block;font-size:14px;color:var(--ink);margin:20px 0 8px;font-fa
 .ask-owner-tools{display:flex;flex-direction:column;align-items:center;margin-top:8px}
 .ask .past-done .again{margin-top:8px}
 .past a.btn{display:block;text-decoration:none}
+
+/* 화면 정리: 놀거리 모음 · MY 그룹 */
+.hub-wrap{margin:4px 0 6px}
+.hub-t{margin:18px 0 10px}
+.hub{display:grid;gap:8px}
+.hub-3{grid-template-columns:repeat(3,1fr)}
+.hub-2{grid-template-columns:repeat(2,1fr)}
+.hub-tile{display:flex;flex-direction:column;align-items:center;justify-content:flex-start;gap:3px;background:var(--paper);border:2.5px solid var(--ink);border-radius:18px;box-shadow:3px 3px 0 var(--ink);padding:12px 6px 10px;text-align:center;color:var(--ink);text-decoration:none;font:inherit;cursor:pointer;min-height:112px}
+.hub-tile:active{transform:translate(2px,2px);box-shadow:1px 1px 0 var(--ink)}
+.hub-e{font-size:30px;line-height:1.1}
+.hub-tile b{font-family:'Jua',sans-serif;font-weight:400;font-size:14.5px;line-height:1.25;word-break:keep-all}
+.hub-tile small{font-size:11px;color:var(--muted);line-height:1.3;word-break:keep-all}
+.hub-pills{display:flex;justify-content:center;gap:8px;text-decoration:none}
+.hub-pills a{font-family:'Jua',sans-serif;font-size:13.5px;color:var(--ink);text-decoration:none;background:#fff;border:2px solid var(--ink);border-radius:99px;padding:6px 12px;box-shadow:2px 2px 0 var(--ink)}
+.grp-t{font-family:'Archivo Black',sans-serif;font-size:12px;letter-spacing:.06em;color:var(--muted);margin:34px 0 -14px;padding-top:14px;border-top:2px dashed rgba(27,20,51,.18)}
