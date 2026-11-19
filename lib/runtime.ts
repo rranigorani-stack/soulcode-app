@@ -18,7 +18,7 @@ declare global {
   interface Window {
     Manseryeok: typeof Manseryeok;
     claude?: { use: (name: string) => Promise<unknown> };
-    soulConfig: { devTestPro: boolean; serverPro: boolean; providers: Provider[]; emailLogin: boolean; payTest: boolean; biz: [string, string][] };
+    soulConfig: { devTestPro: boolean; serverPro: boolean; providers: Provider[]; emailLogin: boolean; payTest: boolean; biz: [string, string][]; freeBeta: boolean };
     soulAuth?: { signIn: (p: Provider) => void; emailPrompt: () => void; signOut: () => void; label: () => string; deleteAccount: () => Promise<boolean> };
     soulPay?: { start: (plan: 'month' | 'year' | 'ticket') => void };
     soulShop?: { unlockSkin: (skin: string) => Promise<{ ok: boolean; code?: string; skins?: string[] }> };
@@ -180,7 +180,7 @@ export async function startSoulcode() {
   if (window.__soulBooted) return;
   window.__soulBooted = true;
   window.Manseryeok = Manseryeok;
-  window.soulConfig = { devTestPro: DEV_TEST_PRO && !TOSS_CLIENT_KEY, serverPro: false, providers: PROVIDERS, emailLogin: EMAIL_LOGIN, payTest: TOSS_CLIENT_KEY.startsWith('test_'), biz: bizLines() };
+  window.soulConfig = { devTestPro: DEV_TEST_PRO && !TOSS_CLIENT_KEY, serverPro: false, providers: PROVIDERS, emailLogin: EMAIL_LOGIN, payTest: TOSS_CLIENT_KEY.startsWith('test_'), biz: bizLines(), freeBeta: process.env.NEXT_PUBLIC_FREE_BETA === '1' };
 
   let session: Session | null = null;
   if (SUPABASE_URL && SUPABASE_ANON) {

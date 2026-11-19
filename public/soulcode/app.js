@@ -1728,6 +1728,26 @@ function tidyMe(){
 cmEntry=function(){tidyLayout()};
 tidyLayout();
 
+/* ================= 무료 베타: PRO 잠금 해제 · 결제 화면 숨김 (NEXT_PUBLIC_FREE_BETA=1) ================= */
+(function(){
+  const beta=!!(window.soulConfig&&window.soulConfig.freeBeta);
+  const P=store.get('soulcode.pro')||{};
+  if(!beta){ if(P.beta) store.del('soulcode.pro'); return; } // 베타 끝나면 베타용 PRO 표시 정리
+  if(!P.active||P.beta) store.set('soulcode.pro',{active:true,beta:true,test:true});
+  const msg=()=>`🧪 지금은 무료 베타라 다 열려 있어요! AI 해석만 하루 ${freeLimit()}회예요`;
+  openPaywall=function(){toast(msg())};
+  openOffer=function(reason){toast(/다 썼|마감/.test(reason||'')?`오늘 AI 해석 ${freeLimit()}회를 다 썼어요. 내일 또 와요! 🌙`:msg())};
+  quotaText=function(){return `🧪 무료 베타 · 오늘 AI 해석 ${Math.max(0,freeLimit()-aiUsed())}/${freeLimit()}회 남음`};
+  renderProBanner=function(){$('proBanner').innerHTML=`<div class="t">🧪 무료 베타 기간<small>연간 상세 리포트 · 덱 스킨 · AI 연애 상담까지 전부 무료! (AI 해석은 하루 ${freeLimit()}회)</small></div>`};
+  // 화면의 PRO 표시 지우기
+  document.documentElement.classList.add('free-beta');
+  try{MT_REL[0].n='썸·연인'}catch(e){}
+  document.querySelectorAll('#mtRel button').forEach(b=>{b.innerHTML=b.innerHTML.replace(/\s*PRO/,'')});
+  const tw=$('mtTimeWrap'); tw&&tw.querySelector('.lb')&&(tw.querySelector('.lb').textContent='상대 태어난 시간 (선택 · 알면 정확도 UP)');
+  // AI 사용 횟수는 베타에서도 기기에 기록 (화면 표시용, 실제 한도는 서버가 지켜요)
+  const _run=runAI; runAI=async function(prompt,box,btn,opts={}){const r=await _run(prompt,box,btn,{...opts,ticket:false}); if(r) store.set('soulcode.ai.'+todayKey(),aiUsed()+1); refreshQuota&&refreshQuota(); return r};
+})();
+
 /* ================= BOOT ================= */
 applySkin(store.get('soulcode.skin'));
 if(profile && MBTI[profile.mbti]){ logVisit(); const t=store.get('soulcode.afterOnb'); if(t){store.del('soulcode.afterOnb');go(t)} else go('s-tarot'); }
