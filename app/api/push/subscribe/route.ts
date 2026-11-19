@@ -14,7 +14,9 @@ export async function POST(req: Request) {
   const body = await req.json().catch(() => null);
   if (!okEndpoint(body?.endpoint)) return json({ code: 'invalid_request' }, 400);
   const user = await requireUser(req);
-  const { error } = await admin().from('push_subscriptions').upsert({ endpoint: body.endpoint, user_id: user?.id ?? null, created_at: new Date().toISOString() }, { onConflict: 'endpoint' });
+  const row = { endpoint: body.endpoint, user_id: user?.id ?? null, created_at: new Date().toISOString() };
+  let { error } = await admin().from('push_subscriptions').upsert({ ...row, lang: body?.lang === 'en' || body?.lang === 'ja' ? body.lang : 'ko' }, { onConflict: 'endpoint' });
+  if (error && /lang/.test(error.message || '')) ({ error } = await admin().from('push_subscriptions').upsert(row, { onConflict: 'endpoint' })); // 언어 칸이 아직 없을 때
   if (error) { console.error('[push/subscribe]', error); return json({ code: 'upstream_error' }, 500); }
   return json({ ok: true });
 }

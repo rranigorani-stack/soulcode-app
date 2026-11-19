@@ -265,6 +265,14 @@ export async function startSoulcode() {
     s.onerror = () => reject(new Error('app.js load failed'));
     document.body.appendChild(s);
   });
+  // 바이럴·도파민 장치 (app.js 다음)
+  await new Promise<void>((resolve) => {
+    const s = document.createElement('script');
+    s.src = '/soulcode/viral.js';
+    s.onload = () => resolve();
+    s.onerror = () => resolve();
+    document.body.appendChild(s);
+  });
 
   const qs = new URLSearchParams(location.search);
   if (qs.get('paid') === '1') { window.toast?.('PRO가 시작됐어요! 💎'); history.replaceState(null, '', '/'); }

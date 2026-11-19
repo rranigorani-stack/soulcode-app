@@ -1415,7 +1415,7 @@ async function enablePush(){
     const reg=await navigator.serviceWorker.ready;
     const {key}=await fetch('/api/push/key').then(r=>r.json());
     const sub=await reg.pushManager.subscribe({userVisibleOnly:true,applicationServerKey:b64u(key)});
-    const r=await fetch('/api/push/subscribe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(sub)});
+    const r=await fetch('/api/push/subscribe',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({...sub.toJSON(),lang:LG})});
     if(!r.ok) throw new Error('save');
     store.set('soulcode.pushAsk','done'); toast(TL('매일 아침 8시에 오늘의 카드를 알려줄게요 🔔','We\'ll send today\'s card every morning at 8 🔔','毎朝8時に今日のカードをお知らせします 🔔'));
   }catch(e){toast(TL('알림을 켜지 못했어요. 잠시 후 다시 시도해주세요','Couldn\'t turn on notifications. Please try again later','通知をオンにできませんでした。しばらくしてから再度お試しください'))}

@@ -1,5 +1,5 @@
 /* 소울코드 서비스워커: 오프라인에서도 앱 화면과 사주 계산이 동작하도록 정적 파일을 캐시해요. */
-const CACHE = 'soulcode-v2';
+const CACHE = 'soulcode-v3';
 const CORE = ['/', '/soulcode/app.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
@@ -32,8 +32,13 @@ const MORNING = [
   ['출석 체크 시간 🔥', '연속 출석 이어가고 오늘의 럭키템도 확인해요'],
 ];
 self.addEventListener('push', (e) => {
-  const [title, body] = MORNING[new Date().getDate() % MORNING.length];
-  e.waitUntil(self.registration.showNotification(title, { body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png', tag: 'soulcode-daily', data: { url: '/?from=push' } }));
+  const fallback = () => { const [title, body] = MORNING[new Date().getDate() % MORNING.length]; return { title, body, url: '/?from=push', tag: 'soulcode-daily' }; };
+  e.waitUntil(
+    self.registration.pushManager.getSubscription()
+      .then((sub) => sub ? fetch('/api/push/pull', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ endpoint: sub.endpoint }) }).then((r) => r.json()) : fallback())
+      .catch(fallback)
+      .then((m) => self.registration.showNotification(m.title, { body: m.body, icon: '/icons/icon-192.png', badge: '/icons/icon-192.png', tag: m.tag || 'soulcode-daily', data: { url: m.url || '/' } }))
+  );
 });
 self.addEventListener('notificationclick', (e) => {
   e.notification.close();
