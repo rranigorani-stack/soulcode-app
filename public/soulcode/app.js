@@ -7,6 +7,8 @@ const BRANCHES_KO = ['자','축','인','묘','진','사','오','미','신','유'
 const ANIMALS = ['쥐','소','호랑이','토끼','용','뱀','말','양','원숭이','닭','개','돼지'];
 const STEM_EL = [0,0,1,1,2,2,3,3,4,4];
 const BR_EL = [4,2,0,0,2,1,1,2,3,3,2,4];
+const LG=window.soulLang||'ko', TL=(k,e,j)=>LG==='en'?e:LG==='ja'?j:k;
+const ZOD_EN=['Rat','Ox','Tiger','Rabbit','Dragon','Snake','Horse','Goat','Monkey','Rooster','Dog','Pig'], ZOD_JA=['子(ねずみ)年','丑(うし)年','寅(とら)年','卯(うさぎ)年','辰(たつ)年','巳(へび)年','午(うま)年','未(ひつじ)年','申(さる)年','酉(とり)年','戌(いぬ)年','亥(いのしし)年'];
 const EL = [
   {ko:'목',name:'나무',emoji:'🌳',color:'var(--wood)',colorName:'초록',zod:'푸른',
    excess:'하고 싶은 게 너무 많아서 시작만 하고 끝을 못 낼 수 있어요.',
@@ -306,32 +308,36 @@ function renderSoul(){
   $('soulEmoji').textContent=sn.emoji;
   $('soulTitle').textContent=sn.title;
   $('soulSub').textContent=`“${sn.sub}”`;
-  $('soulTags').innerHTML=[...st.tags,`#${el.ko}(${el.name})의기운`].map(t=>`<span class="tag">${t}</span>`).join('');
-  $('soulDesc').innerHTML=`<b>${esc(profile.nick)}</b>님은 <b style="color:${el.color}">${STEMS[saju.dayStem]}${el.ko}</b> 일간, ${st.img}의 기운을 타고났어요. ${st.desc}<br><br>여기에 ${mb.desc} <b>${profile.mbti}</b> 성향이 더해져서, ${SYNERGY[(yang?'yang':'yin')+(E?'E':'I')]}`;
+  $('soulTags').innerHTML=[...st.tags,TL(`#${el.ko}(${el.name})의기운`,`#${el.ko}Energy`,`#${el.ko}の気`)].map(t=>`<span class="tag">${t}</span>`).join('');
+  const _dm=`<b style="color:${el.color}">${STEMS[saju.dayStem]} ${el.ko}</b>`, _sy=SYNERGY[(yang?'yang':'yin')+(E?'E':'I')];
+  $('soulDesc').innerHTML=TL(`<b>${esc(profile.nick)}</b>님은 <b style="color:${el.color}">${STEMS[saju.dayStem]}${el.ko}</b> 일간, ${st.img}의 기운을 타고났어요. ${st.desc}<br><br>여기에 ${mb.desc} <b>${profile.mbti}</b> 성향이 더해져서, ${_sy}`,
+    `<b>${esc(profile.nick)}</b> was born as ${_dm} — ${st.img.toLowerCase()}. ${st.desc}<br><br>Add the <b>${profile.mbti}</b> side, someone who ${mb.desc}, and you get this: ${_sy}`,
+    `<b>${esc(profile.nick)}</b>さんは${_dm}の日干、「${st.img}」の気を持って生まれました。${st.desc}<br><br>そこに${mb.desc}<b>${profile.mbti}</b>の性格が加わって、${_sy}`);
   const zEl=EL[STEM_EL[saju.yearStem]];
-  $('zodiac').textContent=`· ${STEMS_KO[saju.yearStem]}${BRANCHES_KO[saju.yearBranch]}년 ${zEl.zod} ${ANIMALS[saju.yearBranch]}띠`;
-  const order=[['시주','hour'],['일주','day'],['월주','month'],['년주','year']];
+  $('zodiac').textContent=LG==='ko'?`· ${STEMS_KO[saju.yearStem]}${BRANCHES_KO[saju.yearBranch]}년 ${zEl.zod} ${ANIMALS[saju.yearBranch]}띠`:`· ${STEMS[saju.yearStem]}${BRANCHES[saju.yearBranch]} · ${TL('',ZOD_EN[saju.yearBranch],ZOD_JA[saju.yearBranch])}`;
+  const order=[[TL('시주','Hour','時柱'),'hour'],[TL('일주','Day','日柱'),'day'],[TL('월주','Month','月柱'),'month'],[TL('년주','Year','年柱'),'year']];
   $('pillars').innerHTML=order.map(([lab,k])=>{
     const p=saju.pillars[k];
-    if(!p) return `<div class="pil"><div class="lab">${lab}</div><div class="gz top" style="color:var(--muted)">?<small>모름</small></div><div class="gz" style="color:var(--muted)">?<small>모름</small></div></div>`;
+    if(!p) return `<div class="pil"><div class="lab">${lab}</div><div class="gz top" style="color:var(--muted)">?<small>${TL('모름','?','不明')}</small></div><div class="gz" style="color:var(--muted)">?<small>${TL('모름','?','不明')}</small></div></div>`;
     return `<div class="pil ${k==='day'?'me':''}"><div class="lab">${lab}</div>
-      <div class="gz top" style="color:${EL[STEM_EL[p.s]].color}">${k==='day'?'<span class="me-badge">나</span>':''}${STEMS[p.s]}<small>${STEMS_KO[p.s]}${EL[STEM_EL[p.s]].ko}</small></div>
-      <div class="gz" style="color:${EL[BR_EL[p.b]].color}">${BRANCHES[p.b]}<small>${BRANCHES_KO[p.b]}${EL[BR_EL[p.b]].ko}</small></div></div>`;
+      <div class="gz top" style="color:${EL[STEM_EL[p.s]].color}">${k==='day'?`<span class="me-badge">${TL('나','ME','私')}</span>`:''}${STEMS[p.s]}<small>${LG==='ko'?STEMS_KO[p.s]:''}${EL[STEM_EL[p.s]].ko}</small></div>
+      <div class="gz" style="color:${EL[BR_EL[p.b]].color}">${BRANCHES[p.b]}<small>${LG==='ko'?BRANCHES_KO[p.b]:''}${EL[BR_EL[p.b]].ko}</small></div></div>`;
   }).join('');
   const M=saju.meta;
-  $('sajuMeta').innerHTML= M.known
+  if(LG!=='ko') $('sajuMeta').innerHTML=M.boundary&&!M.known?TL('','<b style="color:var(--fire)">⚠️ You were born on a solar-term boundary.</b> Adding your birth time may change your month pillar. You can edit it in the MY tab.','<b style="color:var(--fire)">⚠️ 節気が切り替わる日に生まれています。</b>生まれた時刻を入れると月柱が変わることがあります。MYタブで入力できます。'):TL('',`🔭 Korea Astronomy Institute calendar data${M.known?' · solar-term time & true solar time corrected':' · add your birth time to see the hour pillar'}`,`🔭 韓国天文研究院の暦データ${M.known?' · 節入り時刻・真太陽時で補正':' · 生まれた時刻を入れると時柱も出ます'}`);
+  else $('sajuMeta').innerHTML= M.known
     ? `🔭 KASI 정본 만세력 · 절입 시각 기준 · 서울 진태양시·서머타임 보정${profile.lunar?` · 음력 ${profile.lunar.m}월 ${profile.lunar.d}일${profile.lunar.leap?'(윤)':''} 입력`:''}`
     : (M.boundary?'<b style="color:var(--fire)">⚠️ 절기가 바뀌는 날 태어났어요.</b> 태어난 시각을 넣으면 월주(년주)가 달라질 수 있어요. MY 탭에서 다시 입력할 수 있어요.':`🔭 KASI 정본 만세력${profile.lunar?` · 음력 ${profile.lunar.m}월 ${profile.lunar.d}일${profile.lunar.leap?'(윤)':''} 입력`:''} · 시간을 넣으면 시주까지 나와요`);
   const total=saju.counts.reduce((a,b)=>a+b,0), max=Math.max(...saju.counts);
   $('bars').innerHTML=EL.map((e,i)=>`<div class="row"><span class="nm">${e.emoji} ${e.ko}</span><div class="track"><div class="fill" data-w="${saju.counts[i]/max*100}" style="background:${e.color}"></div></div><span class="ct">${saju.counts[i]}</span></div>`).join('')
-    +`<p class="muted" style="font-size:12.5px;margin-top:10px">총 ${total}글자 기준${!profile.btime?' (태어난 시간 제외)':''}</p>`;
+    +`<p class="muted" style="font-size:12.5px;margin-top:10px">${TL(`총 ${total}글자 기준${!profile.btime?' (태어난 시간 제외)':''}`,`Based on ${total} characters${!profile.btime?' (birth time not included)':''}`,`全${total}文字で計算${!profile.btime?'(生まれた時刻なし)':''}`)}</p>`;
   requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('#bars .fill').forEach(f=>f.style.width=f.dataset.w+'%'),80));
   const strong=saju.counts.indexOf(max), weak=saju.counts.indexOf(Math.min(...saju.counts));
-  $('ptExcess').innerHTML=`<b style="color:${EL[strong].color}">${EL[strong].ko} 기운</b>이 강해요. ${EL[strong].excess}`;
-  $('ptLack').innerHTML=`<b style="color:${EL[weak].color}">${EL[weak].ko} 기운</b> 보충 추천: ${EL[weak].lack}`;
+  $('ptExcess').innerHTML=TL(`<b style="color:${EL[strong].color}">${EL[strong].ko} 기운</b>이 강해요. ${EL[strong].excess}`,`Strong <b style="color:${EL[strong].color}">${EL[strong].ko}</b> energy. ${EL[strong].excess}`,`<b style="color:${EL[strong].color}">${EL[strong].ko}の気</b>が強め。${EL[strong].excess}`);
+  $('ptLack').innerHTML=TL(`<b style="color:${EL[weak].color}">${EL[weak].ko} 기운</b> 보충 추천: ${EL[weak].lack}`,`Top up <b style="color:${EL[weak].color}">${EL[weak].ko}</b>: ${EL[weak].lack}`,`<b style="color:${EL[weak].color}">${EL[weak].ko}の気</b>を補うなら: ${EL[weak].lack}`);
   $('ptMbti').innerHTML=`<b>${mb.best}</b> · ${MBTI[mb.best].nick}`;
   const helper=(STEM_EL[saju.dayStem]+4)%5;
-  $('ptElem').innerHTML=`<b style="color:${EL[helper].color}">${EL[helper].ko}(${EL[helper].name}) 일간</b>인 사람이 나를 든든하게 채워줘요`;
+  $('ptElem').innerHTML=TL(`<b style="color:${EL[helper].color}">${EL[helper].ko}(${EL[helper].name}) 일간</b>인 사람이 나를 든든하게 채워줘요`,`People with a <b style="color:${EL[helper].color}">${EL[helper].ko} day master</b> fill you up`,`<b style="color:${EL[helper].color}">${EL[helper].ko}の日干</b>の人があなたを支えてくれます`);
 }
 
 /* ================= TAROT ================= */
@@ -345,12 +351,12 @@ function todayInfo(){
 function renderTarot(){
   if(!profile) return;
   getSaju();
-  const t=todayInfo(), days=['일','월','화','수','목','금','토'];
-  $('todayDate').textContent=`${t.d.getMonth()+1}.${t.d.getDate()} ${days[t.d.getDay()]}요일 · TODAY`;
-  $('todayHello').innerHTML=`${esc(profile.nick)}님의<br>오늘 우주 날씨는? ☁️`;
-  $('todayStreak').textContent=`🔥 ${calcStreak()}일 연속`;
+  const t=todayInfo(), days=TL(['일','월','화','수','목','금','토'],['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],['日','月','火','水','木','金','土']);
+  $('todayDate').textContent=TL(`${t.d.getMonth()+1}.${t.d.getDate()} ${days[t.d.getDay()]}요일 · TODAY`,`${days[t.d.getDay()]} ${t.d.getMonth()+1}.${t.d.getDate()} · TODAY`,`${t.d.getMonth()+1}.${t.d.getDate()} (${days[t.d.getDay()]}) · TODAY`);
+  $('todayHello').innerHTML=TL(`${esc(profile.nick)}님의<br>오늘 우주 날씨는? ☁️`,`${esc(profile.nick)}, what's your<br>cosmic weather today? ☁️`,`${esc(profile.nick)}さんの<br>今日の宇宙天気は? ☁️`);
+  $('todayStreak').textContent=TL(`🔥 ${calcStreak()}일 연속`,`🔥 ${calcStreak()}-day streak`,`🔥 ${calcStreak()}日連続`);
   $('ilji').innerHTML=`<div class="big" style="color:${EL[t.tEl].color}">${STEMS[t.p.s]}${BRANCHES[t.p.b]}</div>
-    <div><div class="t">${t.rel.emoji} 오늘은 ${t.rel.name}</div><div class="d">${STEMS[t.p.s]}${BRANCHES[t.p.b]}日 ·${EL[t.tEl].ko} 기운 × 나의 ${EL[STEM_EL[saju.dayStem]].ko} 기운<br>${t.rel.desc}</div></div>`;
+    <div><div class="t">${t.rel.emoji} ${TL('오늘은 '+t.rel.name,'Today: '+t.rel.name,'今日は'+t.rel.name)}</div><div class="d">${STEMS[t.p.s]}${BRANCHES[t.p.b]}日 · ${TL(`${EL[t.tEl].ko} 기운 × 나의 ${EL[STEM_EL[saju.dayStem]].ko} 기운`,`${EL[t.tEl].ko} day × your ${EL[STEM_EL[saju.dayStem]].ko}`,`${EL[t.tEl].ko}の日 × あなたの${EL[STEM_EL[saju.dayStem]].ko}`)}<br>${t.rel.desc}</div></div>`;
   draw = store.get('soulcode.draw.'+todayKey()) || (draw && draw.date===todayKey() ? draw : null);
   if(draw) showResult(false); else showPicker();
 }
@@ -359,7 +365,7 @@ function showPicker(){
   $('flip').classList.remove('flipped');
   const fan=$('fan'); fan.innerHTML='';
   for(let i=0;i<7;i++){
-    const c=document.createElement('button'); c.className='cback'; c.setAttribute('aria-label',`카드 ${i+1}`);
+    const c=document.createElement('button'); c.className='cback'; c.setAttribute('aria-label',TL(`카드 ${i+1}`,`Card ${i+1}`,`カード${i+1}`));
     const o=i-3; c.style.transform=`translateX(${o*34}px) rotate(${o*9}deg)`; c._base=c.style.transform;
     c.onmouseenter=()=>c.style.transform=c._base+' translateY(-16px)';
     c.onmouseleave=()=>c.style.transform=c._base;
@@ -407,7 +413,7 @@ function holdToFlip(el,bar,done){
     raf=requestAnimationFrame(tick);
   };
   const start=e=>{if(finished)return;e.preventDefault();active=true;t0=performance.now();el.classList.add('charging');raf=requestAnimationFrame(tick)};
-  const stop=()=>{if(!active)return;active=false;cancelAnimationFrame(raf);el.classList.remove('charging');el.style.transform='';bar.style.transition='width .25s';bar.style.width='0';setTimeout(()=>bar.style.transition='',260);toast('조금만 더 꾹— 🤏')};
+  const stop=()=>{if(!active)return;active=false;cancelAnimationFrame(raf);el.classList.remove('charging');el.style.transform='';bar.style.transition='width .25s';bar.style.width='0';setTimeout(()=>bar.style.transition='',260);toast(TL('조금만 더 꾹— 🤏','Hold a little longer— 🤏','もう少し長押し— 🤏'))};
   const cleanup=()=>{el.removeEventListener('pointerdown',start);window.removeEventListener('pointerup',stop);el.removeEventListener('pointerleave',stop)};
   if(el._holdCleanup) el._holdCleanup();
   el._holdCleanup=cleanup;
@@ -449,7 +455,7 @@ function stamp(host,rev){
 function fillResult(){
   setTimeout(showSavedDailyAI,0);
   const c=TAROT[draw.card], t=todayInfo();
-  $('resUD').textContent=draw.rev?'🙃 거꾸로 나왔어요 (역방향)':'😎 똑바로 나왔어요 (정방향)';
+  $('resUD').textContent=draw.rev?TL('🙃 거꾸로 나왔어요 (역방향)','🙃 Reversed','🙃 逆位置で出ました'):TL('😎 똑바로 나왔어요 (정방향)','😎 Upright','😎 正位置で出ました');
   $('resUD').style.background=draw.rev?'var(--blue)':'var(--green)';
   $('resName').textContent=`${c[0]} · ${ROMAN[draw.card]}`;
   $('resKw').textContent=draw.rev?c[4]:c[3];
@@ -459,8 +465,8 @@ function fillResult(){
   const scores=SCORE_CATS.map((_,i)=>{let s=55+Math.floor(r()*30); if(i===t.rel.boost)s+=10; s+=draw.rev?-6:6; return Math.max(30,Math.min(99,s))});
   const total=Math.round(scores.reduce((a,b)=>a+b,0)/4);
   $('scoreTotal').textContent=total;
-  $('scoreLabel').textContent= total>=80?'오늘 치트키 켜짐 🔥':total>=68?'무난하게 굴러가는 날 😎':'살살 가도 되는 날 🫧';
-  $('scoreSub').textContent=`${SCORE_CATS[t.rel.boost][1]} 운이 ${t.rel.name} 기운으로 상승`;
+  $('scoreLabel').textContent= total>=80?TL('오늘 치트키 켜짐 🔥','Cheat code ON today 🔥','今日はチートモード 🔥'):total>=68?TL('무난하게 굴러가는 날 😎','A smooth, easy day 😎','いい感じに回る日 😎'):TL('살살 가도 되는 날 🫧','Take it easy today 🫧','ゆるっといこう 🫧');
+  $('scoreSub').textContent=TL(`${SCORE_CATS[t.rel.boost][1]} 운이 ${t.rel.name} 기운으로 상승`,`${SCORE_CATS[t.rel.boost][1]} luck boosted by ${t.rel.name}`,`${t.rel.name}の気で${SCORE_CATS[t.rel.boost][1]}運アップ`);
   const cols=['var(--pink)','var(--lav)','var(--lime)','var(--cyan)'];
   $('scoreBars').innerHTML=SCORE_CATS.map((s,i)=>`<div class="row"><span class="nm">${s[0]} ${s[1]}</span><div class="track"><div class="fill" data-w="${scores[i]}" style="background:${cols[i]}"></div></div><span class="ct">${scores[i]}</span></div>`).join('');
   setTimeout(()=>document.querySelectorAll('#scoreBars .fill').forEach(f=>f.style.width=f.dataset.w+'%'),100);
@@ -468,9 +474,9 @@ function fillResult(){
   const weak=saju.counts.indexOf(Math.min(...saju.counts)), e=EL[weak];
   const item=e.items[Math.floor(r()*e.items.length)], num=1+Math.floor(r()*9);
   draw.lucky={color:e.colorName,item,num,total};
-  $('lucky').innerHTML=`<div class="mini"><div class="ic" style="color:${e.color}">●</div><div class="k">컬러</div><div class="v">${e.colorName}</div></div>
-    <div class="mini"><div class="ic">🎁</div><div class="k">아이템</div><div class="v">${item}</div></div>
-    <div class="mini"><div class="ic">🔢</div><div class="k">숫자</div><div class="v">${num}</div></div>`;
+  $('lucky').innerHTML=`<div class="mini"><div class="ic" style="color:${e.color}">●</div><div class="k">${TL('컬러','Color','カラー')}</div><div class="v">${e.colorName}</div></div>
+    <div class="mini"><div class="ic">🎁</div><div class="k">${TL('아이템','Item','アイテム')}</div><div class="v">${item}</div></div>
+    <div class="mini"><div class="ic">🔢</div><div class="k">${TL('숫자','Number','数字')}</div><div class="v">${num}</div></div>`;
 }
 function setTone(t){
   tone=t; const c=TAROT[draw.card];
@@ -1756,6 +1762,7 @@ tidyLayout();
 })();
 
 /* ================= BOOT ================= */
+if(window.soulLang&&window.soulLang!=='ko'&&window.applyContentI18n){try{applyContentI18n()}catch(e){console.warn('i18n content',e)}}
 applySkin(store.get('soulcode.skin'));
 if(profile && MBTI[profile.mbti]){ logVisit(); const t=store.get('soulcode.afterOnb'); if(t){store.del('soulcode.afterOnb');go(t)} else go('s-tarot'); }
 initAI(); initCloud();

@@ -249,6 +249,15 @@ export async function startSoulcode() {
     s.onerror = () => resolve();
     document.body.appendChild(s);
   });
+  if ((window as unknown as { soulLang?: string }).soulLang && (window as unknown as { soulLang?: string }).soulLang !== 'ko') {
+    await new Promise<void>((resolve) => {
+      const s = document.createElement('script');
+      s.src = '/soulcode/i18n-content.js';
+      s.onload = () => resolve();
+      s.onerror = () => resolve();
+      document.body.appendChild(s);
+    });
+  }
   await new Promise<void>((resolve, reject) => {
     const s = document.createElement('script');
     s.src = '/soulcode/app.js';
