@@ -20,6 +20,7 @@ export async function GET(req: Request) {
   const day = kstToday();
   const { error: lockErr } = await db.from('push_runs').insert({ day });
   if (lockErr) return json({ ok: true, skipped: 'already_sent', day });
+  await db.rpc('cleanup_ask_boards').then(() => {}, () => {}); // 오래된 '친구들이 보는 나' 링크 정리
 
   let sent = 0, removed = 0, failed = 0, from = 0;
   const PAGE = 500;

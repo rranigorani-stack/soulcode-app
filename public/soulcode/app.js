@@ -1656,7 +1656,7 @@ function pastEntry(){
   if(!window.soulConfig)return;
   const soul=$('s-soul'); if(soul&&!$('pastLink')){const d=soul.querySelector('.disclaimer');d&&d.insertAdjacentHTML('beforebegin','<a class="panel past-link wanted-link" id="pastLink" href="/wanted?utm_source=app_soul"><span class="ev-e">🚨</span><span class="ev-b"><b>운명의 상대 수배전단 뽑기</b><small>내 사주에 부족한 기운으로 찾은 그 사람</small></span><span style="font-size:22px">→</span></a>')}
   const mt=$('s-match'); if(mt&&!$('wantedLink')){const f=$('mtForm');f&&f.insertAdjacentHTML('beforebegin','<a class="panel past-link wanted-link" id="wantedLink" href="/wanted?utm_source=app_match"><span class="ev-e">🚨</span><span class="ev-b"><b>운명의 상대 수배전단</b><small>내 사주에 부족한 기운으로 그린 몽타주</small></span><span style="font-size:22px">→</span></a>')}
-  const sp=$('s-splash'); if(sp&&!$('pastSplash')){const d=sp.querySelector('.disclaimer');d&&d.insertAdjacentHTML('afterend','<div id="pastSplash" class="past-splash"><a href="/wanted?utm_source=app_splash">🚨 운명의 상대 수배전단</a></div>')}
+  const sp=$('s-splash'); if(sp&&!$('pastSplash')){const d=sp.querySelector('.disclaimer');d&&d.insertAdjacentHTML('afterend','<div id="pastSplash" class="past-splash"><a href="/wanted?utm_source=app_splash">🚨 운명의 상대 수배전단</a> · <a href="/ask?utm_source=app_splash">💌 친구들이 보는 나</a></div>')}
 }
 pastEntry();
 try{if(new URLSearchParams(location.search).get('go')==='match'){store.set('soulcode.afterOnb','s-match');history.replaceState(null,'',location.pathname)}}catch(e){}

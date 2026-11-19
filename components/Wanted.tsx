@@ -205,10 +205,11 @@ export default function Wanted() {
             <button className="btn" onClick={share}>📸 수배전단 저장 · 스토리 공유</button>
             <a className="btn pink" style={{ marginTop: 10, textAlign: 'center' }} href="/?go=match&utm_source=wanted">🔎 신고하기: 그 사람이랑 궁합 보기</a>
             <button className="btn ghost" style={{ marginTop: 10 }} onClick={copyLink}>💌 친구한테 수배전단 돌리기</button>
+            <a className="btn ghost" style={{ marginTop: 10, textAlign: 'center' }} href="/ask?utm_source=wanted_done">🤔 친구들은 나를 테토로 볼까? 물어보기</a>
             <button className="again" onClick={() => { setStage('form'); setImg(''); }}>다시 뽑기</button>
           </section>
         )}
-        <footer className="past-foot"><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a></footer>
+        <footer className="past-foot"><a href="/ask">💌 친구들이 보는 나</a> · <a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a></footer>
       </main>
     </div>
   );
