@@ -300,6 +300,88 @@ function soulName(){
   const st=STEM_INFO[saju.dayStem], mb=MBTI[profile.mbti];
   return {title:`${st.img} ${profile.mbti}`, sub:mb.nick, emoji:st.emoji};
 }
+
+/* ================= 전문가 원국표 · 대운 ================= */
+// 지장간 (여기·중기·정기 순, 마지막이 정기) — 천간 인덱스
+const JIJANG=[[8,9],[9,7,5],[4,2,0],[0,1],[1,9,4],[4,6,2],[2,5,3],[3,1,5],[4,8,6],[6,7],[7,3,4],[4,0,8]];
+// 12운성: 일간별 장생 지지. 양간은 순행, 음간은 역행
+const US_START=[11,6,2,9,2,9,5,0,8,3];
+const US_KO=['장생','목욕','관대','건록','제왕','쇠','병','사','묘','절','태','양'];
+const US_JA=['長生','沐浴','冠帯','建禄','帝旺','衰','病','死','墓','絶','胎','養'];
+const US_EN=['Birth','Bath','Youth','Prime','Peak','Ease','Ill','Rest','Vault','Void','Seed','Nurture'];
+function unseong(s,b){const i=s%2===0?(b-US_START[s]+12)%12:(US_START[s]-b+12)%12;return TL(US_KO[i],US_EN[i],US_JA[i])}
+function gongmang(s,b){const b0=(b-s+12)%12;return[(b0+10)%12,(b0+11)%12]}
+const TEN_HJ={비견:'比肩',겁재:'劫財',식신:'食神',상관:'傷官',편재:'偏財',정재:'正財',편관:'偏官',정관:'正官',편인:'偏印',정인:'印綬'};
+const TEN_EN={비견:'Peer',겁재:'Rival',식신:'Maker',상관:'Rebel',편재:'Venture',정재:'Wealth',편관:'Grit',정관:'Order',편인:'Insight',정인:'Support'};
+const tenName=t=>TL(t,TEN_EN[t],TEN_HJ[t]);
+const TEN_DESC={
+  비견:['나와 같은 기운. 자존심과 독립심, 나란히 걷는 동료의 힘이에요.','Energy like your own: pride, independence and a peer walking beside you.','自分と同じ気。プライドと独立心、並んで歩く仲間の力。'],
+  겁재:['지기 싫은 승부욕과 추진력. 경쟁 속에서 크는 타입이에요.','Competitive drive and push. You grow through rivalry.','負けず嫌いの推進力。競争の中で伸びるタイプ。'],
+  식신:['먹고 즐기고 만드는 힘. 여유와 재능이 자연스럽게 흘러나와요.','The power to enjoy and create. Talent and ease flow out naturally.','楽しみ、作り出す力。余裕と才能が自然にあふれる。'],
+  상관:['톡 쏘는 말재주와 끼. 틀을 깨는 아이디어가 강점이에요.','Sharp wit and flair. Breaking the mold is your strength.','キレのある話術と才気。型を破る発想が強み。'],
+  편재:['큰 판을 읽는 감각. 사람과 돈이 활발하게 오가요.','A feel for the big picture. People and money move around you.','大きな流れを読む感覚。人とお金が活発に動く。'],
+  정재:['차곡차곡 쌓는 성실함. 현실 감각과 안정이 강점이에요.','Steady, step-by-step diligence. Practical and stable.','こつこつ積み上げる誠実さ。現実感覚と安定が強み。'],
+  편관:['압박을 버티는 깡과 카리스마. 도전할수록 단단해져요.','Grit and charisma under pressure. Challenges make you stronger.','プレッシャーに耐える根性とカリスマ。挑むほど強くなる。'],
+  정관:['규칙과 책임감. 믿음직함과 명예를 중요하게 여겨요.','Rules and responsibility. You value trust and reputation.','ルールと責任感。信頼と名誉を大切にする。'],
+  편인:['남다른 직관과 눈치. 독특한 공부와 기획에 강해요.','Unusual intuition. Strong at niche study and planning.','人と違う直感と勘。独特な学びや企画に強い。'],
+  정인:['배우고 받아들이는 힘. 보살핌과 안정감을 주는 기운이에요.','The power to learn and receive. It brings care and calm.','学び、受け入れる力。思いやりと安心感の気。'],
+};
+function renderChart(){
+  const S=saju, me=S.dayStem;
+  const cols=[['hour',TL('시주','Hour','時柱')],['day',TL('일주','Day','日柱')],['month',TL('월주','Month','月柱')],['year',TL('년주','Year','年柱')]];
+  const tile=(i,HJ,KO,ELM,isMe)=>`<div class="mc-tile${isMe?' me':''}" style="--c:${EL[ELM[i]].color}">${isMe?`<span class="me-badge">${TL('나','ME','私')}</span>`:''}${HJ[i]}<small>${LG==='ko'?KO[i]:''}${EL[ELM[i]].ko}</small></div>`;
+  const tg=t=>`<button type="button" class="tg-cell" data-tg="${t}">${tenName(t)}</button>`;
+  const row=(lab,fn,cls='',last=false)=>`<div class="mc-l${last?' mc-end':''}">${lab}</div>`+cols.map(([k])=>{const p=S.pillars[k];return `<div class="mc-c ${cls}${k==='day'?' me':''}${last?' mc-end':''}">${p?fn(p,k):'<span class="mc-q">?</span>'}</div>`}).join('');
+  const box=$('pillars'); box.classList.add('mc-on');
+  box.innerHTML=`<div class="mchart"><div class="mc-l"></div>${cols.map(([k,l])=>`<div class="mc-h${k==='day'?' me':''}">${l}</div>`).join('')}`
+    +row(TL('십신','Role','十神'),(p,k)=>k==='day'?`<span class="tg-me">${TL('일간','Self','日干')}</span>`:tg(tenGod(me,p.s)))
+    +row(TL('천간','Stem','天干'),(p,k)=>tile(p.s,STEMS,STEMS_KO,STEM_EL,k==='day'),'tile')
+    +row(TL('지지','Branch','地支'),p=>tile(p.b,BRANCHES,BRANCHES_KO,BR_EL,false),'tile')
+    +row(TL('십신','Role','十神'),p=>tg(tenGod(me,JIJANG[p.b][JIJANG[p.b].length-1])))
+    +row(TL('지장간','Hidden','蔵干'),p=>`<span class="mc-hid">${JIJANG[p.b].map(i=>`<i style="color:${EL[STEM_EL[i]].color}">${STEMS[i]}</i>`).join('')}</span>`)
+    +row(TL('12운성','Stage','十二運'),p=>`<span class="mc-us">${unseong(me,p.b)}</span>`,'',true)
+    +`</div><div class="tg-info" id="tgInfo">${TL('👆 십신을 누르면 뜻이 나와요','👆 Tap a role to see what it means','👆 十神をタップすると意味が出ます')}</div>`
+    +`<p class="mc-note">${TL('십신: 일간(나)과 각 글자의 관계 · 지장간: 지지 속에 숨은 천간 · 12운성: 각 기둥에서 일간이 쓰는 힘의 크기','Role: how each character relates to you (the day stem) · Hidden: stems inside each branch · Stage: how strong you are in each pillar','十神: 日干(私)と各文字の関係 · 蔵干: 地支に隠れた天干 · 十二運: 各柱で日干が持つ力の強さ')}</p>`;
+  box.querySelectorAll('.tg-cell').forEach(b=>b.onclick=()=>{
+    const t=b.dataset.tg, li=LG==='en'?1:LG==='ja'?2:0;
+    box.querySelectorAll('.tg-cell').forEach(x=>x.classList.toggle('on',x.dataset.tg===t));
+    $('tgInfo').innerHTML=`<b>${tenName(t)}${LG==='ko'?`(${TEN_HJ[t]})`:''}</b> · ${TEN_DESC[t][li]}`;
+  });
+}
+function calcDaewoon(){
+  if(!profile.gender||typeof Manseryeok==='undefined')return null;
+  const [y,m,d]=profile.birth.split('-').map(Number); let h=12,mi=0; if(profile.btime)[h,mi]=profile.btime.split(':').map(Number);
+  try{
+    const L=Manseryeok.calculateFourPillars({year:y,month:m,day:d,hour:h,minute:mi,...SAJU_OPTS,gender:profile.gender}).luckPillars;
+    if(!L||!L.pillars)return null;
+    const ix=(s,K,H)=>{const i=K.indexOf(s);return i>=0?i:H.indexOf(s)};
+    const list=L.pillars.map(x=>({age:x.age,s:ix(x.pillar.heavenlyStem,STEMS_KO,STEMS),b:ix(x.pillar.earthlyBranch,BRANCHES_KO,BRANCHES)})).filter(x=>x.s>=0&&x.b>=0);
+    const t0=L.startYears+(L.startMonths||0)/12+(L.startDays||0)/365.25;
+    const ageNow=(Date.now()-Date.UTC(y,m-1,d))/(365.2425*864e5);
+    const cur=ageNow<t0?-1:Math.min(list.length-1,Math.floor((ageNow-t0)/10));
+    return {forward:L.forward,startAge:L.startAge,list,cur};
+  }catch(e){return null}
+}
+function setGender(g){if(g)profile.gender=g;else delete profile.gender;store.set('soulcode.profile',profile);renderDaewoon()}
+function renderDaewoon(){
+  let box=$('dwBox');
+  if(!box){$('bars').insertAdjacentHTML('afterend',`<div class="sec-t" id="dwT">${TL('🧭 나의 대운 · 10년마다 바뀌는 큰 흐름','🧭 My 10-year luck cycles','🧭 私の大運 · 10年ごとの大きな流れ')}</div><div class="panel" id="dwBox"></div>`);box=$('dwBox')}
+  if(!profile.gender){
+    box.innerHTML=`<p class="dw-ask">${TL('대운은 성별에 따라 흐르는 방향이 달라져요. 한 번만 골라 주세요.','Luck cycles run in a different direction depending on gender. Pick once to see yours.','大運は性別によって流れる向きが変わります。一度だけ選んでください。')}</p><div class="dw-gsel"><button class="chip" onclick="setGender('female')">👩 ${TL('여자','Female','女性')}</button><button class="chip" onclick="setGender('male')">👨 ${TL('남자','Male','男性')}</button></div>`;
+    return;
+  }
+  const D=calcDaewoon();
+  if(!D){box.innerHTML=`<p class="muted" style="font-size:13px">${TL('대운을 계산하지 못했어요. 잠시 후 다시 열어 주세요.','Couldn\'t calculate your luck cycles. Please reopen in a moment.','大運を計算できませんでした。しばらくしてから開き直してください。')}</p>`;return}
+  const me=saju.dayStem, yr=TL('세','','歳');
+  const chips=D.list.map((x,i)=>`<div class="dw${i===D.cur?' now':i<D.cur?' dw-was':''}"><div class="dw-a">${x.age}${yr||'+'}</div><div class="dw-gz"><span style="color:${EL[STEM_EL[x.s]].color}">${STEMS[x.s]}</span><span style="color:${EL[BR_EL[x.b]].color}">${BRANCHES[x.b]}</span></div><div class="dw-t">${tenName(tenGod(me,x.s))}</div>${i===D.cur?`<span class="dw-now">${TL('지금','NOW','今')}</span>`:''}</div>`).join('');
+  let cur='';
+  if(D.cur>=0){
+    const c=D.list[D.cur], g=TG_GROUP[tenGod(me,c.s)], th=TG_THEME[g]||{};
+    cur=`<div class="dw-cur"><b>${th.emoji||'🧭'} ${TL('지금 대운','Current cycle','今の大運')} ${STEMS[c.s]}${BRANCHES[c.b]} (${c.age}~${c.age+9}${yr||''}) · ${th.name||''}</b><p>${th.d||''}</p></div>`;
+  }else cur=`<div class="dw-cur"><p>${TL(`첫 대운은 ${D.list[0].age}세부터 시작돼요. 그 전까지는 월주의 기운이 이끌어요.`,`Your first cycle starts at ${D.list[0].age}. Until then, your month pillar leads.`,`最初の大運は${D.list[0].age}歳から。それまでは月柱の気が導きます。`)}</p></div>`;
+  box.innerHTML=`<div class="dw-strip" id="dwStrip">${chips}</div>${cur}<p class="dw-meta">${TL(`대운수 ${D.startAge} · ${D.forward?'순행':'역행'} · ${profile.gender==='female'?'여자':'남자'} 기준`,`Starts at ${D.startAge} · ${D.forward?'forward':'reverse'} · ${profile.gender==='female'?'female':'male'}`,`大運数 ${D.startAge} · ${D.forward?'順行':'逆行'} · ${profile.gender==='female'?'女性':'男性'}`)} <button class="again dw-chg" onclick="setGender(null)">${TL('성별 바꾸기','Change','変更')}</button></p>`;
+  const n=box.querySelector('.dw.now'); if(n)requestAnimationFrame(()=>{const s=$('dwStrip');s.scrollLeft=n.offsetLeft-s.clientWidth/2+n.clientWidth/2});
+}
 function renderSoul(){
   if(!profile) return;
   getSaju();
@@ -317,13 +399,7 @@ function renderSoul(){
   const zEl=EL[STEM_EL[saju.yearStem]];
   $('zodiac').textContent=LG==='ko'?`· ${STEMS_KO[saju.yearStem]}${BRANCHES_KO[saju.yearBranch]}년 ${zEl.zod} ${ANIMALS[saju.yearBranch]}띠`:`· ${STEMS[saju.yearStem]}${BRANCHES[saju.yearBranch]} · ${TL('',ZOD_EN[saju.yearBranch],ZOD_JA[saju.yearBranch])}`;
   const order=[[TL('시주','Hour','時柱'),'hour'],[TL('일주','Day','日柱'),'day'],[TL('월주','Month','月柱'),'month'],[TL('년주','Year','年柱'),'year']];
-  $('pillars').innerHTML=order.map(([lab,k])=>{
-    const p=saju.pillars[k];
-    if(!p) return `<div class="pil"><div class="lab">${lab}</div><div class="gz top" style="color:var(--muted)">?<small>${TL('모름','?','不明')}</small></div><div class="gz" style="color:var(--muted)">?<small>${TL('모름','?','不明')}</small></div></div>`;
-    return `<div class="pil ${k==='day'?'me':''}"><div class="lab">${lab}</div>
-      <div class="gz top" style="color:${EL[STEM_EL[p.s]].color}">${k==='day'?`<span class="me-badge">${TL('나','ME','私')}</span>`:''}${STEMS[p.s]}<small>${LG==='ko'?STEMS_KO[p.s]:''}${EL[STEM_EL[p.s]].ko}</small></div>
-      <div class="gz" style="color:${EL[BR_EL[p.b]].color}">${BRANCHES[p.b]}<small>${LG==='ko'?BRANCHES_KO[p.b]:''}${EL[BR_EL[p.b]].ko}</small></div></div>`;
-  }).join('');
+  void order; renderChart();
   const M=saju.meta;
   if(LG!=='ko') $('sajuMeta').innerHTML=M.boundary&&!M.known?TL('','<b style="color:var(--fire)">⚠️ You were born on a solar-term boundary.</b> Adding your birth time may change your month pillar. You can edit it in the MY tab.','<b style="color:var(--fire)">⚠️ 節気が切り替わる日に生まれています。</b>生まれた時刻を入れると月柱が変わることがあります。MYタブで入力できます。'):TL('',`🔭 Korea Astronomy Institute calendar data${M.known?' · solar-term time & true solar time corrected':' · add your birth time to see the hour pillar'}`,`🔭 韓国天文研究院の暦データ${M.known?' · 節入り時刻・真太陽時で補正':' · 生まれた時刻を入れると時柱も出ます'}`);
   else $('sajuMeta').innerHTML= M.known
@@ -333,6 +409,9 @@ function renderSoul(){
   $('bars').innerHTML=EL.map((e,i)=>`<div class="row"><span class="nm">${e.emoji} ${e.ko}</span><div class="track"><div class="fill" data-w="${saju.counts[i]/max*100}" style="background:${e.color}"></div></div><span class="ct">${saju.counts[i]}</span></div>`).join('')
     +`<p class="muted" style="font-size:12.5px;margin-top:10px">${TL(`총 ${total}글자 기준${!profile.btime?' (태어난 시간 제외)':''}`,`Based on ${total} characters${!profile.btime?' (birth time not included)':''}`,`全${total}文字で計算${!profile.btime?'(生まれた時刻なし)':''}`)}</p>`;
   requestAnimationFrame(()=>setTimeout(()=>document.querySelectorAll('#bars .fill').forEach(f=>f.style.width=f.dataset.w+'%'),80));
+  const gm=gongmang(saju.pillars.day.s,saju.pillars.day.b);
+  $('sajuMeta').insertAdjacentHTML('beforeend',`<br>🕳️ ${TL('공망','Void branches','空亡')} ${gm.map(b=>BRANCHES[b]).join('')}${LG==='ko'?`(${gm.map(b=>BRANCHES_KO[b]).join('')})`:''}`);
+  renderDaewoon();
   const strong=saju.counts.indexOf(max), weak=saju.counts.indexOf(Math.min(...saju.counts));
   $('ptExcess').innerHTML=TL(`<b style="color:${EL[strong].color}">${EL[strong].ko} 기운</b>이 강해요. ${EL[strong].excess}`,`Strong <b style="color:${EL[strong].color}">${EL[strong].ko}</b> energy. ${EL[strong].excess}`,`<b style="color:${EL[strong].color}">${EL[strong].ko}の気</b>が強め。${EL[strong].excess}`);
   $('ptLack').innerHTML=TL(`<b style="color:${EL[weak].color}">${EL[weak].ko} 기운</b> 보충 추천: ${EL[weak].lack}`,`Top up <b style="color:${EL[weak].color}">${EL[weak].ko}</b>: ${EL[weak].lack}`,`<b style="color:${EL[weak].color}">${EL[weak].ko}の気</b>を補うなら: ${EL[weak].lack}`);
@@ -967,7 +1046,7 @@ function personaData(){
 - MBTI: ${profile.mbti} (${MBTI[profile.mbti].nick})
 - 일간(타고난 나): ${STEMS[S.dayStem]}${STEMS_KO[S.dayStem]} · ${el.ko}(${el.name}) 기운 · "${STEM_INFO[S.dayStem].img}"
 - 사주 원국(년·월·일·시): ${P.join(' ')}
-- 오행 분포: ${EL.map((e,i)=>e.ko+S.counts[i]).join(' ')} → 강한 기운 ${EL[S.counts.indexOf(mx)].ko}, 약한 기운 ${EL[S.counts.indexOf(mn)].ko}`;
+- 오행 분포: ${EL.map((e,i)=>e.ko+S.counts[i]).join(' ')} → 강한 기운 ${EL[S.counts.indexOf(mx)].ko}, 약한 기운 ${EL[S.counts.indexOf(mn)].ko}${(()=>{const D=calcDaewoon();if(!D||D.cur<0)return'';const c=D.list[D.cur];return `\n- 현재 대운: ${STEMS[c.s]}${BRANCHES[c.b]} (${c.age}~${c.age+9}세 · 나 기준 ${tenGod(S.dayStem,c.s)})`})()}`;
 }
 const toneLine=t=>t==='T'?'해석 톤: T형 — 팩트와 논리 위주, 담백하고 실용적으로.':'해석 톤: F형 — 공감과 위로 위주, 따뜻하게.';
 function aiErr(code){return({ai_paused:'🛠️ AI 해석이 잠깐 쉬는 중이에요. 오늘 운세와 카드 풀이는 그대로 볼 수 있어요!',rate_limited:'⏳ 요청이 몰렸어요. 잠시 후 다시 눌러주세요.',not_granted:'🙅 이번 접속에서는 AI 사용이 허용되지 않았어요.',sampling_disabled:'🙅 이 계정에서는 AI를 쓸 수 없어요.',refused:'🫥 이 내용은 해석하기 어려워요. 질문을 바꿔볼까요?',session_expired:'🔑 다시 로그인이 필요해요.',cancelled:'멈췄어요.'})[code]||'📡 연결이 끊겼어요. 다시 눌러주세요.'}
