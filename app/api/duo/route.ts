@@ -26,6 +26,6 @@ export async function POST(req: Request) {
 /** 기능 준비 여부 (표가 만들어졌는지) */
 export async function GET() {
   if (!supabaseConfigured()) return json({ ok: false });
-  const { error } = await admin().from('duo_links').select('code', { head: true, count: 'exact' }).limit(1);
+  const { error } = await admin().from('duo_links').select('code').limit(1);
   return new Response(JSON.stringify({ ok: !error }), { headers: { 'content-type': 'application/json', 'cache-control': 'public, max-age=60' } });
 }
