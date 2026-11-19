@@ -1,7 +1,8 @@
 'use client';
 import { BizInfo } from './BizInfo';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { ANIMALS, CHARMS, ISLANDS, LOVES, MIN_REVEAL, topIdx, type AskAnswer, type AskResult } from '@/lib/askData';
+import { askOptions, MIN_REVEAL, topIdx, type AskAnswer, type AskResult } from '@/lib/askData';
+import type { Lang } from '@/lib/wanted';
 
 const CW = 1080, CH = 1920, INK = '#1B1433', PAPER = '#FFFDF8', PINK = '#FF8AD0', YEL = '#FFE04D', MUTED = '#6E6189', SKY = '#7FE3F0', LAV = '#B9A6FF';
 const DISPLAY = '"Black Han Sans", sans-serif', JUA = '"Jua", sans-serif', ARCHIVO = '"Archivo Black", sans-serif';
@@ -14,6 +15,74 @@ function deviceId() {
   try { let d = localStorage.getItem('soulcode.device'); if (!d) { d = crypto.randomUUID(); localStorage.setItem('soulcode.device', d); } return d; } catch { return ''; }
 }
 const answeredKey = (code: string) => 'soulcode.ask.answered.' + code;
+
+/* ───────── 문구 (한국어 / English) ───────── */
+const TX = {
+  ko: {
+    cardTop: (n: number) => `친구 ${n}명이 익명으로 답했어요 💌`, cardH1: '친구들이 보는', cardH2: (nm: string) => `${nm}의 진짜 모습`,
+    cardMbti: '친구들 투표로 정해진 내 MBTI', teto: (p: number) => `💪 테토 ${p}%`, egen: (p: number) => `에겐 ${p}% 🌸`,
+    cardItems: ['매력 포인트 1위', '연애하면 이런 스타일', '친구들이 본 내 동물상', '무인도에서 내 역할'], picked: (p: number) => `친구 ${p}%가 골랐어요`,
+    cardCta: '✦ 너도 친구들한테 물어봐 ✦', cardFoot: (h: string) => `${h}/ask · 재미로 보는 콘텐츠`,
+    badge: '💌 익명 친구 투표', h1: ['친구들이 보는', '나는 어떤 사람?'],
+    sub: <>링크를 단톡방에 뿌리면 친구들이 <b>익명으로</b><br />내 MBTI, 테토/에겐, 매력 포인트를 골라줘요.</>,
+    preview: ['🧬 친구들이 보는 내 MBTI', '💪 테토 vs 에겐 🌸', '✨ 매력 포인트 1위', '💘 연애 스타일', '🐶 동물상', '🏝️ 무인도 역할'],
+    nickLb: '친구들이 부르는 내 이름', nickPh: '예: 하루', create: '내 질문 링크 만들기 💌', creating: '만드는 중...',
+    createNote: <>친구들은 정해진 보기 중에서만 골라요 (나쁜 말 X)<br />친구 {MIN_REVEAL}명 이상 답하면 결과가 열려요 · 재미로 보는 콘텐츠예요</>,
+    mine: '내가 만든 링크', mineGo: '결과 보러 가기 →', oops: '잠깐 문제가 생겼어요. 다시 눌러주세요!',
+    notFound: '없는 링크예요 🥲', notFoundSub: '지워졌거나 주소가 잘못됐어요.', makeMine: '내 질문 링크 만들기 💌', lost: '연결이 끊겼어요', retry: '다시 시도', loading: '불러오는 중...',
+    ownerBadge: (n: string) => `💌 ${n}의 질문 링크`, answered: (n: number) => `친구 ${n}명이 답했어요!`, drawing: '결과 카드 그리는 중...',
+    shareCard: '📸 결과 카드 저장 · 스토리 공유', askMore: '💌 더 많은 친구한테 물어보기', checkNew: '🔄 새 답변 확인',
+    ready: '링크 완성! 🎉', now: (n: number) => `지금 ${n}명 답했어요`,
+    pending: (l: number) => <>이 링크를 단톡방이나 인스타 스토리에 올려요.<br />친구 <b>{l}명</b>만 더 답하면 결과가 열려요! 🔓</>,
+    shareLink: '💌 링크 공유하기', refresh: '🔄 답변 수 새로고침', soul: '🔮 내 사주로 보는 진짜 나 (소울코드)', soulHref: '/?utm_source=ask_owner',
+    secret: '📱 다른 기기에서 결과 보기 (비밀 링크 복사)', del: '🗑️ 이 링크 지우기',
+    secretCopied: '결과를 볼 수 있는 비밀 링크를 복사했어요.\n다른 기기에서 열 때만 쓰고, 친구한테는 보내지 마세요! 🤫', secretPrompt: '비밀 링크 (친구에게 보내지 마세요)',
+    delConfirm: '이 링크와 친구들의 답변을 모두 지울까요? 되돌릴 수 없어요.', linkCopied: '링크를 복사했어요! 단톡방에 붙여넣기 💌', copyPrompt: '이 링크를 복사해 주세요',
+    linkShare: (u: string) => `나에 대해 익명으로 골라줘 💌 내 MBTI, 테토/에겐, 매력 포인트… 친구들이 보는 나는? 👉 ${u}?utm_source=ask_share`,
+    cardShare: (r: AskResult, o: string) => `친구들이 보는 나는 ${r.mbti} · 테토 ${r.tetoPct}% ㅋㅋ 너도 물어봐 👉 ${o}/ask?utm_source=ask_card`,
+    cardFile: (m: string) => `친구들이보는나_${m}.png`,
+    sentH: (n: string) => `${n}한테 익명으로 전달했어요!`, sentSub: (n: string) => <>누가 뭘 골랐는지는 {n}도 몰라요 🤫<br />이제 너 차례! 친구들은 너를 어떻게 볼까?</>,
+    mineToo: '나도 친구들한테 물어보기 💌', wanted: '🚨 운명의 상대 수배전단 뽑기', wantedHref: '/wanted?utm_source=ask_answered',
+    anon: (n: string) => `💌 익명 · ${n}은(는) 누가 답했는지 몰라요`, qH: (n: string) => <>{n}은(는)<br />어떤 사람이야?</>, qSub: (c: number) => `솔직하게 골라줘! 지금까지 ${c}명 답했어요.`,
+    q1: '1. 테토야, 에겐이야?', tetoOpt: '💪 테토 (직진·리더·쿨함)', egenOpt: '🌸 에겐 (섬세·다정·감성)', q2: (n: string) => `2. ${n}의 MBTI를 맞혀봐`,
+    axes: { ei: ['🎉 사람 많을수록 텐션 업', '🏠 집이 최고, 충전 필요'], sn: ['📏 현실적이고 꼼꼼', '🌈 상상력 폭발 엉뚱'], tf: ['🧠 팩트로 말하는 편', '💗 공감부터 해주는 편'], jp: ['📅 계획 세우는 계획러', '🎲 그때그때 즉흥러'] },
+    q3: '3. 제일 큰 매력 포인트는?', q4: '4. 연애하면 어떤 스타일일 것 같아?', q5: '5. 동물상으로 치면?', q6: (n: string) => `6. 같이 무인도에 가면 ${n}의 역할은?`,
+    send: '익명으로 보내기 💌', sending: '보내는 중...', sendNote: '이름·연락처 없이 고른 보기만 전달돼요 · 재미로 보는 콘텐츠예요', full: '이 링크는 답변이 꽉 찼어요!',
+    base: '/ask', other: '/wanted',
+  },
+  en: {
+    cardTop: (n: number) => `${n} friends answered anonymously 💌`, cardH1: 'How my friends', cardH2: (nm: string) => `really see ${nm}`,
+    cardMbti: 'My MBTI, voted by friends', teto: (p: number) => `💪 Bold ${p}%`, egen: (p: number) => `Soft ${p}% 🌸`,
+    cardItems: ['#1 charm point', 'In love, I am...', 'My animal face', 'My role on a desert island'], picked: (p: number) => `${p}% of friends picked this`,
+    cardCta: '✦ Ask your friends too ✦', cardFoot: (h: string) => `${h}/en/ask · just for fun`,
+    badge: '💌 Anonymous friend poll', h1: ['How do my friends', 'really see me?'],
+    sub: <>Drop the link in your group chat and friends <b>anonymously</b><br />pick your MBTI, Bold/Soft type and charm point.</>,
+    preview: ['🧬 My MBTI, by friends', '💪 Bold vs Soft 🌸', '✨ #1 charm point', '💘 Love style', '🐶 Animal face', '🏝️ Island role'],
+    nickLb: 'What friends call me', nickPh: 'e.g. Haru', create: 'Create my link 💌', creating: 'Creating...',
+    createNote: <>Friends can only pick from fixed options (no mean words)<br />Results unlock after {MIN_REVEAL} friends answer · Just for fun</>,
+    mine: 'My links', mineGo: 'See results →', oops: 'Something went wrong. Please try again!',
+    notFound: 'Link not found 🥲', notFoundSub: 'It was deleted or the address is wrong.', makeMine: 'Create my link 💌', lost: 'Connection lost', retry: 'Retry', loading: 'Loading...',
+    ownerBadge: (n: string) => `💌 ${n}'s link`, answered: (n: number) => `${n} friends answered!`, drawing: 'Drawing your result card...',
+    shareCard: '📸 Save card · Share to story', askMore: '💌 Ask more friends', checkNew: '🔄 Check new answers',
+    ready: 'Your link is ready! 🎉', now: (n: number) => `${n} answered so far`,
+    pending: (l: number) => <>Post this link in your group chat or story.<br />Just <b>{l} more</b> friends to unlock your results! 🔓</>,
+    shareLink: '💌 Share my link', refresh: '🔄 Refresh count', soul: '🚨 Get my soulmate WANTED poster', soulHref: '/en/wanted?utm_source=ask_owner',
+    secret: '📱 View on another device (copy secret link)', del: '🗑️ Delete this link',
+    secretCopied: 'Secret results link copied.\nUse it only on your own devices. Do not send it to friends! 🤫', secretPrompt: 'Secret link (do not share)',
+    delConfirm: 'Delete this link and all answers? This cannot be undone.', linkCopied: 'Link copied! Paste it in your group chat 💌', copyPrompt: 'Copy this link',
+    linkShare: (u: string) => `Rate me anonymously 💌 My MBTI, Bold or Soft, charm point… how do you see me? 👉 ${u}?utm_source=ask_share`,
+    cardShare: (r: AskResult, o: string) => `My friends think I'm ${r.mbti} and ${r.tetoPct}% Bold lol. Ask yours 👉 ${o}/en/ask?utm_source=ask_card`,
+    cardFile: (m: string) => `how_friends_see_me_${m}.png`,
+    sentH: (n: string) => `Sent to ${n} anonymously!`, sentSub: (n: string) => <>{n} will never know who picked what 🤫<br />Your turn! How do your friends see you?</>,
+    mineToo: 'Ask my friends too 💌', wanted: '🚨 Get my soulmate WANTED poster', wantedHref: '/en/wanted?utm_source=ask_answered',
+    anon: (n: string) => `💌 Anonymous · ${n} won't know who answered`, qH: (n: string) => <>What is {n}<br />really like?</>, qSub: (c: number) => `Be honest! ${c} friends answered so far.`,
+    q1: '1. Bold or Soft?', tetoOpt: '💪 Bold (direct, leader, cool)', egenOpt: '🌸 Soft (gentle, caring, emotional)', q2: (n: string) => `2. Guess ${n}'s MBTI`,
+    axes: { ei: ['🎉 More people, more energy', '🏠 Home is best, needs recharging'], sn: ['📏 Practical and detailed', '🌈 Wild imagination'], tf: ['🧠 Talks in facts', '💗 Empathy first'], jp: ['📅 Makes plans', '🎲 Goes with the flow'] },
+    q3: '3. Biggest charm point?', q4: '4. What are they like in love?', q5: '5. Which animal face?', q6: (n: string) => `6. On a desert island, ${n} would be...`,
+    send: 'Send anonymously 💌', sending: 'Sending...', sendNote: 'Only your picks are sent, no name or contact · Just for fun', full: 'This link is full!',
+    base: '/en/ask', other: '/en/wanted',
+  },
+};
 
 /* ───────── 캔버스 도우미 ───────── */
 function rr(c: CanvasRenderingContext2D, x: number, y: number, w: number, h: number, r: number, fill: string, lw = 5, shadow = 0) {
@@ -29,7 +98,8 @@ function star(c: CanvasRenderingContext2D, x: number, y: number, r: number, fill
 const strip = (s: string) => s.replace(/^\S+\s/, ''); // 보기 앞 이모지 떼기
 const emo = (s: string) => s.split(' ')[0];
 
-async function drawCard(nick: string, r: AskResult) {
+async function drawCard(nick: string, r: AskResult, lang: Lang) {
+  const T = TX[lang], O = askOptions(lang);
   await Promise.all([`120px ${ARCHIVO}`, `60px ${DISPLAY}`, `40px ${JUA}`].map((f) => document.fonts.load(f, '친구들 보는 나 ABC')));
   const cv = document.createElement('canvas'); cv.width = CW; cv.height = CH;
   const c = cv.getContext('2d')!;
@@ -42,11 +112,11 @@ async function drawCard(nick: string, r: AskResult) {
   const px = 70, py = 90, pw = CW - 140, ph = CH - 200;
   rr(c, px, py, pw, ph, 48, PAPER, 6, 14);
   c.textAlign = 'center'; c.textBaseline = 'alphabetic';
-  c.font = `40px ${JUA}`; c.fillStyle = MUTED; c.fillText(`친구 ${r.count}명이 익명으로 답했어요 💌`, CW / 2, 190);
-  c.font = `78px ${DISPLAY}`; c.fillStyle = INK; c.fillText('친구들이 보는', CW / 2, 290);
+  c.font = `40px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.cardTop(r.count), CW / 2, 190);
+  c.font = `78px ${DISPLAY}`; c.fillStyle = INK; c.fillText(T.cardH1, CW / 2, 290);
   c.font = `96px ${DISPLAY}`; c.fillStyle = INK;
   const nm = nick.length > 6 ? nick.slice(0, 6) + '…' : nick;
-  c.fillText(`${nm}의 진짜 모습`, CW / 2, 400);
+  c.fillText(T.cardH2(nm), CW / 2, 400);
   star(c, 150, 230, 30, YEL); star(c, CW - 150, 340, 24, PINK);
 
   // MBTI 큰 글씨
@@ -55,22 +125,22 @@ async function drawCard(nick: string, r: AskResult) {
   c.fillStyle = PINK; c.fillText(r.mbti, CW / 2 + 10, 640);
   c.lineWidth = 14; c.strokeStyle = INK; c.strokeText(r.mbti, CW / 2, 630);
   c.fillStyle = '#fff'; c.fillText(r.mbti, CW / 2, 630);
-  c.font = `34px ${JUA}`; c.fillStyle = MUTED; c.fillText('친구들 투표로 정해진 내 MBTI', CW / 2, 690);
+  c.font = `34px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.cardMbti, CW / 2, 690);
 
   // 테토 vs 에겐 막대
   const bx = 150, bw = CW - 300, by = 750;
   const teto = r.tetoPct;
-  c.font = `38px ${JUA}`; c.textAlign = 'left'; c.fillStyle = INK; c.fillText(`💪 테토 ${teto}%`, bx, by);
-  c.textAlign = 'right'; c.fillText(`에겐 ${100 - teto}% 🌸`, bx + bw, by);
+  c.font = `38px ${JUA}`; c.textAlign = 'left'; c.fillStyle = INK; c.fillText(T.teto(teto), bx, by);
+  c.textAlign = 'right'; c.fillText(T.egen(100 - teto), bx + bw, by);
   rr(c, bx, by + 22, bw, 54, 27, '#fff', 4);
   if (teto > 0) { c.save(); c.beginPath(); c.roundRect(bx, by + 22, bw, 54, 27); c.clip(); c.fillStyle = YEL; c.fillRect(bx, by + 22, (bw * teto) / 100, 54); c.fillStyle = PINK; c.fillRect(bx + (bw * teto) / 100, by + 22, bw - (bw * teto) / 100, 54); c.restore(); c.strokeStyle = INK; c.lineWidth = 4; c.beginPath(); c.roundRect(bx, by + 22, bw, 54, 27); c.stroke(); }
 
   // 4칸 카드
   const items: [string, string[], number[], string][] = [
-    ['매력 포인트 1위', CHARMS, r.charm, YEL],
-    ['연애하면 이런 스타일', LOVES, r.love, PINK],
-    ['친구들이 본 내 동물상', ANIMALS, r.animal, SKY],
-    ['무인도에서 내 역할', ISLANDS, r.island, LAV],
+    [T.cardItems[0], O.charms, r.charm, YEL],
+    [T.cardItems[1], O.loves, r.love, PINK],
+    [T.cardItems[2], O.animals, r.animal, SKY],
+    [T.cardItems[3], O.islands, r.island, LAV],
   ];
   const gx = 120, gy = 900, gw = (CW - 240 - 30) / 2, gh = 330;
   items.forEach(([title, opts, tally, col], i) => {
@@ -78,36 +148,39 @@ async function drawCard(nick: string, r: AskResult) {
     const top = topIdx(tally), pct = Math.round((tally[top] / Math.max(1, r.count)) * 100);
     rr(c, x, y, gw, gh, 32, '#fff', 4, 6);
     c.save(); c.beginPath(); c.roundRect(x + 14, y + 14, gw - 28, 56, 28); c.fillStyle = col; c.fill(); c.restore();
-    c.textAlign = 'center'; c.font = `30px ${JUA}`; c.fillStyle = INK; c.fillText(title, x + gw / 2, y + 53);
+    c.textAlign = 'center'; c.font = `${lang === 'en' ? 27 : 30}px ${JUA}`; c.fillStyle = INK; c.fillText(title, x + gw / 2, y + 53);
     c.font = `96px ${JUA}`; c.fillText(emo(opts[top]), x + gw / 2, y + 180);
-    c.font = `44px ${DISPLAY}`; c.fillText(strip(opts[top]), x + gw / 2, y + 250);
-    c.font = `28px ${JUA}`; c.fillStyle = MUTED; c.fillText(`친구 ${pct}%가 골랐어요`, x + gw / 2, y + 296);
+    c.font = `${lang === 'en' ? 38 : 44}px ${DISPLAY}`; c.fillText(strip(opts[top]), x + gw / 2, y + 250, gw - 30);
+    c.font = `28px ${JUA}`; c.fillStyle = MUTED; c.fillText(T.picked(pct), x + gw / 2, y + 296, gw - 30);
   });
 
   c.textAlign = 'center'; c.font = `32px ${JUA}`; c.fillStyle = MUTED;
-  c.fillText('✦ 너도 친구들한테 물어봐 ✦', CW / 2, 1690);
+  c.fillText(T.cardCta, CW / 2, 1690);
   c.font = `38px ${ARCHIVO}`; c.fillStyle = '#fff'; c.lineWidth = 7; c.strokeStyle = INK;
   c.strokeText('SOULCODE', CW / 2, CH - 52); c.fillText('SOULCODE', CW / 2, CH - 52);
-  c.font = `26px ${JUA}`; c.fillStyle = INK; c.fillText(`${location.host}/ask · 재미로 보는 콘텐츠`, CW / 2, CH - 16);
+  c.font = `26px ${JUA}`; c.fillStyle = INK; c.fillText(T.cardFoot(location.host), CW / 2, CH - 16);
   return cv;
 }
 
 /* ───────── 화면 ───────── */
 type Board = { nick: string; count: number; owner: boolean; result?: AskResult | null };
 
-function Shell({ children }: { children: React.ReactNode }) {
+function Shell({ children, lang = 'ko' }: { children: React.ReactNode; lang?: Lang }) {
   return (
     <div className="wanted-wrap">
       <main className="past ask">
         {children}
-        <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a><BizInfo /></footer>
+        {lang === 'ko'
+          ? <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a> · <a href="/en/ask">English</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a><BizInfo /></footer>
+          : <footer className="past-foot"><a href="/en/wanted">🚨 Soulmate WANTED poster</a> · <a href="/ask">한국어</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
       </main>
     </div>
   );
 }
 
 /** /ask: 내 보드 만들기 */
-export function AskCreate() {
+export function AskCreate({ lang = 'ko' }: { lang?: Lang }) {
+  const T = TX[lang];
   const [nick, setNick] = useState('');
   const [busy, setBusy] = useState(false);
   const [mine, setMine] = useState<string[]>([]);
@@ -119,26 +192,24 @@ export function AskCreate() {
       const j = await r.json();
       if (!r.ok || !j.code) throw new Error(j.code);
       saveKey(j.code, j.key);
-      location.href = `/ask/${j.code}?new=1`;
-    } catch { alert('잠깐 문제가 생겼어요. 다시 눌러주세요!'); setBusy(false); }
+      location.href = `${T.base}/${j.code}?new=1`;
+    } catch { alert(T.oops); setBusy(false); }
   }
   return (
-    <Shell>
+    <Shell lang={lang}>
       <section>
-        <div className="past-badge wanted-badge ask-badge">💌 익명 친구 투표</div>
-        <h1 className="h-display">친구들이 보는<br />나는 어떤 사람?</h1>
-        <p className="past-sub">링크를 단톡방에 뿌리면 친구들이 <b>익명으로</b><br />내 MBTI, 테토/에겐, 매력 포인트를 골라줘요.</p>
-        <div className="ask-preview">
-          {['🧬 친구들이 보는 내 MBTI', '💪 테토 vs 에겐 🌸', '✨ 매력 포인트 1위', '💘 연애 스타일', '🐶 동물상', '🏝️ 무인도 역할'].map((t) => <span key={t}>{t}</span>)}
-        </div>
-        <label className="lb">친구들이 부르는 내 이름</label>
-        <input className="field" maxLength={10} placeholder="예: 하루" value={nick} onChange={(e) => setNick(e.target.value)} />
-        <button className="btn" style={{ marginTop: 22 }} disabled={!nick.trim() || busy} onClick={create}>{busy ? '만드는 중...' : '내 질문 링크 만들기 💌'}</button>
-        <p className="past-note">친구들은 정해진 보기 중에서만 골라요 (나쁜 말 X)<br />친구 {MIN_REVEAL}명 이상 답하면 결과가 열려요 · 재미로 보는 콘텐츠예요</p>
+        <div className="past-badge wanted-badge ask-badge">{T.badge}</div>
+        <h1 className="h-display">{T.h1[0]}<br />{T.h1[1]}</h1>
+        <p className="past-sub">{T.sub}</p>
+        <div className="ask-preview">{T.preview.map((t) => <span key={t}>{t}</span>)}</div>
+        <label className="lb">{T.nickLb}</label>
+        <input className="field" maxLength={10} placeholder={T.nickPh} value={nick} onChange={(e) => setNick(e.target.value)} />
+        <button className="btn" style={{ marginTop: 22 }} disabled={!nick.trim() || busy} onClick={create}>{busy ? T.creating : T.create}</button>
+        <p className="past-note">{T.createNote}</p>
         {mine.length > 0 && (
           <div className="ask-mine">
-            <b>내가 만든 링크</b>
-            {mine.map((c) => <a key={c} href={`/ask/${c}`}>결과 보러 가기 → /ask/{c}</a>)}
+            <b>{T.mine}</b>
+            {mine.map((c) => <a key={c} href={`${T.base}/${c}`}>{T.mineGo} {T.base}/{c}</a>)}
           </div>
         )}
       </section>
@@ -146,15 +217,12 @@ export function AskCreate() {
   );
 }
 
-const Q_AXES: [keyof AskAnswer, [string, string], [string, string]][] = [
-  ['ei', ['E', '🎉 사람 많을수록 텐션 업'], ['I', '🏠 집이 최고, 충전 필요']],
-  ['sn', ['S', '📏 현실적이고 꼼꼼'], ['N', '🌈 상상력 폭발 엉뚱']],
-  ['tf', ['T', '🧠 팩트로 말하는 편'], ['F', '💗 공감부터 해주는 편']],
-  ['jp', ['J', '📅 계획 세우는 계획러'], ['P', '🎲 그때그때 즉흥러']],
-];
+const AXES: ('ei' | 'sn' | 'tf' | 'jp')[] = ['ei', 'sn', 'tf', 'jp'];
+const AXIS_V = { ei: ['E', 'I'], sn: ['S', 'N'], tf: ['T', 'F'], jp: ['J', 'P'] } as const;
 
 /** /ask/[code]: 친구는 답하고, 주인은 결과 보기 */
-export function AskBoard({ code }: { code: string }) {
+export function AskBoard({ code, lang = 'ko' }: { code: string; lang?: Lang }) {
+  const T = TX[lang], O = askOptions(lang);
   const [board, setBoard] = useState<Board | null>(null);
   const [err, setErr] = useState('');
   const [ans, setAns] = useState<Partial<AskAnswer>>({});
@@ -167,7 +235,7 @@ export function AskBoard({ code }: { code: string }) {
   const load = useCallback(async () => {
     const qs = new URLSearchParams(location.search);
     const k = qs.get('k');
-    if (k) { saveKey(code, k); history.replaceState(null, '', `/ask/${code}`); }
+    if (k) { saveKey(code, k); history.replaceState(null, '', `${T.base}/${code}`); }
     const key = getKeys()[code] || '';
     try {
       const r = await fetch(`/api/ask/${code}`, { headers: key ? { 'x-ask-key': key } : {}, cache: 'no-store' });
@@ -177,37 +245,37 @@ export function AskBoard({ code }: { code: string }) {
       setBoard(b);
       try { if (localStorage.getItem(answeredKey(code))) setSent(true); } catch { /* noop */ }
       if (b.owner && b.result) {
-        const cv = await drawCard(b.nick, b.result);
+        const cv = await drawCard(b.nick, b.result, lang);
         setImg(cv.toDataURL('image/jpeg', 0.92));
         cv.toBlob((bl) => { blobRef.current = bl; }, 'image/png');
       }
     } catch { setErr('error'); }
-  }, [code]);
+  }, [code, lang, T.base]);
   useEffect(() => { load(); }, [load]);
 
-  const link = typeof window !== 'undefined' ? `${location.origin}/ask/${code}` : '';
+  const link = typeof window !== 'undefined' ? `${location.origin}${T.base}/${code}` : '';
   async function shareLink() {
-    const text = `나에 대해 익명으로 골라줘 💌 내 MBTI, 테토/에겐, 매력 포인트… 친구들이 보는 나는? 👉 ${link}?utm_source=ask_share`;
+    const text = T.linkShare(link);
     try { if (navigator.share) { await navigator.share({ text }); return; } } catch { return; }
-    try { await navigator.clipboard.writeText(text); alert('링크를 복사했어요! 단톡방에 붙여넣기 💌'); } catch { prompt('이 링크를 복사해 주세요', link); }
+    try { await navigator.clipboard.writeText(text); alert(T.linkCopied); } catch { prompt(T.copyPrompt, link); }
   }
   async function shareCard() {
     const b = blobRef.current; if (!b || !board?.result) return;
-    const file = new File([b], `친구들이보는나_${board.result.mbti}.png`, { type: 'image/png' });
-    const text = `친구들이 보는 나는 ${board.result.mbti} · 테토 ${board.result.tetoPct}% ㅋㅋ 너도 물어봐 👉 ${location.origin}/ask?utm_source=ask_card`;
+    const file = new File([b], T.cardFile(board.result.mbti), { type: 'image/png' });
+    const text = T.cardShare(board.result, location.origin);
     try { if (navigator.canShare?.({ files: [file] })) { await navigator.share({ files: [file], text }); return; } } catch { return; }
     const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = file.name; a.click();
   }
   async function copySecret() {
     const key = getKeys()[code]; if (!key) return;
-    const url = `${location.origin}/ask/${code}?k=${key}`;
-    try { await navigator.clipboard.writeText(url); alert('결과를 볼 수 있는 비밀 링크를 복사했어요.\n다른 기기에서 열 때만 쓰고, 친구한테는 보내지 마세요! 🤫'); } catch { prompt('비밀 링크 (친구에게 보내지 마세요)', url); }
+    const url = `${location.origin}${T.base}/${code}?k=${key}`;
+    try { await navigator.clipboard.writeText(url); alert(T.secretCopied); } catch { prompt(T.secretPrompt, url); }
   }
   async function removeBoard() {
-    if (!confirm('이 링크와 친구들의 답변을 모두 지울까요? 되돌릴 수 없어요.')) return;
+    if (!confirm(T.delConfirm)) return;
     const key = getKeys()[code];
     const r = await fetch(`/api/ask/${code}`, { method: 'DELETE', headers: { 'x-ask-key': key || '' } });
-    if (r.ok) { const ks = getKeys(); delete ks[code]; try { localStorage.setItem(KEYS, JSON.stringify(ks)); } catch { /* noop */ } location.href = '/ask'; }
+    if (r.ok) { const ks = getKeys(); delete ks[code]; try { localStorage.setItem(KEYS, JSON.stringify(ks)); } catch { /* noop */ } location.href = T.base; }
   }
   async function submit() {
     setBusy(true);
@@ -215,45 +283,45 @@ export function AskBoard({ code }: { code: string }) {
       const r = await fetch(`/api/ask/${code}/answer`, { method: 'POST', headers: { 'content-type': 'application/json', 'x-ask-device': deviceId() }, body: JSON.stringify(ans) });
       const j = await r.json().catch(() => ({}));
       if (r.ok || j.code === 'duplicate') { try { localStorage.setItem(answeredKey(code), '1'); } catch { /* noop */ } setSent(true); window.scrollTo(0, 0); }
-      else if (j.code === 'full') alert('이 링크는 답변이 꽉 찼어요!');
+      else if (j.code === 'full') alert(T.full);
       else throw new Error();
-    } catch { alert('잠깐 문제가 생겼어요. 다시 눌러주세요!'); }
+    } catch { alert(T.oops); }
     setBusy(false);
   }
 
-  if (err === 'not_found') return <Shell><section><h1 className="h-display">없는 링크예요 🥲</h1><p className="past-sub">지워졌거나 주소가 잘못됐어요.</p><a className="btn" href="/ask">내 질문 링크 만들기 💌</a></section></Shell>;
-  if (err) return <Shell><section><h1 className="h-display">연결이 끊겼어요</h1><button className="btn" onClick={() => { setErr(''); load(); }}>다시 시도</button></section></Shell>;
-  if (!board) return <Shell><section className="past-loading"><div className="past-scroll">💌</div><p>불러오는 중...</p></section></Shell>;
+  if (err === 'not_found') return <Shell lang={lang}><section><h1 className="h-display">{T.notFound}</h1><p className="past-sub">{T.notFoundSub}</p><a className="btn" href={T.base}>{T.makeMine}</a></section></Shell>;
+  if (err) return <Shell lang={lang}><section><h1 className="h-display">{T.lost}</h1><button className="btn" onClick={() => { setErr(''); load(); }}>{T.retry}</button></section></Shell>;
+  if (!board) return <Shell lang={lang}><section className="past-loading"><div className="past-scroll">💌</div><p>{T.loading}</p></section></Shell>;
 
   /* 주인 화면 */
   if (board.owner) {
     const left = Math.max(0, MIN_REVEAL - board.count);
     return (
-      <Shell>
+      <Shell lang={lang}>
         <section className="past-done">
-          <div className="past-badge wanted-badge ask-badge">💌 {board.nick}의 질문 링크</div>
+          <div className="past-badge wanted-badge ask-badge">{T.ownerBadge(board.nick)}</div>
           {board.result ? (
             <>
-              <h1 className="h-display" style={{ fontSize: 32 }}>친구 {board.count}명이 답했어요!</h1>
+              <h1 className="h-display" style={{ fontSize: 32 }}>{T.answered(board.count)}</h1>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              {img ? <img src={img} alt={`친구들이 보는 ${board.nick}: ${board.result.mbti}`} className="past-img" /> : <p className="past-sub">결과 카드 그리는 중...</p>}
-              <button className="btn" onClick={shareCard}>📸 결과 카드 저장 · 스토리 공유</button>
-              <button className="btn pink" style={{ marginTop: 10 }} onClick={shareLink}>💌 더 많은 친구한테 물어보기</button>
-              <button className="btn ghost" style={{ marginTop: 10 }} onClick={load}>🔄 새 답변 확인</button>
+              {img ? <img src={img} alt={`${board.nick}: ${board.result.mbti}`} className="past-img" /> : <p className="past-sub">{T.drawing}</p>}
+              <button className="btn" onClick={shareCard}>{T.shareCard}</button>
+              <button className="btn pink" style={{ marginTop: 10 }} onClick={shareLink}>{T.askMore}</button>
+              <button className="btn ghost" style={{ marginTop: 10 }} onClick={load}>{T.checkNew}</button>
             </>
           ) : (
             <>
-              <h1 className="h-display" style={{ fontSize: 32 }}>{isNew ? '링크 완성! 🎉' : `지금 ${board.count}명 답했어요`}</h1>
-              <p className="past-sub">이 링크를 단톡방이나 인스타 스토리에 올려요.<br />친구 <b>{left}명</b>만 더 답하면 결과가 열려요! 🔓</p>
+              <h1 className="h-display" style={{ fontSize: 32 }}>{isNew ? T.ready : T.now(board.count)}</h1>
+              <p className="past-sub">{T.pending(left)}</p>
               <div className="ask-link">{link}</div>
-              <button className="btn" onClick={shareLink}>💌 링크 공유하기</button>
-              <button className="btn ghost" style={{ marginTop: 10 }} onClick={load}>🔄 답변 수 새로고침</button>
+              <button className="btn" onClick={shareLink}>{T.shareLink}</button>
+              <button className="btn ghost" style={{ marginTop: 10 }} onClick={load}>{T.refresh}</button>
             </>
           )}
-          <a className="btn ghost" style={{ marginTop: 10, textAlign: 'center' }} href={`/?utm_source=ask_owner`}>🔮 내 사주로 보는 진짜 나 (소울코드)</a>
+          <a className="btn ghost" style={{ marginTop: 10, textAlign: 'center' }} href={T.soulHref}>{T.soul}</a>
           <div className="ask-owner-tools">
-            <button className="again" onClick={copySecret}>📱 다른 기기에서 결과 보기 (비밀 링크 복사)</button>
-            <button className="again" onClick={removeBoard}>🗑️ 이 링크 지우기</button>
+            <button className="again" onClick={copySecret}>{T.secret}</button>
+            <button className="again" onClick={removeBoard}>{T.del}</button>
           </div>
         </section>
       </Shell>
@@ -263,13 +331,13 @@ export function AskBoard({ code }: { code: string }) {
   /* 친구: 답변 완료 */
   if (sent) {
     return (
-      <Shell>
+      <Shell lang={lang}>
         <section className="past-done">
           <div className="past-scroll" style={{ textAlign: 'center' }}>💌</div>
-          <h1 className="h-display" style={{ fontSize: 32, textAlign: 'center' }}>{board.nick}한테 익명으로 전달했어요!</h1>
-          <p className="past-sub" style={{ textAlign: 'center' }}>누가 뭘 골랐는지는 {board.nick}도 몰라요 🤫<br />이제 너 차례! 친구들은 너를 어떻게 볼까?</p>
-          <a className="btn" style={{ textAlign: 'center' }} href="/ask?utm_source=ask_answered">나도 친구들한테 물어보기 💌</a>
-          <a className="btn ghost" style={{ marginTop: 10, textAlign: 'center' }} href="/wanted?utm_source=ask_answered">🚨 운명의 상대 수배전단 뽑기</a>
+          <h1 className="h-display" style={{ fontSize: 32, textAlign: 'center' }}>{T.sentH(board.nick)}</h1>
+          <p className="past-sub" style={{ textAlign: 'center' }}>{T.sentSub(board.nick)}</p>
+          <a className="btn" style={{ textAlign: 'center' }} href={`${T.base}?utm_source=ask_answered`}>{T.mineToo}</a>
+          <a className="btn ghost" style={{ marginTop: 10, textAlign: 'center' }} href={T.wantedHref}>{T.wanted}</a>
         </section>
       </Shell>
     );
@@ -278,40 +346,40 @@ export function AskBoard({ code }: { code: string }) {
   /* 친구: 답하기 */
   const done = ans.teto !== undefined && ans.ei && ans.sn && ans.tf && ans.jp && ans.charm !== undefined && ans.love !== undefined && ans.animal !== undefined && ans.island !== undefined;
   const set = (p: Partial<AskAnswer>) => setAns((a) => ({ ...a, ...p }));
-  const Opts = ({ k, list }: { k: 'charm' | 'love' | 'animal' | 'island'; list: string[] }) => (
+  const opts = (k: 'charm' | 'love' | 'animal' | 'island', list: string[]) => (
     <div className="ask-opts">{list.map((t, i) => <button key={t} type="button" className={'chip' + (ans[k] === i ? ' sel' : '')} onClick={() => set({ [k]: i } as Partial<AskAnswer>)}>{t}</button>)}</div>
   );
   return (
-    <Shell>
+    <Shell lang={lang}>
       <section>
-        <div className="past-badge wanted-badge ask-badge">💌 익명 · {board.nick}은(는) 누가 답했는지 몰라요</div>
-        <h1 className="h-display" style={{ fontSize: 34 }}>{board.nick}은(는)<br />어떤 사람이야?</h1>
-        <p className="past-sub">솔직하게 골라줘! 지금까지 {board.count}명 답했어요.</p>
+        <div className="past-badge wanted-badge ask-badge">{T.anon(board.nick)}</div>
+        <h1 className="h-display" style={{ fontSize: 34 }}>{T.qH(board.nick)}</h1>
+        <p className="past-sub">{T.qSub(board.count)}</p>
 
-        <label className="lb">1. 테토야, 에겐이야?</label>
+        <label className="lb">{T.q1}</label>
         <div className="ask-opts two">
-          <button type="button" className={'chip' + (ans.teto === true ? ' sel' : '')} onClick={() => set({ teto: true })}>💪 테토 (직진·리더·쿨함)</button>
-          <button type="button" className={'chip' + (ans.teto === false ? ' sel' : '')} onClick={() => set({ teto: false })}>🌸 에겐 (섬세·다정·감성)</button>
+          <button type="button" className={'chip' + (ans.teto === true ? ' sel' : '')} onClick={() => set({ teto: true })}>{T.tetoOpt}</button>
+          <button type="button" className={'chip' + (ans.teto === false ? ' sel' : '')} onClick={() => set({ teto: false })}>{T.egenOpt}</button>
         </div>
 
-        <label className="lb">2. {board.nick}의 MBTI를 맞혀봐</label>
-        {Q_AXES.map(([k, a, b]) => (
+        <label className="lb">{T.q2(board.nick)}</label>
+        {AXES.map((k) => (
           <div key={k} className="ask-opts two">
-            {[a, b].map(([v, t]) => <button key={v} type="button" className={'chip' + (ans[k] === v ? ' sel' : '')} onClick={() => set({ [k]: v } as Partial<AskAnswer>)}>{t}</button>)}
+            {AXIS_V[k].map((v, i) => <button key={v} type="button" className={'chip' + (ans[k] === v ? ' sel' : '')} onClick={() => set({ [k]: v } as Partial<AskAnswer>)}>{T.axes[k][i]}</button>)}
           </div>
         ))}
 
-        <label className="lb">3. 제일 큰 매력 포인트는?</label>
-        <Opts k="charm" list={CHARMS} />
-        <label className="lb">4. 연애하면 어떤 스타일일 것 같아?</label>
-        <Opts k="love" list={LOVES} />
-        <label className="lb">5. 동물상으로 치면?</label>
-        <Opts k="animal" list={ANIMALS} />
-        <label className="lb">6. 같이 무인도에 가면 {board.nick}의 역할은?</label>
-        <Opts k="island" list={ISLANDS} />
+        <label className="lb">{T.q3}</label>
+        {opts('charm', O.charms)}
+        <label className="lb">{T.q4}</label>
+        {opts('love', O.loves)}
+        <label className="lb">{T.q5}</label>
+        {opts('animal', O.animals)}
+        <label className="lb">{T.q6(board.nick)}</label>
+        {opts('island', O.islands)}
 
-        <button className="btn" style={{ marginTop: 24 }} disabled={!done || busy} onClick={submit}>{busy ? '보내는 중...' : '익명으로 보내기 💌'}</button>
-        <p className="past-note">이름·연락처 없이 고른 보기만 전달돼요 · 재미로 보는 콘텐츠예요</p>
+        <button className="btn" style={{ marginTop: 24 }} disabled={!done || busy} onClick={submit}>{busy ? T.sending : T.send}</button>
+        <p className="past-note">{T.sendNote}</p>
       </section>
     </Shell>
   );

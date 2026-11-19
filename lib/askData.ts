@@ -3,6 +3,15 @@ export const CHARMS = ['😆 웃음소리', '👀 눈빛', '🙌 리액션', '�
 export const LOVES = ['💘 직진 고백형', '🙄 츤데레형', '🎣 밀당 장인', '🐶 헌신 댕댕이형', '📵 연락 귀찮형', '🎁 서프라이즈 장인'];
 export const ANIMALS = ['🐶 강아지상', '🐱 고양이상', '🦊 여우상', '🐻 곰상', '🐰 토끼상', '🦌 사슴상', '🦖 공룡상', '🐹 햄스터상'];
 export const ISLANDS = ['👑 리더', '🍳 요리 담당', '🎉 분위기 메이커', '🏕️ 생존 전문가', '🚤 혼자 먼저 탈출', '😴 그냥 잘 사람'];
+export const CHARMS_EN = ['😆 Laugh', '👀 Eyes', '🙌 Reactions', '🧠 Wit', '🫶 Kindness', '👗 Style', '🎙️ Voice', '🤝 Loyalty'];
+export const LOVES_EN = ['💘 Confesses first', '🙄 Tsundere', '🎣 Push & pull master', '🐶 Golden retriever', '📵 Bad texter', '🎁 Surprise planner'];
+export const ANIMALS_EN = ['🐶 Puppy face', '🐱 Cat face', '🦊 Fox face', '🐻 Bear face', '🐰 Bunny face', '🦌 Deer face', '🦖 Dino face', '🐹 Hamster face'];
+export const ISLANDS_EN = ['👑 The leader', '🍳 The cook', '🎉 Mood maker', '🏕️ Survival expert', '🚤 Escapes alone first', '😴 Just sleeps'];
+export function askOptions(lang: 'ko' | 'en') {
+  return lang === 'en'
+    ? { charms: CHARMS_EN, loves: LOVES_EN, animals: ANIMALS_EN, islands: ISLANDS_EN }
+    : { charms: CHARMS, loves: LOVES, animals: ANIMALS, islands: ISLANDS };
+}
 export const MIN_REVEAL = 3; // 이 수 미만이면 결과를 숨겨 누가 뭘 골랐는지 추측하기 어렵게
 export const MAX_ANSWERS = 300;
 

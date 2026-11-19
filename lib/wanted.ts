@@ -55,6 +55,47 @@ const LAST_SEEN = ['친구의 친구 생일파티', '동아리 뒤풀이', '단�
 const SEASON = ['이번 겨울', '2027년 봄', '2027년 여름', '2027년 가을'];
 const SAJU_S = [76, 84, 66, 62, 90];
 
+/* ───────── English ───────── */
+export type Lang = 'ko' | 'en';
+export const EL_EN = [
+  { name: 'Wood', day: 'Thursday' },
+  { name: 'Fire', day: 'Tuesday' },
+  { name: 'Earth', day: 'Saturday' },
+  { name: 'Metal', day: 'Friday' },
+  { name: 'Water', day: 'Wednesday' },
+];
+const ANIMAL_EN = ['🐭 Rat', '🐮 Ox', '🐯 Tiger', '🐰 Rabbit', '🐲 Dragon', '🐍 Snake', '🐴 Horse', '🐑 Goat', '🐵 Monkey', '🐔 Rooster', '🐶 Dog', '🐷 Pig'];
+const LOOKS_EN = [
+  ['tall with long arms and legs', 'eyes turn down when smiling', 'looks great in green', 'always carries a tumbler', 'walks fast', 'calm, gentle voice'],
+  ['eyes disappear when laughing', 'reacts 2x louder than anyone', 'blushes easily', 'loves bright colors', 'talks with their hands', 'a different face in every photo'],
+  ['warm, cozy smile', 'beige & brown outfits', 'always has warm hands', 'snacks in the bag at all times', 'speaks slowly', 'listens with a serious face'],
+  ['sharp, defined features', 'perfectly pressed shirts', 'silver accessories', 'never without a watch', 'neat way of talking', 'great posture'],
+  ['deep, intense eyes', 'mostly wears black', 'low voice', 'earbuds always in', 'hard-to-read expression', 'replies at 3 a.m.'],
+];
+const PLACE_EN = [
+  ['a local plant shop', 'a park walking trail', 'an indie bookstore', 'a hiking trailhead'],
+  ['the front row of a concert', 'a karaoke room', 'a trendy pop-up store', 'the gym'],
+  ['a favorite noodle spot', 'the bakery line', 'a campsite', 'the library reading room'],
+  ['a cafe window seat', 'an art exhibition', 'a select shop', 'a study cafe'],
+  ['a convenience store at dawn', 'the beach', 'a late-night movie', 'the swimming pool'],
+];
+const TIME_EN = ['around 8 a.m.', 'around 1 p.m.', 'around 4 p.m.', 'around 7 p.m.', 'around 11 p.m.'];
+const WARN_EN = [
+  'Stubborn. Pretend to lose the argument.',
+  'Quick temper, but apologizes first in 5 minutes.',
+  'Slow to decide. Do not rush them.',
+  'Brutally honest. Do not take it personally.',
+  'Replies late, but means every word.',
+];
+const LETTER_EN: Record<string, string> = {
+  E: 'talks to strangers like old friends', I: 'talks 3x more once close',
+  N: 'conversations suddenly go to outer space', S: 'knows every good restaurant',
+  T: 'gives solutions before sympathy', F: 'notices your mood first',
+  J: 'researches the meeting spot in advance', P: 'changes plans 30 minutes before',
+};
+const LAST_SEEN_EN = ["a friend of a friend's birthday party", 'a club after-party', 'replying under a group chat notice', 'the same bus stop', 'an office elevator', 'the comments of a Reel the algorithm showed you', 'a line at a dessert shop', 'a group project chat'];
+const SEASON_EN = ['This winter', 'Spring 2027', 'Summer 2027', 'Fall 2027'];
+
 function hash(s: string) {
   let h = 2166136261;
   for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); }
@@ -70,7 +111,8 @@ export type Wanted = {
   type: 'teto' | 'egen'; yang: number; group: 'NT' | 'NF' | 'SJ' | 'SP';
 };
 
-export function wanted(y: number, m: number, d: number, myMbti: string): Wanted {
+export function wanted(y: number, m: number, d: number, myMbti: string, lang: Lang = 'ko'): Wanted {
+  const en = lang === 'en';
   const o = Manseryeok.calculateFourPillars({ year: y, month: m, day: d, hour: 12, minute: 0, trueSolarTime: { longitude: 126.978 }, dayBoundary: 'jasi' }).toObject() as unknown as Record<string, string>;
   const P = ['year', 'month', 'day'].map((k) => ({ s: SK.indexOf(o[k][0]), b: BK.indexOf(o[k][1]) }));
   const counts = [0, 0, 0, 0, 0];
@@ -89,21 +131,21 @@ export function wanted(y: number, m: number, d: number, myMbti: string): Wanted 
   const yb = P[0].b, partnerYb = (13 - yb) % 12; // 육합
   const mbti = MBTI_BEST[myMbti] || 'ENFP';
   const h = hash(`${y}-${m}-${d}-${myMbti}`);
-  const L = LOOKS[lackEl];
+  const L = (en ? LOOKS_EN : LOOKS)[lackEl];
   const looks = [L[h % L.length], L[(h >>> 4) % L.length]];
   if (looks[0] === looks[1]) looks[1] = L[(h % L.length + 1) % L.length];
   const rel = (lackEl - myEl + 5) % 5;
   const reward = Math.min(99, Math.round(SAJU_S[rel] * 0.55 + 96 * 0.45) + (stemHap ? 4 : 0));
   return {
     myEl, myStem: SK_H[ds], counts, lackEl,
-    el: lackEl, stem: SK_H[stemIdx] + EL[STEM_EL[stemIdx]].ko, stemHap,
-    animal: ANIMAL[partnerYb], mbti,
+    el: lackEl, stem: en ? `${SK_H[stemIdx]} (${EL_EN[STEM_EL[stemIdx]].name})` : SK_H[stemIdx] + EL[STEM_EL[stemIdx]].ko, stemHap,
+    animal: (en ? ANIMAL_EN : ANIMAL)[partnerYb], mbti,
     looks,
-    habits: [LETTER[mbti[0]], LETTER[mbti[2]]],
-    place: PLACE[lackEl][(h >>> 8) % 4],
-    time: TIME[lackEl], day: EL[lackEl].day,
-    warn: WARN[lackEl],
-    lastSeen: `${SEASON[(h >>> 11) % 4]} · ${LAST_SEEN[(h >>> 13) % LAST_SEEN.length]}`,
+    habits: en ? [LETTER_EN[mbti[0]], LETTER_EN[mbti[2]]] : [LETTER[mbti[0]], LETTER[mbti[2]]],
+    place: (en ? PLACE_EN : PLACE)[lackEl][(h >>> 8) % 4],
+    time: (en ? TIME_EN : TIME)[lackEl], day: en ? EL_EN[lackEl].day : EL[lackEl].day,
+    warn: (en ? WARN_EN : WARN)[lackEl],
+    lastSeen: `${(en ? SEASON_EN : SEASON)[(h >>> 11) % 4]} · ${(en ? LAST_SEEN_EN : LAST_SEEN)[(h >>> 13) % LAST_SEEN.length]}`,
     reward,
     caseNo: `${String(y).slice(2)}${String(h % 9000 + 1000)}`,
     seed: h,
