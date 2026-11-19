@@ -540,3 +540,5 @@ label.lb{display:block;font-size:14px;color:var(--ink);margin:20px 0 8px;font-fa
 .past.ja .chip,.past.ja .btn,.past.ja .ask-preview span{font-family:'Zen Maru Gothic','Jua',sans-serif;font-weight:700}
 .lang-set{display:flex;flex-wrap:wrap;gap:6px}
 .lang-set .chip{margin:0}
+
+.splash-lang{text-align:center;font-size:12.5px;margin-top:10px;color:var(--muted)}.splash-lang a{color:var(--muted);text-decoration:none;padding:2px 4px}.splash-lang a.on{color:var(--text);font-weight:800;text-decoration:underline}

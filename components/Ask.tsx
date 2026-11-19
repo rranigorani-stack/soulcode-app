@@ -205,10 +205,10 @@ function Shell({ children, lang = 'ko' }: { children: React.ReactNode; lang?: La
       <main className={'past ask' + (lang === 'ja' ? ' ja' : '')}>
         {children}
         {lang === 'ja'
-          ? <footer className="past-foot"><a href="/ja/wanted">🚨 運命の相手の手配書</a> · <a href="/ask">한국어</a> · <a href="/en/ask">English</a><br /><a href="/terms">利用規約 (韓国語)</a> · <a href="/privacy">プライバシー (韓国語)</a></footer>
+          ? <footer className="past-foot"><a href="/ja/wanted">🚨 運命の相手の手配書</a> · <a href="/ask">한국어</a> · <a href="/en/ask">English</a><br /><a href="/ja/terms">利用規約</a> · <a href="/ja/privacy">プライバシー</a></footer>
           : lang === 'ko'
           ? <footer className="past-foot"><a href="/wanted">🚨 운명의 상대 수배전단</a> · <a href="/">소울코드</a> · <a href="/en/ask">English</a> · <a href="/ja/ask">日本語</a><br /><a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a><BizInfo /></footer>
-          : <footer className="past-foot"><a href="/en/wanted">🚨 Soulmate WANTED poster</a> · <a href="/ask">한국어</a> · <a href="/ja/ask">日本語</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
+          : <footer className="past-foot"><a href="/en/wanted">🚨 Soulmate WANTED poster</a> · <a href="/ask">한국어</a> · <a href="/ja/ask">日本語</a><br /><a href="/en/terms">Terms</a> · <a href="/en/privacy">Privacy</a></footer>}
       </main>
     </div>
   );

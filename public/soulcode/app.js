@@ -1730,6 +1730,7 @@ function tidyLayout(){
   if(dis&&!$('hubSoul'))dis.insertAdjacentHTML('beforebegin',hubHTML('hubSoul',['wanted','ask'],'👯 이 결과로 친구랑 놀기'));
   // 첫 화면: 밑줄 링크 → 작은 버튼 2개
   const sp=$('pastSplash'); if(sp&&!sp.classList.contains('hub-pills'))sp.className='past-splash hub-pills',sp.innerHTML='<a href="/wanted?utm_source=app_splash">🚨 수배전단</a><a href="/ask?utm_source=app_splash">💌 친구들이 보는 나</a>';
+  const ss=$('s-splash'); if(ss&&!$('splashLang')){const cur=window.soulLang||'ko';(sp||ss.querySelector('.disclaimer'))?.insertAdjacentHTML('afterend',`<div id="splashLang" class="splash-lang">${[['ko','한국어'],['en','English'],['ja','日本語']].map(([k,n])=>`<a href="#" class="${k===cur?'on':''}" onclick="setLang('${k}');return false">${n}</a>`).join(' · ')}</div>`)}
   tidyMe();
 }
 function setLang(k){store.set('soulcode.lang',k);location.href=location.pathname}

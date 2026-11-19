@@ -290,10 +290,10 @@ export default function Wanted({ lang = 'ko' }: { lang?: Lang }) {
           </section>
         )}
         {lang === 'ja'
-          ? <footer className="past-foot"><a href="/ja/ask">💌 友達から見た私</a> · <a href="/wanted">한국어</a> · <a href="/en/wanted">English</a><br /><a href="/terms">利用規約 (韓国語)</a> · <a href="/privacy">プライバシー (韓国語)</a></footer>
+          ? <footer className="past-foot"><a href="/ja/ask">💌 友達から見た私</a> · <a href="/wanted">한국어</a> · <a href="/en/wanted">English</a><br /><a href="/ja/terms">利用規約</a> · <a href="/ja/privacy">プライバシー</a></footer>
           : lang === 'ko'
           ? <footer className="past-foot"><a href="/ask">💌 친구들이 보는 나</a> · <a href="/terms">이용약관</a> · <a href="/privacy">개인정보처리방침</a> · <a href="/">소울코드</a> · <a href="/en/wanted">English</a> · <a href="/ja/wanted">日本語</a><BizInfo /></footer>
-          : <footer className="past-foot"><a href="/en/ask">💌 How friends see me</a> · <a href="/wanted">한국어</a> · <a href="/ja/wanted">日本語</a><br /><a href="/terms">Terms (Korean)</a> · <a href="/privacy">Privacy (Korean)</a></footer>}
+          : <footer className="past-foot"><a href="/en/ask">💌 How friends see me</a> · <a href="/wanted">한국어</a> · <a href="/ja/wanted">日本語</a><br /><a href="/en/terms">Terms</a> · <a href="/en/privacy">Privacy</a></footer>}
       </main>
     </div>
   );
