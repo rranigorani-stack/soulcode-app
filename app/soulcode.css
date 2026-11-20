@@ -604,3 +604,207 @@ html[lang=en] .dex button small,html[lang=ja] .dex button small{font-size:8px;le
 .vx-bars,.vx-more{transition:opacity .5s}.vx-cta{margin-top:14px;text-align:center}.vx-cta .btn{margin-top:8px}
 .vx-title-lock{display:block;margin:12px auto 0;background:#1B1433;color:#FFE04D;border-radius:999px;padding:8px 16px;font-weight:800;font-size:14px;animation:vxpulse 1.6s infinite}
 .vx-title{display:flex;gap:10px;align-items:center;margin:12px auto 0;background:#fff;border:2.5px solid var(--ink);border-radius:16px;padding:10px 14px;box-shadow:3px 3px 0 var(--ink);max-width:320px;text-align:left;position:relative}.vx-title span{font-size:30px}.vx-title small{display:block;font-size:11px;color:var(--muted);font-weight:800}.vx-title b{display:block;font-size:16px}.vx-title em{display:block;font-style:normal;font-size:11.5px;color:var(--pink);margin-top:2px;font-weight:700}
+
+/* =====================================================================
+   한지 × 먹 테마 (Korean traditional × modern)
+   한지 아이보리 바탕, 먹색 글씨, 오방색(청·적·황·백·흑) 포인트.
+   기존 컴포넌트 위에 덮어쓰는 층이라, 지우면 예전 파스텔 디자인으로 돌아가요.
+   ===================================================================== */
+:root{
+  --hanji:#F3ECDF; --hanji-2:#EAE1D0; --ink:#1E1A16; --text:#1E1A16; --muted:#7B7064; --paper:#FBF7EF;
+  --o-blue:#1F4A73; --o-red:#B23A2E; --o-yellow:#C99A2E; --o-white:#F8F4EC; --o-black:#1E1A16;
+  --pink:#B23A2E; --lav:#1F4A73; --yellow:#C99A2E; --green:#2F6B57; --orange:#B8642A; --blue:#1F4A73; --cyan:#3F7F8C; --lime:#2F6B57;
+  --wood:#2F6B57; --fire:#B23A2E; --earth:#B8862A; --metal:#8A8378; --water:#1F3A5F;
+  --holo:linear-gradient(160deg,#FBF7EF,#F1E8D8);
+  --holo-ink:linear-gradient(90deg,#B23A2E,#B23A2E);
+  --line:rgba(30,26,22,.85);
+  --sh:0 1px 0 rgba(30,26,22,.06),0 8px 24px -14px rgba(30,26,22,.35);
+  --sh-s:0 1px 0 rgba(30,26,22,.05); --sh-l:0 18px 40px -22px rgba(30,26,22,.45);
+  --serif:'Noto Serif KR','Nanum Myeongjo',serif;
+  --brush:'Nanum Brush Script',var(--serif);
+  /* 기본 카드 뒷면: 쪽빛 바탕 + 금색 테두리 + 가운데 원 */
+  --card-back:radial-gradient(circle at 50% 50%,transparent 0 22%,#C99A2E 22.5% 23.5%,transparent 24%),
+    repeating-linear-gradient(45deg,rgba(201,154,46,.10) 0 2px,transparent 2px 10px),
+    repeating-linear-gradient(-45deg,rgba(201,154,46,.10) 0 2px,transparent 2px 10px),
+    linear-gradient(170deg,#1F3A5F,#16293F);
+  --back-sym:'命';
+}
+html,body{background:#E4DACA}
+.app{background:var(--hanji);color:var(--ink)}
+/* 한지 섬유 질감 */
+.app::before{inset:0;filter:none;animation:none;opacity:.55;
+  background:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='220' height='220'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 .45  0 0 0 0 .38  0 0 0 0 .28  0 0 0 .28 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>"),
+    radial-gradient(120% 80% at 50% 0%,#F8F2E6 0,transparent 60%)}
+.app::after{animation:none;opacity:1;background:
+    linear-gradient(90deg,transparent 0 calc(100% - 1px),rgba(30,26,22,.05) 0) 0 0/100% 100%}
+
+/* 공통: 스티커 그림자·기울기 걷어내고 얇은 먹선으로 */
+.app :is(.btn,.panel,.mini,.tag,.chip,.field,.mbti-opt,.ilji,.msg-box,.ai-box,.q-echo span,.entry-row button,.plan,.pw,.login,.tabbar,.cal button,.week i,.dex button,.skins .sw,.dw,.mc-tile,.pil .gz,.tg-cell,.avatar .e,.soul-emoji,.card-art .sym,.card-art .num,.cback,.face,.slot .face,.stk,.soul-quip,.soul-sub,.streak-chip,.res-head .ud,.pos .hd .p,.tone,.hold-bar,.progress,.bars .track,.ilji .big,.story,.story .card-l,.story .big-e,.pop-sticker,.me-badge,.dw-now,.ai-badge,[class^="vx-"],[class*=" vx-"],[class^="ev"],[class*=" ev"]){box-shadow:none;rotate:none}
+.app :is(.btn,.panel,.mini,.chip,.field,.mbti-opt,.ilji,.msg-box,.ai-box,.entry-row button,.plan,.pw,.login,.tabbar,.cal button,.week i,.dex button,.dw,.pil .gz,.mc-tile,.tg-cell,.avatar .e,.soul-emoji,.tone,.hold-bar,.progress,.bars .track,.ilji .big,.q-echo span,.tag){border-width:1px;border-color:var(--line)}
+
+/* 글꼴 */
+.h-display,.page-h,.soul-title,.res-head h3,.verdict,.q,.today-head h2,.pw h3,.st{font-family:var(--serif);font-weight:900;letter-spacing:-.5px}
+.jua,.sec-t,label.lb,.mini .k,.bars .nm,.pick-hint,.hold-ui p,.load-txt,.chip,.slot-cap,.q-echo,.mrow b,.cal .h,.week div,.ychart span,.tabbar button,.entry-row button,.pro-banner .t,.streak b,.res-head .kw,.ilji .t,.skins button,.slot .lbl,.pil .lab,.mchart>.mc-h,.ai-box.thinking{font-family:var(--serif);font-weight:700}
+.btn{font-family:var(--serif);font-weight:700}
+.eng{font-family:var(--serif);letter-spacing:.32em;font-size:10.5px;font-weight:600;color:var(--o-red)}
+.holo-text{background:none;color:var(--o-red);-webkit-text-fill-color:var(--o-red)}
+.score-num,.streak .n,.heart,.bars .ct,.plan b,.mbti-opt b,.card-art .num,.card-art .nm small{font-family:var(--serif);font-weight:900}
+
+/* 단추: 먹 단추 */
+.btn{background:var(--ink);color:var(--o-white);border-radius:6px;padding:16px;font-size:17px;letter-spacing:.02em}
+.btn:active{transform:translateY(1px);box-shadow:none}
+.btn.ghost{background:transparent;color:var(--ink)}
+.btn.pink{background:var(--o-red);color:#fff;border-color:var(--o-red)}
+.btn:disabled{opacity:.3}
+
+/* 판(panel) */
+.panel,.mini,.msg-box,.ai-box,.ilji,.pw,.entry-row button{background:var(--paper);border-radius:4px}
+.grid-paper,.msg-box{background-image:none;background-color:var(--paper)}
+.grid2 .mini:nth-child(n),.lucky .mini:nth-child(n){background:var(--paper)}
+.grid2 .mini:nth-child(1){border-top:3px solid var(--o-red)}.grid2 .mini:nth-child(2){border-top:3px solid var(--o-blue)}
+.grid2 .mini:nth-child(3){border-top:3px solid var(--o-yellow)}.grid2 .mini:nth-child(4){border-top:3px solid var(--wood)}
+.sec-t{font-size:16px;margin:34px 0 12px;padding-bottom:8px;border-bottom:1px solid rgba(30,26,22,.18)}
+
+/* 태그·칩 */
+.tag,.tag:nth-child(n){background:transparent;border-radius:2px;font-weight:600;font-size:12.5px;padding:4px 10px}
+.chip{background:transparent;border-radius:3px;font-size:14.5px}
+.chip.sel{background:var(--ink);color:var(--o-white);transform:none}
+.mbti-opt{background:var(--paper);border-radius:4px}
+.mbti-opt.sel{background:var(--ink);color:var(--o-white);transform:none}
+.mbti-opt.sel span{color:#D8CFC0}
+.field{background:var(--paper);border-radius:4px}
+.field:focus{box-shadow:none;border-color:var(--o-red)}
+.progress{height:3px;border:none;background:rgba(30,26,22,.12);border-radius:0}
+.progress i{background:var(--o-red);border:none}
+
+/* 첫 화면: 먹으로 그린 원(원상) 안에 큰 命 */
+.ball{background:transparent;border:none;animation:none;width:210px;height:210px}
+.ball::before{content:'';position:absolute;inset:0;border-radius:50%;
+  background:radial-gradient(circle,transparent 63%,var(--ink) 64% 67%,transparent 68%),
+    conic-gradient(from 200deg,transparent 0 6%,rgba(30,26,22,.0) 6%);
+  -webkit-mask:conic-gradient(from 210deg,#000 0 92%,transparent 96%);mask:conic-gradient(from 210deg,#000 0 92%,transparent 96%)}
+.ball span{font-size:0}
+.ball span::after{content:'命';font-family:var(--serif);font-weight:900;font-size:104px;color:var(--ink);line-height:1}
+.ring-text text{font-family:var(--serif);font-weight:600;font-size:12.5px;letter-spacing:5px;fill:var(--muted)}
+.stk{background:var(--paper)!important;border:1px solid var(--line);border-radius:2px;font-family:var(--serif);font-weight:700;font-size:14px;animation:none;color:var(--ink)}
+.stk.s1{border-left:4px solid var(--o-red)}.stk.s2{border-left:4px solid var(--o-blue)}.stk.s3{border-left:4px solid var(--wood)}.stk.s5{border-left:4px solid var(--o-yellow)}
+.stk.s4{display:none}
+.star-stk{display:none}
+.logo{font-family:var(--serif);font-weight:900;color:var(--ink);-webkit-text-stroke:0;text-shadow:none;letter-spacing:.18em;font-size:40px}
+.tagline{font-family:var(--serif);font-weight:700}
+
+/* 낙관(붉은 도장) 스타일 */
+.soul-quip,.me-badge,.dw-now,.ai-badge,.res-head .ud{background:var(--o-red)!important;color:#FBF4EA!important;border:none!important;border-radius:2px!important;font-family:var(--serif)!important;font-weight:700}
+.soul-quip{rotate:4deg!important;font-size:12px;padding:6px 9px;outline:1px solid rgba(178,58,46,.35);outline-offset:2px}
+
+/* 소울 카드 */
+.soul-hero-in{background:var(--paper);border:1px solid var(--line);border-radius:4px;animation:none;
+  background-image:radial-gradient(circle at 50% 30%,rgba(201,154,46,.10),transparent 60%)}
+.soul-hero-in::before{display:none}
+.soul-hero-in::after{content:'';position:absolute;inset:8px;border:1px solid rgba(30,26,22,.18);pointer-events:none}
+.soul-emoji{background:transparent;border:1px solid var(--line)}
+.soul-sub{background:transparent;border:none;border-top:1px solid var(--line);border-bottom:1px solid var(--line);border-radius:0;font-family:var(--serif);font-weight:700;color:var(--o-red);padding:6px 14px}
+
+/* 원국표 */
+.pil .gz,.mc-tile{background:var(--paper);border-radius:3px;font-family:var(--serif)}
+.pil.me .gz.top,.mc-tile.me{background:var(--ink);color:var(--o-white)!important}
+.mc-tile.me small{color:#D8CFC0}
+.mchart>.me{background:rgba(201,154,46,.12)}
+.tg-cell{background:transparent;border-radius:2px}
+.tg-cell.on{background:var(--o-red);color:#fff}
+.tg-me{background:var(--o-red);border-radius:2px}
+.dw{background:var(--paper);border-radius:3px}
+.dw.now{background:var(--ink);color:var(--o-white)}
+.dw.now .dw-a,.dw.now .dw-t{color:#D8CFC0}
+
+/* 오행 막대 */
+.bars .track{height:6px;border:none;background:rgba(30,26,22,.10);border-radius:0}
+.bars .fill{border:none;border-radius:0}
+
+/* 일진·타로 */
+.ilji .big{background:transparent;border-radius:2px;font-family:var(--serif)}
+.cback,.face{border:1px solid #C99A2E;border-radius:6px}
+.cback::before,.face.back::before{border:1px solid rgba(201,154,46,.55);border-radius:3px}
+.cback::after,.face.back::after{color:#E9D9A8!important;font-family:var(--serif);font-weight:900}
+.face.front::after{background:linear-gradient(115deg,transparent 30%,rgba(255,250,235,.55) 48%,transparent 66%);background-size:260% 260%;background-position:var(--sx,0%) var(--sy,0%);mix-blend-mode:soft-light}
+.card-art{color:var(--ink)}
+.card-art::before{background-image:none;box-shadow:inset 0 0 0 6px rgba(251,247,239,.55),inset 0 0 0 7px rgba(30,26,22,.25)}
+.card-art .sym{background:rgba(251,247,239,.9);border:1px solid var(--line)}
+.card-art .num{background:transparent;border:none;border-bottom:1px solid var(--line);border-radius:0}
+.card-art .nm b{font-family:var(--serif);font-weight:900}
+.hold-bar{height:3px;border:none;background:rgba(30,26,22,.12)}
+.hold-bar i{background:var(--o-red)}
+.tone{background:transparent;border-radius:3px}
+.tone button{border-radius:2px}
+.lucky .mini{border-top:3px solid var(--o-yellow)}
+.slot{border:1px dashed rgba(30,26,22,.4);border-radius:6px;background:rgba(251,247,239,.5)}
+.pos .hd .p,.pos:nth-of-type(n) .hd .p{background:transparent;border:1px solid var(--line);border-radius:2px}
+.q-echo span{background:var(--paper);border-radius:3px;rotate:none}
+.streak-chip{background:transparent;border:1px solid var(--o-red);color:var(--o-red);border-radius:2px}
+
+/* 궁합 */
+.avatar .e,.avatar:first-child .e,.avatar:last-child .e{background:var(--paper)}
+.heart{color:var(--o-red)}
+
+/* 내 페이지·리포트 */
+.week i{border-radius:2px;background:var(--paper)}
+.week i.on{background:var(--ink);color:var(--o-white)}
+.dex button{border-radius:3px}
+.dex button.lock{background:transparent}
+.pro-banner{background:var(--paper);animation:none;border-left:4px solid var(--o-red)}
+.cal button{border-radius:2px;background:var(--paper)}
+.cal button.good{background:#E3EDE6}.cal button.bad{background:#F3DFDA}
+.ychart i{border:none;border-radius:0;background:var(--o-blue)}
+.ychart i.hi{background:var(--wood)}.ychart i.lo{background:var(--o-red)}
+.plan{background:var(--paper);border-radius:4px}.plan.sel{background:var(--ink);color:var(--o-white)}.plan.sel small{color:#D8CFC0}
+.skins .sw{border-radius:4px}
+.skins button.sel .sw{outline:2px solid var(--o-red)}
+.login{border-radius:4px}
+
+/* 하단 탭 */
+.tabbar{left:0;right:0;bottom:0;height:72px;border-radius:0;border:none;border-top:1px solid rgba(30,26,22,.2);background:rgba(243,236,223,.94);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px);padding-bottom:6px}
+.tabbar button.on .i{background:transparent;border:none;transform:none;filter:grayscale(1) contrast(1.2)}
+.tabbar button.on{color:var(--o-red)}
+.tabbar button.on::after{content:'';display:block;width:16px;height:2px;background:var(--o-red);margin-top:2px}
+
+/* 모달·토스트·공유카드 */
+.modal{background:rgba(30,26,22,.55)}
+.toast{background:var(--ink);color:var(--o-white);border-radius:3px;font-family:var(--serif)}
+.story{background:var(--paper);border:1px solid var(--line);border-radius:6px}
+.story .logo-s{color:var(--ink);-webkit-text-stroke:0;font-family:var(--serif);font-weight:900}
+.story .big-e,.story .card-l{background:transparent;border:1px solid var(--line)}
+.legal-wrap{background:#E4DACA}
+
+/* 덱 스킨은 그대로 쓰되, 기본(홀로그램)만 한지 테마 카드 뒷면을 써요 */
+.app:not([data-skin]) .cback::after,.app:not([data-skin]) .face.back::after{font-size:30px}
+
+/* --- 한지 테마: 나머지 컴포넌트 일괄 정리 --- */
+.app *,.past-wrap *,.wanted-wrap *{box-shadow:none!important;text-shadow:none}
+.app :is(.ev-card,.fit-btns button,.wish-card,.offer,.hub-tile,.cm-entry,.past-link,.vx-title,.vx-title-lock,.vx-chip,.vx-earn div,.vx-dex>*,.vx-duo-list>*,.vx-face,.dy,.pop-sticker,.pro-chip,.sync .dot,.cm-members>div,.ask-preview span,.hub-pills a){border-width:1px!important;border-color:var(--line)!important}
+.ev-card,.ev-card.info,.past-link,.cm-entry,.hub-tile,.offer,.vx-title,.vx-earn div,.vx-duo-list>*,.dy{background:var(--paper)!important;border-radius:4px!important;rotate:none}
+.ev-card{border-left:3px solid var(--o-red)!important}
+.ev-bar{background:rgba(30,26,22,.1);border:none;height:3px;border-radius:0}.ev-bar i{background:var(--o-red)}
+.fit-btns button{background:var(--paper);border-radius:3px;font-family:var(--serif);font-weight:700}
+.offer.hot{background:var(--ink)!important;color:var(--o-white)}.offer.hot small{color:#D8CFC0}
+.vx-title-lock{background:var(--ink)!important;color:#E9D9A8!important;border-radius:3px!important;animation:none!important;font-family:var(--serif)}
+.vx-chip{background:transparent!important;border-radius:2px!important}
+.vx-dex>*{border-radius:3px!important;background:var(--paper)}
+.vx-back{background:linear-gradient(170deg,#1F3A5F,#16293F)!important;color:#E9D9A8}
+.vx-face{border-radius:6px!important}
+.pop-sticker{background:var(--o-red)!important;color:#FBF4EA!important;border:none!important;border-radius:2px!important;font-family:var(--serif)!important;font-weight:700;font-size:14px}
+.past-splash a,.hub-pills a{background:transparent!important;border:1px solid var(--line)!important;border-radius:3px!important;color:var(--ink);font-family:var(--serif);font-weight:700}
+.wish-card{border-width:1px!important;border-radius:6px!important}
+/* 타로 앞면: 카드마다 다른 파스텔 대신 한지 바탕 + 위쪽 색 띠 */
+.card-art{background:var(--paper)!important;border-top:10px solid var(--c-band,var(--o-blue))}
+.slot .card-art{border-top-width:5px}
+.dex button:not(.lock){background:var(--paper)!important}
+/* 다른 페이지(수배전단·친구들이 보는 나) 바탕 */
+.past-wrap,.wanted-wrap{background:var(--hanji)!important}
+/* 강조선은 굵게 유지 */
+.grid2 .mini:nth-child(n){border-top-width:3px!important}
+.lucky .mini{border-top-width:3px!important}
+.pro-banner{border-left-width:4px!important}
+.ev-card{border-left-width:3px!important}
+.stk.s1,.stk.s2,.stk.s3,.stk.s5{border-left-width:4px!important}
+.mbti-preview{font-family:var(--serif);font-weight:900;color:var(--ink);-webkit-text-stroke:0;letter-spacing:.3em;font-size:44px}
+.toast{top:auto;bottom:92px;transform:translate(-50%,20px)}.toast.show{transform:translate(-50%,0)}
