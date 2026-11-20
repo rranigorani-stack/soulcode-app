@@ -13,7 +13,7 @@
     '본명 아니어도 됨. 결과 카드에 박제될 이름이에요.':['Doesn’t have to be your real name. It goes on your result card.','本名じゃなくてOK。結果カードに載る名前です。'],
     '다음':['Next','次へ'],
     '언제 지구에 착륙했어? 🛸':['When did you land on Earth? 🛸','いつ地球に着陸した? 🛸'],
-    '양력 생년월일로 사주를 펼쳐요.':['We read your Saju from your birth date.','生年月日(西暦)で命式を出します。'],
+    '생년월일로 사주를 펼쳐요. 음력 생일도 OK!':['We read your Saju from your birth date. Lunar birthdays work too!','生年月日で命式を出します。旧暦の誕生日もOK!'],
     '태어난 시각을 분 단위로 알면 절기 경계까지 정확하게!':['Know your birth time? Even more accurate!','生まれた時刻がわかるともっと正確に!'],
     '생년월일':['Date of birth','生年月日'],
     '태어난 시간':['Time of birth','生まれた時間'],

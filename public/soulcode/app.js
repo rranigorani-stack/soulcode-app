@@ -204,12 +204,13 @@ function calcSaju(y,m,d,time){
 }
 /* ---- 양력/음력 생일 입력 ---- */
 const pad2=n=>String(n).padStart(2,'0');
+const MAX_Y=new Date().getFullYear();
 function mountBirthPicker(dateEl,onChange){
   const tg=document.createElement('div'); tg.className='chips-sel'; tg.style.marginBottom='10px';
   tg.innerHTML='<button type="button" class="chip sel" data-c="solar">☀️ 양력</button><button type="button" class="chip" data-c="lunar">🌙 음력</button>';
   dateEl.before(tg);
   const box=document.createElement('div'); box.style.display='none';
-  box.innerHTML=`<div style="display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px"><select class="field ly" aria-label="음력 연도"><option value="">${TL('년','Year','年')}</option>${Array.from({length:86},(_,i)=>2025-i).map(v=>`<option value="${v}">${TL(v+'년',v,v+'年')}</option>`).join('')}</select><select class="field lm" aria-label="음력 월"><option value="">${TL('월','Month','月')}</option>${Array.from({length:12},(_,i)=>`<option value="${i+1}">${TL((i+1)+'월',i+1,(i+1)+'月')}</option>`).join('')}</select><select class="field ld" aria-label="음력 일"><option value="">${TL('일','Day','日')}</option>${Array.from({length:30},(_,i)=>`<option value="${i+1}">${TL((i+1)+'일',i+1,(i+1)+'日')}</option>`).join('')}</select></div>
+  box.innerHTML=`<div style="display:grid;grid-template-columns:1.35fr 1fr 1fr;gap:8px"><select class="field ly" aria-label="음력 연도"><option value="">${TL('년','Year','年')}</option>${Array.from({length:MAX_Y-1939},(_,i)=>MAX_Y-i).map(v=>`<option value="${v}">${TL(v+'년',v,v+'年')}</option>`).join('')}</select><select class="field lm" aria-label="음력 월"><option value="">${TL('월','Month','月')}</option>${Array.from({length:12},(_,i)=>`<option value="${i+1}">${TL((i+1)+'월',i+1,(i+1)+'月')}</option>`).join('')}</select><select class="field ld" aria-label="음력 일"><option value="">${TL('일','Day','日')}</option>${Array.from({length:30},(_,i)=>`<option value="${i+1}">${TL((i+1)+'일',i+1,(i+1)+'日')}</option>`).join('')}</select></div>
     <div style="margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap"><button type="button" class="chip ll">${TL('윤달이에요','Leap month','閏月です')}</button><span class="lc" style="font-size:14px"></span></div>`;
   dateEl.after(box);
   const ly=box.querySelector('.ly'),lm=box.querySelector('.lm'),ld=box.querySelector('.ld'),ll=box.querySelector('.ll'),lc=box.querySelector('.lc');
@@ -272,18 +273,23 @@ $('birth').oninput=e=>$('n2').disabled=!e.target.value;
 const obPicker=mountBirthPicker($('birth'),()=>$('n2').disabled=!$('birth').value);
 $('btUnknown').onclick=()=>{const on=!$('btUnknown').classList.contains('sel');$('btUnknown').classList.toggle('sel',on);$('btime').disabled=on;if(on)$('btime').value=''};
 $('btime').oninput=()=>{if($('btime').value){$('btUnknown').classList.remove('sel');$('btime').disabled=false}};
+['birth','mtBirth'].forEach(id=>{const e=$(id);if(e)e.max=`${MAX_Y}-12-31`});
+/* 성별 (선택) — 대운 방향 계산에만 써요. 결과 화면에서 다시 묻지 않도록 온보딩에서 미리 받아요 */
+$('btUnknown').parentElement.insertAdjacentHTML('afterend',`<label class="lb">${TL('성별 (선택 · 대운 계산에만 써요)','Gender (optional · only for luck cycles)','性別(任意 · 大運の計算にだけ使います)')}</label><div class="chips-sel" id="obGender"><button type="button" class="chip" data-g="female">👩 ${TL('여자','Female','女性')}</button><button type="button" class="chip" data-g="male">👨 ${TL('남자','Male','男性')}</button></div>`);
+document.querySelectorAll('#obGender .chip').forEach(b=>b.onclick=()=>{ob.gender=ob.gender===b.dataset.g?null:b.dataset.g;document.querySelectorAll('#obGender .chip').forEach(x=>x.classList.toggle('sel',x.dataset.g===ob.gender))});
 function setStep(n){
   ob.step=n;
   document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',+s.dataset.step===n));
   $('prog').style.width=(n*33.4)+'%'; $('stepLabel').textContent=`STEP ${n} / 3`;
 }
 function nextStep(){
-  if(ob.step===2){const y=+$('birth').value.slice(0,4);if(y<1940||y>2025){toast(TL('1940~2025년 사이로 입력해주세요','Enter a year between 1940 and 2025','1940〜2025年の間で入力してください'));return}}
+  if(ob.step===2){const y=+$('birth').value.slice(0,4);if(y<1940||y>MAX_Y){toast(TL(`1940~${MAX_Y}년 사이로 입력해주세요`,`Enter a year between 1940 and ${MAX_Y}`,`1940〜${MAX_Y}年の間で入力してください`));return}}
   setStep(ob.step+1)
 }
 function prevStep(){setStep(ob.step-1)}
 function finishOnb(){
   profile={nick:$('nick').value.trim(),birth:$('birth').value,btime:$('btime').value||'',lunar:obPicker.info(),mbti:$('mbtiPrev').textContent};
+  if(ob.gender)profile.gender=ob.gender;
   store.set('soulcode.profile',profile);
   logVisit();
   go('s-loading');
@@ -494,10 +500,14 @@ function holdToFlip(el,bar,done){
   };
   const start=e=>{if(finished)return;e.preventDefault();active=true;t0=performance.now();el.classList.add('charging');raf=requestAnimationFrame(tick)};
   const stop=()=>{if(!active)return;active=false;cancelAnimationFrame(raf);el.classList.remove('charging');el.style.transform='';bar.style.transition='width .25s';bar.style.width='0';setTimeout(()=>bar.style.transition='',260);toast(TL('조금만 더 꾹— 🤏','Hold a little longer— 🤏','もう少し長押し— 🤏'))};
-  const cleanup=()=>{el.removeEventListener('pointerdown',start);window.removeEventListener('pointerup',stop);el.removeEventListener('pointerleave',stop)};
+  // 키보드(Enter·Space)와 마우스 더블클릭으로도 바로 뒤집기 — 꾹 누르기가 어려운 환경용
+  const quick=e=>{if(finished)return;if(e.type==='keydown'&&e.key!=='Enter'&&e.key!==' ')return;e.preventDefault();active=false;finished=true;cancelAnimationFrame(raf);el.classList.remove('charging');el.style.transform='';bar.style.width='100%';cleanup();done()};
+  const cleanup=()=>{el.removeEventListener('pointerdown',start);window.removeEventListener('pointerup',stop);el.removeEventListener('pointerleave',stop);el.removeEventListener('keydown',quick);el.removeEventListener('dblclick',quick);el.removeAttribute('tabindex');el.removeAttribute('role')};
   if(el._holdCleanup) el._holdCleanup();
   el._holdCleanup=cleanup;
   el.addEventListener('pointerdown',start); window.addEventListener('pointerup',stop); el.addEventListener('pointerleave',stop);
+  el.addEventListener('keydown',quick); el.addEventListener('dblclick',quick);
+  el.tabIndex=0; el.setAttribute('role','button'); el.setAttribute('aria-label',TL('카드 뒤집기 (꾹 누르거나 Enter)','Flip the card (hold, or press Enter)','カードをめくる(長押し、またはEnter)'));
   el.oncontextmenu=e=>e.preventDefault();
 }
 function enableTilt(el){
@@ -615,7 +625,7 @@ function renderMe(){
 }
 function resetAll(){
   store.del('soulcode.profile'); store.del('soulcode.draw.'+todayKey());
-  profile=null; draw=null; ob.mbti={};
+  profile=null; draw=null; ob.mbti={}; ob.gender=null; document.querySelectorAll('#obGender .chip').forEach(x=>x.classList.remove('sel'));
   obPicker.reset(); $('nick').value=''; $('birth').value=''; $('btime').value=''; $('btime').disabled=false; $('btUnknown').classList.remove('sel'); $('n1').disabled=true;$('n2').disabled=true;$('n3').disabled=true;
   document.querySelectorAll('.mbti-opt').forEach(b=>b.classList.remove('sel')); $('mbtiPrev').textContent='????';
   spReset(); mtReset();
@@ -711,7 +721,11 @@ function spRender(){
     const c=TAROT[p.card], kw=p.rev?c[4]:c[3], v=LUCK[p.card];
     score+=(p.rev?(v>0?-1:v<0?1:-1):v)*SP_POS[i].w;
     const lead=TL([`${cat.n}에서 지나온 흐름은 「${kw}」였어요.`,`지금 ${cat.n}의 핵심 키워드는 「${kw}」.`,`앞으로는 「${kw}」 쪽으로 흘러갈 가능성이 높아요.`],[`In ${cat.n.toLowerCase()}, the road behind you was “${kw}”.`,`Right now your ${cat.n.toLowerCase()} keyword is “${kw}”.`,`Things are likely to flow toward “${kw}”.`],[`${cat.n}でこれまでの流れは「${kw}」でした。`,`今の${cat.n}のキーワードは「${kw}」。`,`これからは「${kw}」の方向へ流れそう。`])[i];
-    const msg=p.rev?(t==='T'?c[7]:c[8]):(t==='T'?c[5]:c[6]);
+    const msg=i===0
+      ?(p.rev
+        ?TL(`그때의 「${kw}」 흐름이 아직 마음 한쪽에 남아 있을 수 있어요. 지금 고를 땐 그 기억을 너무 크게 두지 마요.`,`That “${kw}” phase may still be lingering. Don't let it weigh too much on today's choice.`,`あの頃の「${kw}」の流れが、まだ心に残っているかも。今の選択ではその記憶を大きくしすぎないで。`)
+        :TL(`그때 지나온 「${kw}」 흐름이 지금 고민의 출발점이에요. 그 경험이 남긴 걸 한번 떠올려 봐요.`,`That “${kw}” phase is where this question started. Think about what it left you with.`,`あの頃の「${kw}」の流れが今の悩みの出発点。その経験が残したものを思い出してみて。`))
+      :p.rev?(t==='T'?c[7]:c[8]):(t==='T'?c[5]:c[6]);
     return `<div class="panel pos"><div class="hd"><span class="p">${SP_POS[i].k}</span><b>${c[2]} ${c[0]}</b>${p.rev?`<span class="r">${TL('역방향','Reversed','逆位置')}</span>`:''}</div><p class="kwl">${lead}</p><p>${msg}</p></div>`;
   }).join('');
   const vk=score>=3?'go':score>=0?'wait':'turn', V=VERDICT[vk];
@@ -780,7 +794,7 @@ function ttiMatch(a,b){
 function runMatch(){
   if(mt.rel==='lover') return runLovePro();
   const nick=$('mtNick').value.trim(), [y,m,d]=$('mtBirth').value.split('-').map(Number), mb=$('mtMbti').value;
-  if(y<1940||y>2025){toast(TL('1940~2025년 사이로 입력해주세요','Enter a year between 1940 and 2025','1940〜2025年の間で入力してください'));return}
+  if(y<1940||y>MAX_Y){toast(TL(`1940~${MAX_Y}년 사이로 입력해주세요`,`Enter a year between 1940 and ${MAX_Y}`,`1940〜${MAX_Y}年の間で入力してください`));return}
   const them=calcSaju(y,m,d,''), a=saju.dayStem, b=them.dayStem;
   const ea=STEM_EL[a], eb=STEM_EL[b];
   let sj={...SAJU_MATCH[(eb-ea+5)%5]}, hap=Math.abs(a-b)===5;
@@ -916,7 +930,7 @@ function coupleMonths(A,B){
 }
 function runLovePro(){
   const nick=$('mtNick').value.trim(), [y,m,d]=$('mtBirth').value.split('-').map(Number), mb=$('mtMbti').value, hb=$('mtTime').value;
-  if(y<1940||y>2025){toast(TL('1940~2025년 사이로 입력해주세요','Enter a year between 1940 and 2025','1940〜2025年の間で入力してください'));return}
+  if(y<1940||y>MAX_Y){toast(TL(`1940~${MAX_Y}년 사이로 입력해주세요`,`Enter a year between 1940 and ${MAX_Y}`,`1940〜${MAX_Y}年の間で入力してください`));return}
   const A=saju, B=calcSaju(y,m,d,hb), me=esc(profile.nick), them=esc(nick);
   // 1 spouse palace
   const sp=BR_REL[brRel(A.pillars.day.b,B.pillars.day.b)];
@@ -1053,6 +1067,7 @@ function aiErr(code){return({ai_paused:'🛠️ AI 해석이 잠깐 쉬는 중�
 function aiBadge(box){const b=document.createElement('span');b.className='ai-badge';b.textContent='🤖 AI 해석';box.appendChild(b)}
 async function runAI(prompt,box,btn,opts={}){
   if(!AI){toast('AI를 쓸 수 없는 환경이에요');return null}
+  if(needsAILogin()){loginPrompt();return null}
   const retry=()=>runAI(prompt,box,btn,{...opts,ticket:true});
   if(opts.pro&&!isPro()&&!opts.ticket){openOffer(opts.proReason||'PRO 전용 AI 기능이에요',retry);return null}
   if(!opts.ticket&&aiLeft()<=0){openOffer(`오늘 무료 AI 해석 ${freeLimit()}회를 다 썼어요`,retry);return null}
@@ -1063,7 +1078,7 @@ async function runAI(prompt,box,btn,opts={}){
     if(opts.ticket&&!isPro()) store.set('soulcode.tickets',Math.max(0,tickets()-1)); else if(!isPro()) store.set('soulcode.ai.'+todayKey(),aiUsed()+1);
     return text;
   }catch(e){
-    if(e.code==='auth_required'){box.className='ai-box';box.textContent='';toast('로그인하면 AI 해석을 쓸 수 있어요 🔐');go('s-me');return null}
+    if(e.code==='auth_required'){box.className='ai-box';box.textContent='';loginPrompt();return null}
     if(e.code==='quota_exceeded'){box.className='ai-box';box.textContent='';openOffer(`오늘 무료 AI 해석 ${freeLimit()}회를 다 썼어요`,retry);return null}
     if(e.code==='free_sold_out'){box.className='ai-box';box.textContent='';openOffer('오늘 무료 AI 해석이 인기 폭발로 마감됐어요 🔥',retry);return null}
     if(e.code==='no_ticket'){box.className='ai-box';box.textContent='';store.set('soulcode.tickets',0);openOffer('티켓이 다 떨어졌어요',retry);return null}
@@ -1853,6 +1868,22 @@ tidyLayout();
   // AI 사용 횟수는 베타에서도 기기에 기록 (화면 표시용, 실제 한도는 서버가 지켜요)
   const _run=runAI; runAI=async function(prompt,box,btn,opts={}){const r=await _run(prompt,box,btn,{...opts,ticket:false}); if(r) store.set('soulcode.ai.'+todayKey(),aiUsed()+1); refreshQuota&&refreshQuota(); return r};
 })();
+
+/* ================= 로그인 전 AI 안내 ================= */
+// 로그인 기능이 켜져 있는데 아직 로그인 전이면, "남은 횟수" 대신 로그인 안내를 보여주고 바로 로그인 창을 띄워요
+function needsAILogin(){return !!(window.soulAuth&&window.soulConfig&&!window.soulConfig.serverPro)}
+function loginPrompt(){
+  let m=$('loginM');
+  if(!m){$('app').insertAdjacentHTML('beforeend','<div class="modal" id="loginM" onclick="if(event.target.id===\'loginM\')this.classList.remove(\'show\')"><div class="pw" id="loginIn"></div></div>');m=$('loginM')}
+  $('loginIn').innerHTML=`<div style="text-align:center"><div style="font-size:44px">🤖</div><h3 class="h-display" style="font-size:22px">${TL('로그인하고 AI 해석 받기','Log in for AI readings','ログインしてAI解説を受け取る')}</h3><p class="muted" style="font-size:13.5px;margin-top:6px">${TL(`AI 해석은 로그인하면 하루 ${freeLimit()}회 무료예요. 기록도 안전하게 저장돼요.`,`AI readings are free ${freeLimit()} times a day once you log in. Your records get saved too.`,`ログインするとAI解説が1日${freeLimit()}回無料。記録も安全に保存されます。`)}</p></div><div class="login-btns" style="margin-top:16px">${loginButtons()}</div><p class="consent-note">${TL('로그인하면 <a href="/terms" target="_blank">이용약관</a>과 <a href="/privacy" target="_blank">개인정보처리방침</a>에 동의하고, 만 14세 이상임을 확인한 것으로 봐요.','By logging in you agree to the <a href="/terms" target="_blank">Terms</a> and <a href="/privacy" target="_blank">Privacy Policy</a> and confirm you are 14 or older.','ログインすると<a href="/terms" target="_blank">利用規約</a>と<a href="/privacy" target="_blank">プライバシーポリシー</a>に同意し、14歳以上であることを確認したものとみなします。')}</p><button class="btn ghost" style="margin-top:10px" onclick="$('loginM').classList.remove('show')">${TL('다음에 할게요','Maybe later','また今度')}</button>`;
+  m.classList.add('show');
+}
+{const _qt=quotaText; quotaText=function(){return needsAILogin()?TL(`🔐 로그인하면 AI 해석 하루 ${freeLimit()}회 무료`,`🔐 Log in for ${freeLimit()} free AI readings a day`,`🔐 ログインでAI解説が1日${freeLimit()}回無料`):_qt()}; refreshQuota();}
+// 무료 베타에선 스킨이 이미 다 열려 있어서, 출석 보상은 "베타가 끝나도 평생 소장"으로 안내해요
+if(window.soulConfig&&window.soulConfig.freeBeta){
+  const _ae=activeEvents; activeEvents=function(){return _ae().map(e=>e.id!=='streak7'?e:{...e,s:TL(`7일 연속 오면 '딸기우유' 스킨을 베타가 끝나도 평생 소장 · 지금 <b>${Math.min(calcStreak(),7)}/7</b>`,`Visit 7 days in a row to keep the 'Strawberry Milk' skin forever, even after the beta · now <b>${Math.min(calcStreak(),7)}/7</b>`,`7日連続で来ると「いちごミルク」スキンをベータ終了後もずっと使える · 今 <b>${Math.min(calcStreak(),7)}/7</b>`)})};
+  const _rm3=renderMe; renderMe=function(){_rm3(); const n=calcStreak(); if(!unlocks().includes('strawberry')&&n<7&&$('stS'))$('stS').textContent=TL(`${7-n}일만 더 오면 '딸기우유' 스킨 베타 끝나도 평생 소장 🍓`,`${7-n} more days to keep 'Strawberry Milk' forever, even after the beta 🍓`,`あと${7-n}日で「いちごミルク」をベータ後もずっと使える 🍓`)};
+}
 
 /* ================= BOOT ================= */
 if(window.soulLang&&window.soulLang!=='ko'&&window.applyContentI18n){try{applyContentI18n()}catch(e){console.warn('i18n content',e)}}
