@@ -3,20 +3,21 @@
   --bg:#F1EFEA; --ink:#111110; --sub:#55534E; --line:rgba(17,17,16,.16); --red:#B23A2E;
   --serif:'Noto Serif KR','Nanum Myeongjo',Georgia,serif;
   --mono:'DM Mono',ui-monospace,Menlo,monospace;
-  background:var(--bg); color:var(--ink); font-family:'Noto Sans KR',system-ui,sans-serif;
+  --sans:'Noto Sans KR',system-ui,sans-serif; --hs:1; --bs:1; --radius:0px;
+  background:var(--bg); color:var(--ink); font-family:var(--sans);
   min-height:100vh; overflow-x:hidden; -webkit-font-smoothing:antialiased;
 }
 html:has(.lp),body:has(.lp){background:#F1EFEA;height:auto}
 .lp a{color:inherit;text-decoration:none}
 .lp-mono{font-family:var(--mono);font-size:11.5px;letter-spacing:.14em;text-transform:uppercase}
-.lp-h1{font-family:var(--serif);font-weight:600;font-size:clamp(34px,6.4vw,76px);line-height:1.12;letter-spacing:-.02em;word-break:keep-all}
-.lp-h2{font-family:var(--serif);font-weight:600;font-size:clamp(26px,4.2vw,50px);line-height:1.2;letter-spacing:-.015em;word-break:keep-all}
+.lp-h1{font-family:var(--serif);font-weight:600;font-size:calc(clamp(34px,6.4vw,76px) * var(--hs));line-height:1.12;letter-spacing:-.02em;word-break:keep-all}
+.lp-h2{font-family:var(--serif);font-weight:600;font-size:calc(clamp(26px,4.2vw,50px) * var(--hs));line-height:1.2;letter-spacing:-.015em;word-break:keep-all}
 .lp-h2 em{font-style:normal;color:var(--red)}
-.lp-h3{font-family:var(--serif);font-weight:700;font-size:clamp(21px,2.4vw,28px);line-height:1.3;letter-spacing:-.01em}
+.lp-h3{font-family:var(--serif);font-weight:700;font-size:calc(clamp(21px,2.4vw,28px) * var(--hs));line-height:1.3;letter-spacing:-.01em}
 .lp p{line-height:1.75;word-break:keep-all}
 
 /* 단추 */
-.lp-btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--ink);color:var(--bg)!important;border:1px solid var(--ink);
+.lp-btn{border-radius:var(--radius);display:inline-flex;align-items:center;justify-content:center;gap:8px;background:var(--ink);color:var(--bg)!important;border:1px solid var(--ink);
   padding:15px 26px;font-family:var(--mono);font-size:12.5px;letter-spacing:.14em;text-transform:uppercase;transition:background .2s,color .2s}
 .lp-btn:hover{background:transparent;color:var(--ink)!important}
 .lp-btn-o{background:transparent;color:var(--ink)!important}
@@ -40,7 +41,7 @@ html:has(.lp),body:has(.lp){background:#F1EFEA;height:auto}
 .lp-hero>*:not(.lp-astro){position:relative}
 .lp-kicker{color:var(--red)}
 .lp-hero .lp-h1{margin:22px auto 0;max-width:15em}
-.lp-lead{max-width:34em;margin:26px auto 0;font-size:clamp(15px,1.6vw,18px);color:var(--sub)}
+.lp-lead{max-width:34em;margin:26px auto 0;font-size:calc(clamp(15px,1.6vw,18px) * var(--bs));color:var(--sub)}
 .lp-ctas{display:flex;gap:10px;justify-content:center;flex-wrap:wrap;margin-top:34px}
 .lp-note{margin-top:16px;color:var(--sub);font-size:10.5px}
 .lp-hero-phones{display:flex;justify-content:center;align-items:flex-end;gap:clamp(10px,2.5vw,34px);margin-top:clamp(48px,7vw,84px);padding-bottom:0}
@@ -61,7 +62,7 @@ html:has(.lp),body:has(.lp){background:#F1EFEA;height:auto}
 /* 무엇인가요 */
 .lp-what .lp-h2{max-width:20em}
 .lp-what-grid{display:grid;grid-template-columns:1.1fr 1fr;gap:clamp(30px,6vw,90px);margin-top:clamp(40px,6vw,70px);align-items:start}
-.lp-what-text p{font-size:clamp(15px,1.5vw,17px);color:var(--sub);margin-bottom:18px}
+.lp-what-text p{font-size:calc(clamp(15px,1.5vw,17px) * var(--bs));color:var(--sub);margin-bottom:18px}
 .lp-chart{border:1px solid var(--ink);padding:18px 18px 22px;background:#F7F5F0}
 .lp-chart figcaption{color:var(--sub);margin-bottom:14px}
 .lp-chart-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));border-left:1px solid var(--line)}
@@ -82,7 +83,7 @@ html:has(.lp),body:has(.lp){background:#F1EFEA;height:auto}
 .lp-feat.rev .lp-feat-text{order:2}
 .lp-feat-text{max-width:30em}
 .lp-num{display:block;color:var(--sub);margin-bottom:16px}
-.lp-feat-text p{margin-top:14px;color:var(--sub);font-size:clamp(15px,1.5vw,17px)}
+.lp-feat-text p{margin-top:14px;color:var(--sub);font-size:calc(clamp(15px,1.5vw,17px) * var(--bs))}
 @media (max-width:760px){.lp-feat,.lp-feat.rev{grid-template-columns:1fr}.lp-feat.rev .lp-feat-text{order:0}.lp-feat .lp-phone{width:min(300px,78vw);margin:0 auto}}
 
 /* 정확도 (검은 판) */

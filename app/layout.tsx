@@ -25,6 +25,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         {children}
+        {/* 디자인 조정판: 주소 끝에 ?edit=1 을 붙였을 때만 불러와요 */}
+        <script dangerouslySetInnerHTML={{ __html: "if(/[?&]edit=1/.test(location.search)){window.addEventListener('load',function(){var s=document.createElement('script');s.src='/edit-panel.js';document.body.appendChild(s)})}" }} />
         {/* Vercel Web Analytics: 방문·조회수 (쿠키 없음). 대시보드 Analytics 탭에서 켜야 수집돼요 */}
         <script defer src="/_vercel/insights/script.js" />
       </body>

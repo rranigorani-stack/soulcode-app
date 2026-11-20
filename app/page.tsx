@@ -8,7 +8,7 @@ import './landing.css';
  * 화면이 그려지기 전에 /app 으로 바로 넘겨요. utm_·lang 같은 추적용 값만 있으면 소개 페이지를 보여줘요.
  */
 const FORWARD = `(function(){try{var s=location.search,h=location.hash,p=new URLSearchParams(s),go=false;
-p.forEach(function(v,k){if(!/^(utm_|fbclid$|gclid$|ref$|lang$)/.test(k))go=true});
+p.forEach(function(v,k){if(!/^(utm_|fbclid$|gclid$|ref$|lang$|edit$)/.test(k))go=true});
 if(h&&h.length>1)go=true;
 if(localStorage.getItem('soulcode.profile'))go=true;
 if((window.matchMedia&&matchMedia('(display-mode: standalone)').matches)||navigator.standalone)go=true;
