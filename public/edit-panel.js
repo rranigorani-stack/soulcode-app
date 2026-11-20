@@ -4,28 +4,30 @@
 (function () {
   if (window.__editPanel) return; window.__editPanel = true;
   var KEY = 'soulcode.designEdit';
-  var isLanding = !!document.querySelector('.lp');
-  var host = isLanding ? document.querySelector('.lp') : document.documentElement;
+  var isLanding = !!document.querySelector('.lp,.lt');
+  var isLetter = !!document.querySelector('.lt');
+  var host = isLanding ? document.querySelector('.lp,.lt') : document.documentElement;
   var cs = getComputedStyle(host);
   var cv = function (n) { return cs.getPropertyValue(n).trim(); };
   var FONTS = {
-    serif: ['Noto Serif KR', 'Nanum Myeongjo', 'Song Myung', 'Gowun Batang', 'Hahmlet', 'Black Han Sans', 'Do Hyeon', 'Nanum Brush Script', 'East Sea Dokdo', 'Noto Sans KR'],
-    sans: ['Noto Sans KR', 'IBM Plex Sans KR', 'Gothic A1', 'Nanum Gothic', 'Gowun Dodum', 'Nanum Myeongjo'],
-    mono: ['DM Mono', 'IBM Plex Mono', 'Space Mono', 'JetBrains Mono', 'Nanum Gothic Coding', 'Noto Sans KR'],
+    serif: ['Special Elite', 'Song Myung', 'Noto Serif KR', 'Nanum Myeongjo', 'Song Myung', 'Gowun Batang', 'Hahmlet', 'Black Han Sans', 'Do Hyeon', 'Nanum Brush Script', 'East Sea Dokdo', 'Noto Sans KR'],
+    sans: ['Courier Prime', 'Nanum Gothic Coding', 'Noto Sans KR', 'IBM Plex Sans KR', 'Gothic A1', 'Nanum Gothic', 'Gowun Dodum', 'Nanum Myeongjo'],
+    mono: ['Courier Prime', 'Special Elite', 'Nanum Gothic Coding', 'DM Mono', 'IBM Plex Mono', 'Space Mono', 'JetBrains Mono', 'Nanum Gothic Coding', 'Noto Sans KR'],
   };
   // 화면별로 바꿀 수 있는 항목 (CSS 변수 이름)
   var FIELDS = isLanding ? [
     { k: 'serif', label: '제목 글꼴', type: 'font', group: 'serif', v: '--serif' },
     { k: 'sans', label: '본문 글꼴', type: 'font', group: 'sans', v: '--sans' },
     { k: 'mono', label: '라벨 글꼴', type: 'font', group: 'mono', v: '--mono' },
-    { k: 'bg', label: '바탕색', type: 'color', v: '--bg' },
+    { k: 'bg', label: isLetter ? '편지지 색' : '바탕색', type: 'color', v: '--bg' },
+  ].concat(isLetter ? [{ k: 'desk', label: '책상(바깥) 색', type: 'color', v: '--desk' }] : []).concat([
     { k: 'ink', label: '글자·단추색', type: 'color', v: '--ink' },
     { k: 'sub', label: '보조 글자색', type: 'color', v: '--sub' },
     { k: 'red', label: '강조색', type: 'color', v: '--red' },
     { k: 'hs', label: '제목 크기', type: 'range', min: 0.7, max: 1.4, step: 0.05, v: '--hs' },
     { k: 'bs', label: '본문 크기', type: 'range', min: 0.85, max: 1.3, step: 0.05, v: '--bs' },
     { k: 'radius', label: '단추 모서리', type: 'range', min: 0, max: 30, step: 1, unit: 'px', v: '--radius' },
-  ] : [
+  ]) : [
     { k: 'serif', label: '제목 글꼴', type: 'font', group: 'serif', v: '--serif' },
     { k: 'sans', label: '본문 글꼴', type: 'font', group: 'sans', css: function (val) { var a = document.querySelector('.app'); if (a) a.style.fontFamily = val; } },
     { k: 'bg', label: '바탕색 (한지)', type: 'color', v: '--hanji', also: function (val) { var a = document.querySelector('.app'); if (a) a.style.background = val; } },
