@@ -216,7 +216,7 @@ label.lb{display:block;font-size:14px;color:var(--ink);margin:20px 0 8px;font-fa
 .card-art .nm{text-align:center}
 .card-art .nm b{display:block;font-size:22px;font-family:'Black Han Sans';font-weight:400}
 .card-art .nm small{font-family:'Archivo Black';font-size:10px;letter-spacing:.15em}
-.card-art.rev .sym{transform:rotate(180deg)}
+.card-art.rev{transform:rotate(180deg)} /* 역방향: 카드 전체를 뒤집어 한눈에 보이게 */
 .hold-ui{display:flex;flex-direction:column;align-items:center;margin-top:22px;gap:10px}
 .hold-ui p{font-family:'Jua';font-size:17px;animation:bob 1.6s ease-in-out infinite}
 .hold-bar{width:200px;height:16px;border:2.5px solid var(--ink);border-radius:99px;background:#fff;overflow:hidden}

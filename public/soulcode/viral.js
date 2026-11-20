@@ -94,12 +94,16 @@
     return pick;
   }
   const pairKey = (A, B) => [A.mbti, A.stem, A.yb, B.nick, B.mbti, B.stem, B.yb].join('|');
+  // 잠긴 동안에는 진짜 내용을 페이지에 넣지 않고 모양만 비슷한 자리표시를 보여줘요 (흐림 효과 너머로 읽히지 않게)
+  const lockedBodies = {};
+  const lockedPreview = (n) => Array.from({ length: n }, () => `<div class="vx-fight"><p>🔥 <b>${TL('싸우는 이유', 'Why you fight', 'ケンカの理由')}</b><br>●●●●●● ●●●● ●●●●●●● ●●●●●</p><p>🩹 <b>${TL('해결법', 'How to fix it', '解決法')}</b><br>●●●●● ●●●●●●● ●●●●</p></div>`).join('');
   function fightHTML(A, B, slot) {
     const key = pairKey(A, B), open = (store.get('soulcode.opened') || {})[key];
     const L = fightLines(A, B);
     const body = L.map(([r, f], i) => `<div class="vx-fight"><p>🔥 <b>${TL('싸우는 이유', 'Why you fight', 'ケンカの理由')} ${i + 1}</b><br>${r}</p><p>🩹 <b>${TL('해결법', 'How to fix it', '解決法')}</b><br>${f}</p></div>`).join('');
+    lockedBodies[slot] = open ? null : body;
     return `<div class="sec-t">${TL('🔥 둘이 싸우는 이유 · 해결법', '🔥 Why you fight · How to fix it', '🔥 ふたりがケンカする理由・解決法')}</div>
-      <div class="panel vx-lock${open ? ' open' : ''}" id="${slot}"><div class="vx-lock-body">${body}</div>${open ? '' : `<div class="vx-veil"><b>${TL(`${esc(B.nick)}님과 부딪히는 지점 ${L.length}가지`, `${L.length} friction points with ${esc(B.nick)}`, `${esc(B.nick)}さんとぶつかるポイント${L.length}つ`)}</b><button class="btn" onclick="vxOpenFight('${slot}','${encodeURIComponent(key)}')">⭐ 10${TL('개로 열기', ' to open', '個で開く')} <small>(${TL('보유', 'you have', '所持')} <span class="vx-star-n">${stars()}</span>)</small></button></div>`}</div>`;
+      <div class="panel vx-lock${open ? ' open' : ''}" id="${slot}"><div class="vx-lock-body">${open ? body : lockedPreview(L.length)}</div>${open ? '' : `<div class="vx-veil"><b>${TL(`${esc(B.nick)}님과 부딪히는 지점 ${L.length}가지`, `${L.length} friction points with ${esc(B.nick)}`, `${esc(B.nick)}さんとぶつかるポイント${L.length}つ`)}</b><button class="btn" onclick="vxOpenFight('${slot}','${encodeURIComponent(key)}')">⭐ 10${TL('개로 열기', ' to open', '個で開く')} <small>(${TL('보유', 'you have', '所持')} <span class="vx-star-n">${stars()}</span>)</small></button></div>`}</div>`;
   }
   window.vxOpenFight = (slot, k) => {
     const key = decodeURIComponent(k);
@@ -108,7 +112,7 @@
       return;
     }
     const o = store.get('soulcode.opened') || {}; o[key] = 1; store.set('soulcode.opened', o);
-    const el = $(slot); if (el) { el.classList.add('open'); const v = el.querySelector('.vx-veil'); v && v.remove(); burst(el, 12); }
+    const el = $(slot); if (el) { const b = el.querySelector('.vx-lock-body'); if (b && lockedBodies[slot]) b.innerHTML = lockedBodies[slot]; el.classList.add('open'); const v = el.querySelector('.vx-veil'); v && v.remove(); burst(el, 12); }
     try { navigator.vibrate && navigator.vibrate(25); } catch (e) {}
   };
 
