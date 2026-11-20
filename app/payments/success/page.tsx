@@ -19,7 +19,7 @@ function Confirm() {
         body: JSON.stringify({ paymentKey: q.get('paymentKey'), orderId: q.get('orderId'), amount: Number(q.get('amount')) }),
       });
       const body = await res.json().catch(() => ({}));
-      if (res.ok) { const t = body.kind === 'ticket'; setMsg(t ? '1회 이용권이 들어왔어요! 🎟️ 잠시 후 이동해요' : 'PRO가 시작됐어요! 💎 잠시 후 이동해요'); setTimeout(() => location.replace(t ? '/?paid=ticket' : '/?paid=1'), 1200); }
+      if (res.ok) { const t = body.kind === 'ticket'; setMsg(t ? '1회 이용권이 들어왔어요! 🎟️ 잠시 후 이동해요' : 'PRO가 시작됐어요! 💎 잠시 후 이동해요'); setTimeout(() => location.replace(t ? '/app?paid=ticket' : '/app?paid=1'), 1200); }
       else { setErr(true); setMsg(body.message || '결제 승인에 실패했어요.'); }
     })();
   }, [q]);
@@ -32,7 +32,7 @@ function Card({ title, msg, showHome }: { title: string; msg: string; showHome: 
       <div className="pw" style={{ textAlign: 'center' }}>
         <h3 className="h-display">{title}</h3>
         <p style={{ margin: '14px 0', lineHeight: 1.6 }}>{msg}</p>
-        {showHome && <a className="btn" href="/">홈으로</a>}
+        {showHome && <a className="btn" href="/app">홈으로</a>}
       </div>
     </div>
   );

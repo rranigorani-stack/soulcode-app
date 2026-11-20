@@ -3,7 +3,8 @@ import type { MetadataRoute } from 'next';
 const base = process.env.NEXT_PUBLIC_SITE_URL || 'https://soulcode-app-orcin.vercel.app';
 
 const pages: { path: string; priority: number }[] = [
-  { path: '', priority: 0.8 },
+  { path: '', priority: 1 },
+  { path: '/app', priority: 0.8 },
   { path: '/en', priority: 0.8 },
   { path: '/ja', priority: 0.8 },
   { path: '/wanted', priority: 1 },

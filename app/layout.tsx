@@ -12,7 +12,7 @@ export const metadata: Metadata = {
   twitter: { card: 'summary_large_image', images: ['/og.png'] },
 };
 
-export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#F7D4F2' };
+export const viewport: Viewport = { width: 'device-width', initialScale: 1, themeColor: '#F3ECDF' };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -21,7 +21,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
         {/* eslint-disable-next-line @next/next/no-page-custom-font */}
-        <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Black+Han+Sans&family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&family=Nanum+Myeongjo:wght@700;800&family=Noto+Serif+KR:wght@600;700;900&family=Nanum+Brush+Script&family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet" />
+        <link href="https://fonts.googleapis.com/css2?family=Archivo+Black&family=Black+Han+Sans&family=Jua&family=Noto+Sans+KR:wght@400;500;700;900&family=Nanum+Myeongjo:wght@700;800&family=Noto+Serif+KR:wght@600;700;900&family=Nanum+Brush+Script&family=DM+Mono:wght@400;500&family=Dela+Gothic+One&family=Zen+Maru+Gothic:wght@500;700&display=swap" rel="stylesheet" />
       </head>
       <body>
         {children}

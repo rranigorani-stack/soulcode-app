@@ -117,7 +117,7 @@ function emailModal() {
     const email = input.value.trim();
     if (!/^\S+@\S+\.\S+$/.test(email)) { window.toast?.('이메일 주소를 확인해주세요'); return; }
     send.setAttribute('disabled', '');
-    const { error } = await supabase!.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + '/' } });
+    const { error } = await supabase!.auth.signInWithOtp({ email, options: { emailRedirectTo: location.origin + '/app' } });
     send.removeAttribute('disabled');
     if (error) { window.toast?.('메일을 보내지 못했어요. 잠시 후 다시 시도해주세요'); return; }
     wrap.remove();
@@ -193,7 +193,7 @@ export async function startSoulcode() {
     window.soulConfig.serverPro = !!session;
     const providerName: Record<string, string> = { kakao: '카카오 계정', apple: 'Apple 계정', google: 'Google 계정', email: '이메일 계정' };
     window.soulAuth = {
-      signIn: (provider) => { supabase!.auth.signInWithOAuth({ provider, options: { redirectTo: location.origin + '/' } }); },
+      signIn: (provider) => { supabase!.auth.signInWithOAuth({ provider, options: { redirectTo: location.origin + '/app' } }); },
       emailPrompt: emailModal,
       signOut: async () => { await supabase!.auth.signOut(); },
       label: () => providerName[session?.user.app_metadata?.provider || 'email'] || '내 계정',
@@ -275,8 +275,8 @@ export async function startSoulcode() {
   });
 
   const qs = new URLSearchParams(location.search);
-  if (qs.get('paid') === '1') { window.toast?.('PRO가 시작됐어요! 💎'); history.replaceState(null, '', '/'); }
-  if (qs.get('paid') === 'ticket') { history.replaceState(null, '', '/'); setTimeout(() => (window as unknown as { afterTicket?: () => void }).afterTicket?.(), 500); }
+  if (qs.get('paid') === '1') { window.toast?.('PRO가 시작됐어요! 💎'); history.replaceState(null, '', location.pathname); }
+  if (qs.get('paid') === 'ticket') { history.replaceState(null, '', location.pathname); setTimeout(() => (window as unknown as { afterTicket?: () => void }).afterTicket?.(), 500); }
 
   if ('serviceWorker' in navigator && process.env.NODE_ENV === 'production') {
     navigator.serviceWorker.register('/sw.js').catch(() => {});

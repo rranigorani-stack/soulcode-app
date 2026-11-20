@@ -15,7 +15,7 @@ export function LegalPage({ title, children, lang = 'ko' }: { title: string; chi
   return (
     <div className="legal-wrap" lang={lang}>
       <article className="legal">
-        <Link href={lang === 'ko' ? '/' : `/?lang=${lang}`} className="legal-back">{t.back}</Link>
+        <Link href={lang === 'ko' ? '/app' : `/app?lang=${lang}`} className="legal-back">{t.back}</Link>
         <h1 className="h-display">{title}</h1>
         <p className="legal-date">{t.date}: {DATE[lang]}</p>
         {t.note && <p className="legal-date"><i>{t.note}</i></p>}

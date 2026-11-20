@@ -7,7 +7,7 @@
  * app.js 뒤에 로드돼요. app.js의 전역(TL, LG, store, $, toast, profile, saju …)을 그대로 써요. */
 (function () {
   if (typeof TL !== 'function') return;
-  const PFX = LG === 'ko' ? '/' : '/' + LG;
+  const PFX = LG === 'ko' ? '/app' : '/' + LG;
   const device = () => { try { let d = localStorage.getItem('soulcode.device'); if (!d) { d = crypto.randomUUID(); localStorage.setItem('soulcode.device', d); } return d; } catch (e) { return ''; } };
   const api = async (path, opt = {}) => { const r = await fetch('/api/duo' + path, { ...opt, headers: { 'content-type': 'application/json', 'x-ask-device': device(), ...(opt.headers || {}) } }); const j = await r.json().catch(() => ({})); if (!r.ok) throw Object.assign(new Error(j.code || 'error'), { code: j.code }); return j; };
   let ready = null; const online = () => !!(window.soulConfig) && ready !== false;

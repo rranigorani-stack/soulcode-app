@@ -1,6 +1,6 @@
 /* 소울코드 서비스워커: 오프라인에서도 앱 화면과 사주 계산이 동작하도록 정적 파일을 캐시해요. */
-const CACHE = 'soulcode-v4';
-const CORE = ['/', '/soulcode/app.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
+const CACHE = 'soulcode-v5';
+const CORE = ['/app', '/soulcode/app.js', '/manifest.webmanifest', '/icons/icon-192.png', '/icons/icon-512.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then((c) => c.addAll(CORE)).then(() => self.skipWaiting()));
@@ -13,7 +13,9 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(req.url);
   if (req.method !== 'GET' || url.origin !== location.origin || url.pathname.startsWith('/api/') || url.pathname.startsWith('/payments/')) return;
   if (req.mode === 'navigate') {
-    e.respondWith(fetch(req).then((res) => { caches.open(CACHE).then((c) => c.put('/', res.clone())); return res; }).catch(() => caches.match('/')));
+    // 오프라인 대비 저장은 앱(/app)만. 소개 페이지는 항상 네트워크에서 받아요
+    const key = url.pathname === '/app' ? '/app' : null;
+    e.respondWith(fetch(req).then((res) => { if (key && res.ok) caches.open(CACHE).then((c) => c.put(key, res.clone())); return res; }).catch(() => caches.match('/app')));
     return;
   }
   e.respondWith(

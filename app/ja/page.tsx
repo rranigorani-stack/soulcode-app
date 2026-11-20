@@ -12,8 +12,8 @@ export const metadata: Metadata = {
 export default function Page() {
   return (
     <>
-      <script dangerouslySetInnerHTML={{ __html: "var q=location.search.slice(1);location.replace('/?lang=ja'+(q?'&'+q:''))" }} />
-      <p style={{ textAlign: 'center', marginTop: 80 }}><a href="/?lang=ja">SOULCODE →</a></p>
+      <script dangerouslySetInnerHTML={{ __html: "var q=location.search.slice(1);location.replace('/app?lang=ja'+(q?'&'+q:''))" }} />
+      <p style={{ textAlign: 'center', marginTop: 80 }}><a href="/app?lang=ja">SOULCODE →</a></p>
     </>
   );
 }
