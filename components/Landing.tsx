@@ -2,268 +2,39 @@ import { bizLines } from '@/lib/legal';
 
 export type LandingLang = 'ko' | 'en';
 
-/* 콘셉트: 근대(1930년대)에 타자기로 한 자 한 자 쳐서 보낸 편지.
-   누런 편지지, 번진 먹, 붉은 도장, 우표, 테이프로 붙인 사진. */
+/*
+ * 소개 페이지 — "한 권의 화첩".
+ * 구름이 걷히며 청록산수가 드러나고, 장(章)을 넘길 때마다 그림이 펼쳐져요.
+ * 그림은 Figma AI로 새로 그린 것 (public/landing/ai). 스타일은 app/landing.css (.sc5 안에서만 적용).
+ * 마크업과 스크립트는 정적인 문자열이라 서버에서 그대로 그려지고, 스크립트는 처음 열 때 한 번 실행돼요.
+ */
 
-const NUM_KO = ['一', '二', '三', '四'];
+const MARKUP = "\n<svg width=\"0\" height=\"0\" style=\"position:absolute\" aria-hidden=\"true\"><defs>\n<symbol id=\"f-good\" viewBox=\"0 0 22 16\"><circle cx=\"7\" cy=\"5\" r=\"1.3\" fill=\"currentColor\"/><circle cx=\"15\" cy=\"5\" r=\"1.3\" fill=\"currentColor\"/><path d=\"M5 10q6 5 12 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.2\"/></symbol>\n<symbol id=\"f-mid\" viewBox=\"0 0 22 16\"><circle cx=\"7\" cy=\"5\" r=\"1.3\" fill=\"currentColor\"/><circle cx=\"15\" cy=\"5\" r=\"1.3\" fill=\"currentColor\"/><path d=\"M5 12h12\" stroke=\"currentColor\" stroke-width=\"1.2\"/></symbol>\n<symbol id=\"f-bad\" viewBox=\"0 0 22 16\"><circle cx=\"7\" cy=\"5\" r=\"1.3\" fill=\"currentColor\"/><circle cx=\"15\" cy=\"5\" r=\"1.3\" fill=\"currentColor\"/><path d=\"M5 14q6 -5 12 0\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.2\"/></symbol>\n<g id=\"sym-src\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.3\" stroke-linecap=\"round\" stroke-linejoin=\"round\">\n<symbol id=\"g0\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"7\"/><circle cx=\"12\" cy=\"12\" r=\"1.2\" fill=\"currentColor\"/></symbol>\n<symbol id=\"g1\" viewBox=\"0 0 24 24\"><circle cx=\"9\" cy=\"12\" r=\"6\"/><circle cx=\"15\" cy=\"12\" r=\"6\"/></symbol>\n<symbol id=\"g2\" viewBox=\"0 0 24 24\"><path d=\"M5 9q7 9 14 0\"/><circle cx=\"12\" cy=\"5\" r=\"1.6\"/><path d=\"M12 15v5\"/></symbol>\n<symbol id=\"g3\" viewBox=\"0 0 24 24\"><path d=\"M6 18L18 6M10 6h8v8\"/></symbol>\n<symbol id=\"g4\" viewBox=\"0 0 24 24\"><path d=\"M12 3l7 9-7 9-7-9z\"/></symbol>\n<symbol id=\"g5\" viewBox=\"0 0 24 24\"><rect x=\"5\" y=\"5\" width=\"14\" height=\"14\"/><path d=\"M5 12h14\"/></symbol>\n<symbol id=\"g6\" viewBox=\"0 0 24 24\"><path d=\"M12 3v18M7 8l5-5 5 5M8 15h8\"/></symbol>\n<symbol id=\"g7\" viewBox=\"0 0 24 24\"><path d=\"M5 11q7-8 14 0M12 11v10M8 21h8\"/></symbol>\n<symbol id=\"g8\" viewBox=\"0 0 24 24\"><path d=\"M15 4a8 8 0 1 0 0 16a6.5 6.5 0 0 1 0-16z\"/></symbol>\n<symbol id=\"g9\" viewBox=\"0 0 24 24\"><path d=\"M3 7q4.5-2 9 1q4.5-3 9-1v11q-4.5-2-9 1q-4.5-3-9-1z M12 8v11\"/></symbol>\n<symbol id=\"e-Wood\" viewBox=\"0 0 24 24\"><path d=\"M12 21V4M12 10l-5-4M12 14l5-4\"/></symbol>\n<symbol id=\"e-Fire\" viewBox=\"0 0 24 24\"><path d=\"M12 4l8 15H4z\"/></symbol>\n<symbol id=\"e-Earth\" viewBox=\"0 0 24 24\"><rect x=\"5\" y=\"5\" width=\"14\" height=\"14\"/></symbol>\n<symbol id=\"e-Metal\" viewBox=\"0 0 24 24\"><circle cx=\"12\" cy=\"12\" r=\"7.5\"/></symbol>\n<symbol id=\"e-Water\" viewBox=\"0 0 24 24\"><path d=\"M3 9q4.5-4 9 0t9 0M3 16q4.5-4 9 0t9 0\"/></symbol>\n</g></defs></svg>\n\n<canvas id=\"dust\"></canvas>\n<div id=\"intro\" aria-hidden=\"true\"><div class=\"half l\"></div><div class=\"half qr\"></div><div class=\"seal\">命</div></div>\n<nav id=\"nav\"><a class=\"qlogo\" href=\"#top\">SoulCode</a><div class=\"qr mono\"><a class=\"hide\" href=\"#saju\">기록</a><a class=\"hide\" href=\"#chart\">코드</a><a class=\"hide\" href=\"#gods\">해독</a><a class=\"hide\" href=\"#lens\">렌즈</a><a href=\"#start\">시작하기</a></div></nav>\n\n<main>\n<header class=\"hero\" id=\"top\">\n  <div class=\"bg\" id=\"herobg\"></div>\n  <div class=\"hcopy\">\n    <div class=\"ch c-center h-in\"><span class=\"qn\">序</span><span class=\"mono\">Prologue · Korean Saju</span></div>\n    <h1 aria-label=\"SoulCode.\">SoulCode.</h1>\n    <p class=\"qtag h-in\" style=\"transition-delay:1.2s\">당신이 태어난 순간, 하늘은 여덟 글자를 적어 두었습니다.<br>우리는 그것을 코드라고 부릅니다.</p>\n    <div class=\"btns h-in\" style=\"transition-delay:1.45s\"><a class=\"b mono\" href=\"/wanted\">수배전단 뽑기</a><a class=\"b f mono\" href=\"/app\">내 사주 보기</a></div>\n    <div class=\"quip h-in\" style=\"transition-delay:1.7s\">“반박 시, 당신 말이 맞습니다.”</div>\n  </div>\n</header>\n\n<section class=\"sec night dk\" id=\"saju\">\n  <div class=\"wm\">壹</div>\n  <div class=\"ch c-center rv\"><span class=\"qn\">第一章</span><span class=\"mono\">The Record</span></div>\n  <h2 class=\"rv d1\">옛사람들은 하늘을<br>별이 아니라 달력에 받아 적었습니다</h2>\n  <p class=\"lead rv d2\">해와 달이 어디쯤 있는지, 계절의 마디가 어디서 꺾이는지. 조선의 관상감은 그것을 날짜에 새겼고, 사람이 태어난 순간도 그렇게 기록되었습니다. 네 기둥, 여덟 글자로.</p>\n  <div class=\"dragon\" id=\"dragonbox\"><img id=\"dragon\" src=\"/landing/ai/dragon.jpg\" alt=\"금빛 구름 사이로 여의주를 향해 날아가는 청룡\"><div class=\"glint\"></div></div>\n  <div class=\"three\">\n    <figure class=\"rv\"><div class=\"orb\"><img src=\"/landing/ai/yinyang.jpg\" alt=\"구름에 싸인 달과 해를 물길이 잇는 그림\"></div><h3>음양 陰陽</h3><p>해와 달, 밝음과 어둠. 모든 글자는 둘 중 한쪽의 결을 띱니다. 당신이 왜 밤에 더 똑똑해지는지도 여기서 나옵니다.</p></figure>\n    <figure class=\"rv d1\"><div class=\"orb\"><img src=\"/landing/ai/ohaeng.jpg\" alt=\"소나무·불꽃·바위산·폭포·금빛 종이 한 섬에 모인 그림\"></div><h3>오행 五行</h3><p>나무·불·흙·쇠·물. 다섯 기운이 서로 낳고 누르는 관계로 성격과 궁합을 읽습니다.</p></figure>\n    <figure class=\"rv d2\"><div class=\"orb\"><img src=\"/landing/ai/jeolgi.jpg\" alt=\"스물네 칸으로 나뉜 천문도와 매화 가지\"></div><h3>절기 節氣</h3><p>한 해를 스물네 마디로 나눈 절기로 달을 정합니다. 1월생이어도 입춘 전이면 지난해 사람입니다.</p></figure>\n  </div>\n</section>\n\n<section class=\"sec\" id=\"chart\">\n  <div class=\"wm\">貳</div>\n  <div class=\"wrap\">\n    <div class=\"eight\" id=\"eight\">\n      <div class=\"c\"><div class=\"l mono\"><span>時</span>Hour</div><b>丙</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Fire\"/></svg>Fire</i><b>寅</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Wood\"/></svg>Wood</i></div>\n      <div class=\"c qme\"><div class=\"l mono\"><span>日</span>Day</div><b>甲</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Wood\"/></svg>Wood</i><b>子</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Water\"/></svg>Water</i><em class=\"mono\">You</em></div>\n      <div class=\"c\"><div class=\"l mono\"><span>月</span>Month</div><b>辛</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Metal\"/></svg>Metal</i><b>巳</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Fire\"/></svg>Fire</i></div>\n      <div class=\"c\"><div class=\"l mono\"><span>年</span>Year</div><b>庚</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Metal\"/></svg>Metal</i><b>午</b><i class=\"mono\"><svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"1.6\"><use href=\"#e-Fire\"/></svg>Fire</i></div>\n    </div>\n    <div class=\"split\">\n      <div class=\"wheel\" id=\"wheel\"><div class=\"halo\"></div><img src=\"/landing/ai/ohaeng_wheel.jpg\" alt=\"소나무·불꽃·바위산·종·물결 다섯 원이 별 모양으로 이어진 오행도\"></div>\n      <div>\n        <div class=\"ch rv\"><span class=\"qn\">第二章</span><span class=\"mono\">The Code</span></div>\n        <h2 class=\"rv d1\">여덟 글자,<br>당신의 소스코드</h2>\n        <p class=\"lead rv d2\">네 기둥에 두 글자씩. 그중 태어난 날의 윗글자가 ‘나’, 일간입니다. 나머지 일곱 글자는 나를 둘러싼 날씨예요. 소울코드는 한국천문연구원 만세력과 진태양시로 이 코드를 한 글자도 틀리지 않게 받아 적습니다.</p>\n        <div class=\"tabs rv d2\" role=\"group\" aria-label=\"일간 예시\">\n          <button aria-pressed=\"true\" data-i=\"0\">甲 나무</button><button aria-pressed=\"false\" data-i=\"1\">丙 불</button><button aria-pressed=\"false\" data-i=\"2\">戊 흙</button><button aria-pressed=\"false\" data-i=\"3\">庚 쇠</button><button aria-pressed=\"false\" data-i=\"4\">壬 물</button>\n        </div>\n        <div class=\"card rv d3\" id=\"card\" aria-live=\"polite\">\n          <p class=\"qt\" id=\"ct\">甲子 — 물 위의 큰 나무</p>\n          <div class=\"qd mono\" id=\"cd\">Day master · 일간 甲 · Wood</div>\n          <p id=\"cb\">곧게 자라려는 고집이 있고, 남이 꺾으려 할수록 더 단단해집니다. 대신 쉬는 법을 모릅니다. 오늘은 물을 좀 주세요.</p>\n        </div>\n        <a class=\"link mono rv d4\" href=\"/app\">내 원국 펼치기 →</a>\n      </div>\n    </div>\n  </div>\n</section>\n\n<section class=\"sec decode\" id=\"gods\">\n  <div class=\"wm\">參</div>\n  <div class=\"wrap split\">\n    <div class=\"panelwrap\"><div class=\"qpanel scroll qv\"><img src=\"/landing/ai/sipjangsaeng.jpg\" alt=\"해·학·소나무·폭포·사슴·거북·물결이 담긴 십장생도\"></div></div>\n    <div>\n      <div class=\"ch rv\"><span class=\"qn\">第三章</span><span class=\"mono\">Decoding · 十神</span></div>\n      <h2 class=\"rv d1\">열 가지 기운으로<br>오늘을 해독합니다</h2>\n      <p class=\"lead rv d2\">일간을 기준으로 나머지 글자가 어떤 관계인지에 따라 열 가지 이름이 붙습니다. 오늘의 일진이 그중 어느 기운을 건드리는지 표정으로 보여드려요.</p>\n      <div class=\"legend mono rv d3\"><span><svg viewBox=\"0 0 22 16\"><use href=\"#f-good\"/></svg>좋음</span><span><svg viewBox=\"0 0 22 16\"><use href=\"#f-mid\"/></svg>평범</span><span><svg viewBox=\"0 0 22 16\"><use href=\"#f-bad\"/></svg>조심</span><span id=\"gday\">甲 일간의 오늘 예시</span></div>\n      <ul class=\"glist\" id=\"glist\"></ul>\n    </div>\n  </div>\n</section>\n\n<section class=\"sec lens\" id=\"lens\">\n  <div class=\"wm\">肆</div>\n  <div class=\"ch c-center rv\"><span class=\"qn\">第四章</span><span class=\"mono\">Three lenses</span></div>\n  <h2 class=\"rv d1\">오래된 코드를,<br>오늘의 언어로 읽습니다</h2>\n  <div class=\"three\">\n    <figure class=\"rv\"><div class=\"pic\"><img class=\"float\" src=\"/landing/ai/lens_saju.jpg\" alt=\"바위에 깊이 뿌리내린 붉은 소나무\"></div><h3>Saju · 四柱</h3><p class=\"qk\">뿌리</p><p>바뀌지 않는 타고난 설계도. 당신이 어떤 재료로 만들어졌는지.</p></figure>\n    <figure class=\"rv d1\"><div class=\"pic\"><img class=\"float\" src=\"/landing/ai/lens_mbti.jpg\" alt=\"산수가 비치는 청동 거울\"></div><h3>MBTI</h3><p class=\"qk\">결</p><p>지금의 당신이 세상을 대하는 방식. 설계도가 실제로 어떻게 지어졌는지.</p></figure>\n    <figure class=\"rv d2\"><div class=\"pic\"><img class=\"float\" src=\"/landing/ai/lens_tarot.jpg\" alt=\"초승달과 산이 그려진 카드 한 장과 흩날리는 꽃잎\"></div><h3>Tarot · 塔羅</h3><p class=\"qk\">날씨</p><p>오늘 하루, 카드 한 장의 귓속말. 같은 집에도 매일 다른 바람이 붑니다.</p></figure>\n  </div>\n  <p class=\"after rv\">셋이 같은 말을 할 때, 그건 아마 진짜입니다.</p>\n</section>\n\n<section class=\"sec lines dk\" id=\"daily\">\n  <div class=\"wm\">伍</div>\n  <div class=\"head\"><div><div class=\"ch rv\"><span class=\"qn\">第五章</span><span class=\"mono\">Daily talisman</span></div><h2 class=\"rv d1\" style=\"margin:0\">오늘의 문장</h2></div><div class=\"arrows\"><button id=\"prev\" aria-label=\"이전 문장\">←</button><button id=\"next\" aria-label=\"다음 문장\">→</button></div></div>\n  <div class=\"stage\"><div class=\"qtrack\" id=\"track\"></div></div>\n  <div class=\"dots\" id=\"dots\"></div>\n  <p class=\"qnote\">앱이 일간별로 보내는 하루 한 줄 예시입니다.</p>\n</section>\n\n<section class=\"moon\" id=\"start\">\n  <div class=\"bg\" id=\"moonbg\"></div>\n  <div class=\"inner\">\n    <div class=\"ch c-center rv\"><span class=\"qn\">終</span><span class=\"mono\">Epilogue</span></div>\n    <h2 class=\"rv d1\">이제 당신의 코드를<br>읽을 차례입니다</h2>\n    <p class=\"rv d2\">생년월일과 태어난 시간이면 충분합니다. 음력도 괜찮아요. 아직 망설여진다면, 수배전단부터 뽑아 보셔도 좋습니다.</p>\n    <div class=\"btns rv d3\" style=\"margin-top:26px\"><a class=\"b mono\" href=\"/wanted\">수배전단 뽑기</a><a class=\"b f mono\" href=\"/app\">내 사주 보기</a></div>\n  </div>\n</section>\n</main>\n__FOOTER__\n\n";
 
-const T = {
-  ko: {
-    app: '/app', other: 'English', otherHref: '/?lang=en',
-    org: '소울코드 사주연구소', orgSub: '四柱 · MBTI · 타로',
-    to: '받는 이', toV: '태어난 시각을 아는 그대에게',
-    from: '보내는 이', fromV: '소울코드',
-    re: '용건', reV: '당신의 여덟 글자에 관하여',
-    h1: ['태어난 시각까지 읽는', '한국의 점성술.'],
-    open: '그대에게.',
-    lead: '별자리는 태어난 날을 봅니다. 사주는 태어난 시각을 봅니다. 저희는 한국천문연구원 만세력으로 그대의 여덟 글자를 계산해, 오늘의 말로 풀어 드리고자 이 편지를 씁니다. MBTI와 타로도 함께 동봉합니다.',
-    typo: '운명', typoFix: '기질',
-    cta: '편지 열어보기', how: '계산 방법부터 보기',
-    note: '가입 없음 · 1분 · 재미로 읽어 주세요',
-    photos: ['오늘의 카드', '소울 타입', '궁합'],
-    s1: '사주란 무엇인가',
-    s1p: [
-      '사주(四柱)는 태어난 해·달·날·시, 네 개의 기둥으로 사람을 읽는 한국의 오래된 점성술입니다. 기둥마다 하늘의 글자(천간)와 땅의 글자(지지)가 하나씩, 모두 여덟 글자가 됩니다.',
-      '그 여덟 글자 속 나무·불·흙·쇠·물, 다섯 기운의 균형이 그대가 타고난 기질을 말해 줍니다.',
-    ],
-    chartCap: '예시 원국 (설명용)',
-    cols: ['시', '일', '월', '년'],
-    el: { 木: '나무', 火: '불', 土: '흙', 金: '쇠', 水: '물' } as Record<string, string>,
-    me: '나',
-    s2: '이 편지로 할 수 있는 일',
-    feats: [
-      { t: '소울 타입', d: '타고난 기운(일간) × MBTI로 만든 그대만의 인물상. 원국, 오행 균형, 십 년마다 바뀌는 대운까지 적어 드립니다.', img: 'soul' },
-      { t: '오늘의 카드', d: '꾹 눌러 뒤집는 타로 한 장과, 오늘의 일진이 그대와 맺는 관계. 자정마다 새 카드가 들어옵니다.', img: 'daily' },
-      { t: '고민 타로', d: '연애·진로·인간관계·금전. 고민 하나를 놓고 과거·현재·미래 세 장으로 흐름을 봅니다.', img: 'spread' },
-      { t: '궁합', d: '생일과 MBTI만 있으면 됩니다. 배우자 자리, 합과 충, 서로에게 어떤 존재인지, 둘의 때까지.', img: 'match' },
-    ],
-    s3: '계산에 관하여',
-    s3lead: '재미로 읽으시더라도, 계산만큼은 정확히 하였습니다.',
-    ledger: [['여덟', '글자'], ['예순', '갑자'], ['스물넷', '절기'], ['서른둘', '분 보정']],
-    prec: [
-      ['입춘의 분 단위', '사주의 해는 1월 1일도 설날도 아닌 입춘 절입 시각에 바뀝니다. 2월 4일생은 태어난 시각에 따라 해가 달라질 수 있습니다.'],
-      ['진태양시 보정', '서울의 시계는 해보다 약 32분 빠릅니다. 시주를 정할 때 이 차이를 바로잡습니다.'],
-      ['서머타임 연도', '한국이 서머타임을 썼던 해에 태어나셨다면, 그 한 시간도 되돌려 계산합니다.'],
-      ['음력과 윤달', '음력 생일, 윤달 생일도 그대로 적어 주시면 양력으로 옮겨 계산합니다.'],
-    ],
-    src: '만세력 자료: 한국천문연구원(KASI) 기반 공개 소스 manseryeok',
-    close: '부디 그대의 여덟 글자를 열어 보시기를 바랍니다.',
-    sign: '소울코드 드림',
-    seal: ['소울', '코드'],
-    ps: '추신.',
-    psT: '가입은 필요 없고, 일 분이면 충분합니다. 다만 중요한 결정은 그대 스스로, 믿을 만한 사람과 함께 내리십시오.',
-    stamp: '열람',
-    foot: [['이용약관', '/terms'], ['개인정보처리방침', '/privacy'], ['환불정책', '/refund'], ['수배전단', '/wanted'], ['친구들이 보는 나', '/ask']],
-    postage: '소울코드 우표',
-  },
-  en: {
-    app: '/app?lang=en', other: '한국어', otherHref: '/?lang=ko',
-    org: 'SOULCODE Saju Institute', orgSub: 'Saju · MBTI · Tarot',
-    to: 'To', toV: 'Whoever knows the hour they were born',
-    from: 'From', fromV: 'SOULCODE',
-    re: 'Re', reV: 'Your eight characters',
-    h1: ['Korean astrology,', 'read from the hour you were born.'],
-    open: 'Dear you,',
-    lead: 'Western astrology reads the day you were born. Saju reads the hour. We calculate your eight characters with Korea Astronomy Institute calendar data and write them back to you in plain words. MBTI and tarot are enclosed.',
-    typo: 'fate', typoFix: 'temperament',
-    cta: 'Open the letter', how: 'See how it is calculated',
-    note: 'No sign-up · 1 minute · Just for fun',
-    photos: ['Daily card', 'Soul type', 'Compatibility'],
-    s1: 'What Saju is',
-    s1p: [
-      'Saju (四柱, "four pillars") is Korea\'s traditional way of reading a person from the year, month, day and hour of birth. Each pillar holds a heavenly stem and an earthly branch: eight characters in all.',
-      'The balance of five elements inside them, Wood, Fire, Earth, Metal and Water, describes the temperament you were born with.',
-    ],
-    chartCap: 'Sample chart (for illustration)',
-    cols: ['Hour', 'Day', 'Month', 'Year'],
-    el: { 木: 'Wood', 火: 'Fire', 土: 'Earth', 金: 'Metal', 水: 'Water' } as Record<string, string>,
-    me: 'YOU',
-    s2: 'What this letter can do',
-    feats: [
-      { t: 'Soul type', d: 'Your day master × your MBTI, as one character. With your full chart, five-element balance and 10-year luck cycles.', img: 'soul' },
-      { t: 'Daily card', d: 'Hold to flip today\'s tarot card, read against the day\'s energy on the Korean calendar. A new card every midnight.', img: 'daily' },
-      { t: 'Ask the cards', d: 'Love, career, friends or money. Past, present and future for one specific worry.', img: 'spread' },
-      { t: 'Compatibility', d: 'Just birthdays and MBTI. Spouse palace, harmonies and clashes, what you are to each other, and your timing.', img: 'match' },
-    ],
-    s3: 'On the calculation',
-    s3lead: 'Read it for fun, but the math is done properly.',
-    ledger: [['8', 'characters'], ['60', 'cycle'], ['24', 'solar terms'], ['32', 'min corrected']],
-    prec: [
-      ['The minute of 입춘', 'The Saju year turns at the solar term 입춘, not Jan 1 or Lunar New Year. Born on Feb 4? Your hour decides the year.'],
-      ['True solar time', 'Seoul\'s clock runs about 32 minutes ahead of the sun. The hour pillar is corrected for it.'],
-      ['Daylight-saving years', 'Born in a year when Korea used daylight saving? That hour is taken back out.'],
-      ['Lunar & leap months', 'Enter a lunar birthday, even in a leap month, and it is converted for you.'],
-    ],
-    src: 'Calendar data: open-source manseryeok, based on Korea Astronomy and Space Science Institute data',
-    close: 'I hope you will open your eight characters.',
-    sign: 'Yours, SOULCODE',
-    seal: ['소울', '코드'],
-    ps: 'P.S.',
-    psT: 'No sign-up, one minute is enough. Make the big decisions yourself, with people you trust.',
-    stamp: 'OPEN',
-    foot: [['Terms', '/en/terms'], ['Privacy', '/en/privacy'], ['WANTED poster', '/en/wanted'], ['How friends see me', '/en/ask']],
-    postage: 'SOULCODE POST',
-  },
-};
+const SCRIPT = "\n{\nconst SC=document.querySelector('.sc5');const $=s=>document.querySelector(s),$$=s=>[...document.querySelectorAll(s)];\nconst RM=matchMedia('(prefers-reduced-motion: reduce)').matches;\n\n/* title letters */\nconst h1=$('h1');h1.innerHTML=[...'SoulCode.'].map((c,i)=>`<span style=\"transition-delay:${.55+i*.08}s\">${c}</span>`).join('');\n\n/* intro: seal stamps, clouds part */\nconst intro=$('#intro');const root=document.documentElement;\nfunction open(){intro.classList.remove('turn');intro.classList.add('qopen');SC.classList.add('opened');root.style.overflow='';setTimeout(()=>{if(intro.classList.contains('qopen'))intro.classList.add('gone')},3600)}\nif(RM){SC.classList.add('opened')}else{root.style.overflow='hidden';const im=new Image();im.src='/landing/ai/hero1.jpg';Promise.race([im.decode().catch(()=>{}),new Promise(r=>setTimeout(r,1600))]).then(()=>setTimeout(open,900))}\n\n/* page turn: clouds close over the page, jump, clouds part again */\nconst L=$('#intro .l'),R=$('#intro .qr'),SE=$('#intro .seal');let busy=false;\n$$('a[href^=\"#\"]').forEach(a=>a.addEventListener('click',async e=>{const t=$(a.getAttribute('href'));if(!t)return;e.preventDefault();\n if(RM){t.scrollIntoView();return}\n if(busy)return;busy=true;\n intro.className='wa';const ez='cubic-bezier(.75,0,.2,1)';\n const bg=intro.animate([{backgroundColor:'#D9C29C00'},{backgroundColor:'#D9C29C'}],{duration:900,easing:'ease-in',fill:'forwards'});\n L.animate([{transform:'translateX(-100%) scale(1.15)',opacity:0},{transform:'none',opacity:1}],{duration:1000,easing:ez,fill:'forwards'});\n R.animate([{transform:'scaleX(-1) translateX(-100%) scale(1.15)',opacity:0},{transform:'scaleX(-1)',opacity:1}],{duration:1000,easing:ez,fill:'forwards'});\n SE.animate([{opacity:0,transform:'scale(2)'},{opacity:1,transform:'scale(1)'}],{duration:500,delay:650,easing:'cubic-bezier(.3,1.6,.5,1)',fill:'forwards'});\n await new Promise(r=>setTimeout(r,1250));\n window.scrollTo({top:t.offsetTop,behavior:'instant'});frame();\n SE.animate([{opacity:1},{opacity:0}],{duration:400,fill:'forwards'});\n bg.reverse();\n L.animate([{transform:'none',opacity:1},{transform:'translateX(-100%) scale(1.15)',opacity:0}],{duration:1800,easing:ez,fill:'forwards'});\n const fin=R.animate([{transform:'scaleX(-1)',opacity:1},{transform:'scaleX(-1) translateX(-100%) scale(1.15)',opacity:0}],{duration:1800,easing:ez,fill:'forwards'});\n await fin.finished;intro.className='wa gone';busy=false}));\n\n/* reveals */\nconst io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.18});\n$$('.rv,#eight,#wheel,#glist,#dragonbox,.orb').forEach(el=>io.observe(el));\nconst io3=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.querySelector('.scroll').classList.add('in');io3.unobserve(e.target)}}),{threshold:.2});\n$$('.scroll').forEach(s=>io3.observe(s.parentElement));\nconst io2=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting)e.target.classList.add('qon')}),{threshold:.25});\n$$('.sec').forEach(s=>io2.observe(s));\n$$('.eight b').forEach((b,i)=>b.style.transitionDelay=(i*.12)+'s');\n\n/* scroll-driven: nav, dragon flight, moon parallax */\nconst nav=$('#nav'),dg=$('#dragon'),moonbg=$('#moonbg'),darks=$$('.dk,.moon');\nfunction frame(){const y=scrollY;\n const onDark=darks.some(s=>{const r=s.getBoundingClientRect();return r.top<50&&r.bottom>50});\n nav.classList.toggle('dark',onDark);nav.classList.toggle('solid',y>60&&!onDark);\n const b=dg.getBoundingClientRect();const p=(innerHeight-b.top)/(innerHeight+b.height);dg.style.transform=`translateX(${(0.5-p)*14}%) translateY(${Math.sin(p*Math.PI*2)*8}px)`;\n const m=moonbg.getBoundingClientRect();moonbg.style.transform=`translateY(${Math.max(0,m.top)*.18}px) scale(${1+Math.max(0,m.top)/innerHeight*.06})`}\nlet tk=false;addEventListener('scroll',()=>{if(!tk){tk=true;requestAnimationFrame(()=>{tk=false;frame()})}},{passive:true});frame();\n\n/* hero: painting follows the cursor a little */\nconst hero=$('.hero');hero.addEventListener('pointermove',e=>{const r=hero.getBoundingClientRect();$('#herobg').style.setProperty('--mx',((e.clientX/r.width-.5)*-14)+'px');$('#herobg').style.setProperty('--my',((e.clientY/r.height-.5)*-8)+'px')});\n\n/* gold dust drifting upward */\nconst cv=$('#dust'),x=cv.getContext('2d');let W,H,P=[];\nfunction size(){const d=Math.min(devicePixelRatio||1,2);W=innerWidth;H=innerHeight;cv.width=W*d;cv.height=H*d;x.setTransform(d,0,0,d,0,0);P=Array.from({length:Math.round(W*H/22000)},()=>({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.6+.3,s:Math.random()*.35+.08,w:Math.random()*6.28,a:Math.random()*.6+.2}))}\nfunction dust(t){x.clearRect(0,0,W,H);for(const p of P){p.y-=p.s;p.x+=Math.sin(t/1800+p.w)*.25;if(p.y<-5){p.y=H+5;p.x=Math.random()*W}const tw=.55+.45*Math.sin(t/600+p.w*3);x.globalAlpha=p.a*tw;x.fillStyle='#F2D58C';x.beginPath();x.arc(p.x,p.y,p.r,0,6.283);x.fill()}requestAnimationFrame(dust)}\nif(!RM){size();addEventListener('resize',size);requestAnimationFrame(dust)}\n\n/* day master tabs */\nconst C=[[\"甲子 — 물 위의 큰 나무\",\"Day master · 일간 甲 · Wood\",\"곧게 자라려는 고집이 있고, 남이 꺾으려 할수록 더 단단해집니다. 대신 쉬는 법을 모릅니다. 오늘은 물을 좀 주세요.\"],[\"丙午 — 한낮의 태양\",\"Day master · 일간 丙 · Fire\",\"방에 들어서면 온도가 바뀌는 사람. 숨기는 데 서툴고, 그래서 믿음을 얻습니다. 그늘도 필요하다는 걸 잊지 마세요.\"],[\"戊辰 — 안개 낀 큰 산\",\"Day master · 일간 戊 · Earth\",\"쉽게 움직이지 않아 듬직하지만 속을 잘 보여주지 않습니다. 기다려 주는 사람에게만 길을 엽니다.\"],[\"庚申 — 막 벼린 쇠\",\"Day master · 일간 庚 · Metal\",\"결단이 빠르고 기준이 분명합니다. 맞는 말을 아프게 하는 재주가 있으니 가끔은 칼등으로 말하세요.\"],[\"壬子 — 밤의 큰 물\",\"Day master · 일간 壬 · Water\",\"어디로든 흘러가고 무엇이든 담습니다. 생각이 많아 밤이 길어요. 흐름을 믿되 둑 하나는 세워 두세요.\"]];\nconst DM=['甲','丙','戊','庚','壬'];\nconst tabs=$$('.tabs button'),card=$('#card');\ntabs.forEach(b=>b.addEventListener('click',()=>{const i=+b.dataset.i;tabs.forEach(t=>t.setAttribute('aria-pressed',t===b));card.classList.add('swap');setTimeout(()=>{$('#ct').textContent=C[i][0];$('#cd').textContent=C[i][1];$('#cb').textContent=C[i][2];card.classList.remove('swap')},350);mood(i)}));\n\n/* ten gods */\nconst G=[[\"비견\",\"比肩\",\"Self & Pride\"],[\"겁재\",\"劫財\",\"Rivals & Drive\"],[\"식신\",\"食神\",\"Taste & Ease\"],[\"상관\",\"傷官\",\"Wit & Rebellion\"],[\"편재\",\"偏財\",\"Luck & Windfalls\"],[\"정재\",\"正財\",\"Money & Habits\"],[\"편관\",\"偏官\",\"Pressure & Nerve\"],[\"정관\",\"正官\",\"Duty & Reputation\"],[\"편인\",\"偏印\",\"Intuition & Oddity\"],[\"정인\",\"正印\",\"Learning & Care\"]];\nconst gl=$('#glist');\ngl.innerHTML=G.map((g,i)=>`<li style=\"transition-delay:${i*.07}s\"><svg class=\"qface\" viewBox=\"0 0 22 16\"><use href=\"#f-good\"/></svg><svg class=\"g\" viewBox=\"0 0 24 24\"><use href=\"#g${i}\"/></svg><div class=\"qlb\">${g[2]}<small>${g[0]}</small></div><span class=\"hz2\">${g[1]}</span></li>`).join('');\nconst faces=$$('#glist .qface');\nfunction mood(d){faces.forEach((f,i)=>{const h=(d*7+i*13+3)%10;const k=h<3?'good':h<5?'bad':null;f.classList.toggle('qon',!!k);if(k)f.querySelector('use').setAttribute('href','#f-'+k)});$('#gday').textContent=DM[d]+' 일간의 오늘 예시'}\nmood(0);\n\n/* talisman carousel */\nconst Q=[[\"끝까지 버티는 건 장점이지만, 오늘은 먼저 연락하는 쪽이 이깁니다.\",\"甲\",\"나무\"],[\"당신이 켜 둔 불을 다른 사람은 경보로 볼 수 있습니다. 한 톤만 낮추세요.\",\"丙\",\"불\"],[\"모두가 기대고 싶어 하는 날. 거절해도 산은 무너지지 않습니다.\",\"戊\",\"흙\"],[\"정확한 말이 꼭 필요한 말은 아닙니다. 칼집에 넣어 두세요.\",\"庚\",\"쇠\"],[\"생각이 너무 깊으면 길을 잃습니다. 오늘은 얕게 가도 됩니다.\",\"壬\",\"물\"],[\"어제 미룬 답장, 사실 상대도 미루고 있습니다.\",\"乙\",\"풀\"]];\nconst tr=$('#track'),dots=$('#dots');let cur=0,timer;\ntr.innerHTML=Q.map(q=>`<div class=\"slip\"><div class=\"qtop\">${q[1]}</div><q>${q[0]}</q><div class=\"qwho\"><span class=\"mono\">${q[1]} · ${q[2]} 일간</span><span class=\"stamp\">吉</span></div></div>`).join('');\ndots.innerHTML=Q.map(()=>'<i></i>').join('');\nconst sl=[...tr.children],dt=[...dots.children];\nfunction go(n){cur=(n+Q.length)%Q.length;const s=sl[cur];const off=s.offsetLeft+s.offsetWidth/2-tr.parentElement.clientWidth/2;tr.style.transform=`translateX(${-off}px)`;sl.forEach((e,i)=>{e.classList.toggle('qon',i===cur);e.classList.toggle('left',i<cur)});dt.forEach((e,i)=>e.classList.toggle('qon',i===cur));clearInterval(timer);timer=setInterval(()=>go(cur+1),5600)}\n$('#prev').onclick=()=>go(cur-1);$('#next').onclick=()=>go(cur+1);sl.forEach((s,i)=>s.addEventListener('click',()=>go(i)));\nlet sx=null;tr.addEventListener('pointerdown',e=>{sx=e.clientX});addEventListener('pointerup',e=>{if(sx==null)return;const d=e.clientX-sx;sx=null;if(Math.abs(d)>40)go(cur+(d<0?1:-1))});\naddEventListener('resize',()=>go(cur));go(1);\n}\n";
 
-const SAMPLE: { s: string; b: string; se: string; be: string; me?: boolean }[] = [
-  { s: '丙', b: '寅', se: '火', be: '木' },
-  { s: '甲', b: '子', se: '木', be: '水', me: true },
-  { s: '辛', b: '巳', se: '金', be: '火' },
-  { s: '庚', b: '午', se: '金', be: '火' },
-];
+const FONTS = 'https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500&family=Hahmlet:wght@300;400&family=Noto+Serif+KR:wght@200;300;500&family=DM+Mono:wght@400&display=swap';
 
-function Photo({ src, cap, tilt, eager }: { src: string; cap: string; tilt: number; eager?: boolean }) {
-  return (
-    <figure className="lt-photo" style={{ ['--tilt' as string]: `${tilt}deg` }}>
-      <span className="lt-tape" aria-hidden="true" />
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img src={src} alt={cap} width={390} height={844} loading={eager ? 'eager' : 'lazy'} decoding="async" />
-      <figcaption>{cap}</figcaption>
-    </figure>
-  );
-}
-
-function Seal({ chars }: { chars: string[] }) {
-  return (
-    <span className="lt-seal" aria-hidden="true">
-      <span>{chars[0]}</span><span>{chars[1]}</span>
-    </span>
-  );
-}
+const FOOT: [string, string][] = [['이용약관', '/terms'], ['개인정보처리방침', '/privacy'], ['환불정책', '/refund'], ['수배전단', '/wanted'], ['친구들이 보는 나', '/ask'], ['English', '/app?lang=en']];
 
 export default function Landing({ lang }: { lang: LandingLang }) {
-  const t = T[lang];
-  const shot = (k: string) => `/landing/${lang}_${k}.webp`;
-  const d = new Date(Date.now() + 9 * 3600e3);
-  const date = lang === 'ko'
-    ? `${d.getUTCFullYear()}年 ${d.getUTCMonth() + 1}月 ${d.getUTCDate()}日`
-    : d.toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
-  const home = lang === 'ko' ? '/' : '/?lang=en';
+  void lang; // 지금은 한국어 화첩 하나. 영어판은 앱(/app?lang=en)으로 안내해요.
+  const [head, tail] = MARKUP.split('__FOOTER__');
+  const year = new Date().getUTCFullYear();
+  const footer = `<footer class="mono"><span>KASI 만세력 기준 · 진태양시 보정</span><span>무료 · 가입 없음</span></footer>`;
   return (
-    <div className="lt" lang={lang}>
-      {/* 번진 먹 효과용 필터 */}
-      <svg width="0" height="0" style={{ position: 'absolute' }} aria-hidden="true">
-        <filter id="ink"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3" /><feDisplacementMap in="SourceGraphic" scale="1.6" /></filter>
-        <filter id="rough"><feTurbulence type="fractalNoise" baseFrequency="0.06" numOctaves="3" seed="8" /><feDisplacementMap in="SourceGraphic" scale="5" /></filter>
-      </svg>
-
-      <nav className="lt-top">
-        <a href={home} className="lt-top-mark">SOULCODE</a>
-        <span>
-          <a href={t.otherHref}>{t.other}</a>
-          <a className="lt-top-open" href={t.app}>{t.cta} →</a>
-        </span>
-      </nav>
-
-      <article className="lt-paper">
-        <span className="lt-fold lt-fold-1" aria-hidden="true" />
-        <span className="lt-fold lt-fold-2" aria-hidden="true" />
-
-        {/* 편지 머리 */}
-        <header className="lt-head">
-          <div>
-            <p className="lt-org">{t.org}</p>
-            <p className="lt-orgsub">{t.orgSub}</p>
-          </div>
-          <div className="lt-postage" aria-hidden="true">
-            <span className="lt-postage-in"><b>命</b><small>{t.postage}</small></span>
-            <span className="lt-postmark">SEOUL · {d.getUTCFullYear()}</span>
-          </div>
-        </header>
-        <hr className="lt-rule" />
-        <p className="lt-date">{date}</p>
-        <dl className="lt-meta">
-          <dt>{t.to}</dt><dd>{t.toV}</dd>
-          <dt>{t.from}</dt><dd>{t.fromV}</dd>
-          <dt>{t.re}</dt><dd>{t.reV}</dd>
-        </dl>
-
-        {/* 첫 문단 */}
-        <h1 className="lt-h1 ink">{t.h1[0]}<br />{t.h1[1]}</h1>
-        <p className="lt-open">{t.open}</p>
-        <p className="lt-body">{t.lead}</p>
-        <p className="lt-body lt-typo">
-          {lang === 'ko' ? <>사주는 정해진 <s>{t.typo}</s> {t.typoFix}을 읽는 거울입니다.</> : <>Saju is a mirror for your <s>{t.typo}</s> {t.typoFix}.</>}
-        </p>
-        <div className="lt-ctas">
-          <a className="lt-stampbtn" href={t.app}><span>{t.cta}</span></a>
-          <a className="lt-link" href="#calc">{t.how} →</a>
+    <>
+      {/* eslint-disable-next-line @next/next/no-page-custom-font */}
+      <link rel="stylesheet" href={FONTS} />
+      <div className="sc5">
+        <div dangerouslySetInnerHTML={{ __html: head + footer }} style={{ display: 'contents' }} />
+        <div className="qlegal">
+          <p>{FOOT.map(([k, h]) => <a key={h} href={h}>{k}</a>)}</p>
+          <p>{bizLines().map(([k, v]) => <span key={k}>{k}: {v}</span>)} <span>© {year} SOULCODE</span></p>
         </div>
-        <p className="lt-note">{t.note}</p>
-
-        <div className="lt-photos">
-          <Photo src={shot('daily')} cap={t.photos[0]} tilt={-4} />
-          <Photo src={shot('soul')} cap={t.photos[1]} tilt={2} eager />
-          <Photo src={shot('match')} cap={t.photos[2]} tilt={5} />
-        </div>
-
-        {/* 一 */}
-        <section className="lt-sec">
-          <h2 className="lt-h2 ink"><span className="lt-no">{NUM_KO[0]}.</span> {t.s1}</h2>
-          {t.s1p.map((p) => <p key={p.slice(0, 10)} className="lt-body">{p}</p>)}
-          <figure className="lt-chart">
-            <table>
-              <thead><tr>{t.cols.map((c, i) => <th key={c} className={SAMPLE[i].me ? 'me' : ''}>{c}</th>)}</tr></thead>
-              <tbody>
-                <tr>{SAMPLE.map((c, i) => <td key={i} className={c.me ? 'me' : ''}><b className="ink">{c.s}</b><small>{t.el[c.se]}</small></td>)}</tr>
-                <tr>{SAMPLE.map((c, i) => <td key={i} className={c.me ? 'me' : ''}><b className="ink">{c.b}</b><small>{t.el[c.be]}</small>{c.me && <span className="lt-me">{t.me}</span>}</td>)}</tr>
-              </tbody>
-            </table>
-            <figcaption>{t.chartCap}</figcaption>
-          </figure>
-        </section>
-
-        {/* 二 */}
-        <section className="lt-sec">
-          <h2 className="lt-h2 ink"><span className="lt-no">{NUM_KO[1]}.</span> {t.s2}</h2>
-          {t.feats.map((f, i) => (
-            <div key={f.t} className={'lt-feat' + (i % 2 ? ' rev' : '')}>
-              <div>
-                <h3 className="lt-h3">{lang === 'ko' ? '가나다라'[i] : 'abcd'[i]}. {f.t}</h3>
-                <p className="lt-body">{f.d}</p>
-                <a className="lt-link" href={t.app}>{t.cta} →</a>
-              </div>
-              <Photo src={shot(f.img)} cap={f.t} tilt={i % 2 ? -3 : 3} />
-            </div>
-          ))}
-        </section>
-
-        {/* 三 */}
-        <section className="lt-sec" id="calc">
-          <h2 className="lt-h2 ink"><span className="lt-no">{NUM_KO[2]}.</span> {t.s3}</h2>
-          <p className="lt-body">{t.s3lead}</p>
-          <table className="lt-ledger">
-            <tbody><tr>{t.ledger.map(([n, l]) => <td key={l}><b className="ink">{n}</b><small>{l}</small></td>)}</tr></tbody>
-          </table>
-          <ol className="lt-prec">
-            {t.prec.map(([h, p]) => <li key={h}><b>{h}.</b> {p}</li>)}
-          </ol>
-          <div className="lt-calc-photo">
-            <Photo src={shot('chart')} cap={lang === 'ko' ? '원국 화면' : 'Chart screen'} tilt={-2} />
-            <p className="lt-src">{t.src}</p>
-          </div>
-        </section>
-
-        {/* 맺음 */}
-        <section className="lt-close">
-          <p className="lt-body">{t.close}</p>
-          <div className="lt-sign">
-            <span className="lt-pen">{t.sign}</span>
-            <Seal chars={t.seal} />
-          </div>
-          <p className="lt-ps"><b>{t.ps}</b> {t.psT}</p>
-          <div className="lt-ctas">
-            <a className="lt-stampbtn big" href={t.app}><span>{t.cta}</span></a>
-          </div>
-          <p className="lt-note">{t.note}</p>
-        </section>
-      </article>
-
-      <footer className="lt-foot">
-        <nav>{t.foot.map(([l, h]) => <a key={h} href={h}>{l}</a>)}</nav>
-        <p>{bizLines().map(([k, v]) => <span key={k}>{k}: {v}</span>)} <span>© {d.getUTCFullYear()} SOULCODE</span></p>
-      </footer>
-    </div>
+        <div dangerouslySetInnerHTML={{ __html: tail }} style={{ display: 'contents' }} />
+      </div>
+      <script dangerouslySetInnerHTML={{ __html: SCRIPT }} />
+    </>
   );
 }
