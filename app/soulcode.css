@@ -1045,3 +1045,48 @@ body:has(#soul-root),html:has(#soul-root){background:#0A121B}
   .app #s-loading .ld-seal{width:120px;height:120px}
   .app .load-txt{font-size:20px}
 }
+
+/* ── Co-Star처럼: 작고 얇은 글자, 넉넉한 여백, 머리카락 같은 선 ── */
+.app #s-splash .sp-seal{width:38px;height:38px;margin-bottom:40px;opacity:.85}
+.app #s-splash .sp-ch{gap:14px;margin-bottom:26px;font-size:11px;letter-spacing:.32em;color:#7D8AA0}
+.app #s-splash .sp-ch span{font:200 15px/1 'Noto Serif KR',serif;color:#AFC3D8}
+.app #s-splash .sp-ch i{width:44px;opacity:.35}
+.app #s-splash .sp-h{font:200 clamp(26px,2.2vw,34px)/1.7 'Noto Serif KR',serif;letter-spacing:.22em;color:#D9E0EA;margin-bottom:26px}
+.app #s-splash .sp-p{font:200 14.5px/2.3 'Noto Sans KR',sans-serif;letter-spacing:.14em;color:#98A5B7;max-width:460px;margin-bottom:34px}
+.app #s-splash .sp-facts{gap:0;margin-bottom:44px;border-top:1px solid rgba(198,216,234,.12);border-bottom:1px solid rgba(198,216,234,.12);padding:14px 0;max-width:460px;justify-content:space-between}
+.app #s-splash .sp-facts li{font-size:11px;letter-spacing:.16em;color:#728096;flex-direction:column;gap:6px;align-items:flex-start}
+.app #s-splash .sp-facts b{font:300 12px 'Noto Serif KR',serif;letter-spacing:.24em;color:#B9CADC}
+.app #s-splash .btn{background:transparent;color:#DCE6F0;border:1px solid rgba(198,216,234,.45);border-radius:0;font:300 13.5px 'Noto Sans KR',sans-serif;letter-spacing:.34em;padding:16px 40px;transition:background .4s,border-color .4s,color .4s}
+.app #s-splash .btn:hover{background:#DCE6F0;color:#0E1722;border-color:#DCE6F0}
+.app #s-splash .disclaimer{font:200 11.5px/1.9 'Noto Sans KR',sans-serif;letter-spacing:.12em;color:#677488;margin-top:18px}
+.app #s-splash .hub-pills{display:flex;gap:0;margin-top:30px;justify-content:flex-start}
+.app #s-splash .hub-pills a{background:none!important;border:none!important;padding:0;font:200 11.5px 'Noto Sans KR',sans-serif!important;letter-spacing:.14em;color:#8794A8!important;text-decoration:none}
+.app #s-splash .hub-pills a+a::before{content:'·';margin:0 12px;color:#4E5A6B}
+.app #s-splash .hub-pills a:hover{color:#DCE6F0!important}
+.app #s-splash .splash-lang{margin-top:10px;font:200 11px 'Noto Sans KR',sans-serif;letter-spacing:.14em;color:#4E5A6B;text-align:left}
+.app #s-splash .splash-lang a{color:#677488;text-decoration:none;font-weight:200}
+.app #s-splash .splash-lang a.on{color:#C6D8EA;text-decoration:none;border-bottom:1px solid rgba(198,216,234,.4)}
+@media (min-width:1000px){
+  .app .sp-art{left:44%}
+  .app .sp-copy{width:min(480px,40vw);left:max(80px,calc((100vw - 1180px) / 2))}
+}
+/* 입력 단계도 같은 결로 */
+.app #s-onb .eng{font:300 11px 'Noto Sans KR',sans-serif;letter-spacing:.32em;color:#AFC3D8}
+.app #s-onb .progress{height:1px;background:rgba(198,216,234,.12)}
+.app #s-onb .progress i{background:#AFC3D8}
+.app #s-onb .q{font:200 clamp(24px,2.2vw,32px)/1.7 'Noto Serif KR',serif!important;letter-spacing:.2em;color:#D9E0EA}
+.app #s-onb .sub{font:200 14px/2.25 'Noto Sans KR',sans-serif;letter-spacing:.12em;color:#8E9BAE}
+.app #s-onb .lb{font:300 11px 'Noto Sans KR',sans-serif;letter-spacing:.28em;color:#728096}
+.app #s-onb .field{background:transparent!important;border:none!important;border-bottom:1px solid rgba(198,216,234,.25)!important;border-radius:0;padding-left:0;font:200 18px 'Noto Sans KR',sans-serif;letter-spacing:.12em;color:#DCE6F0;height:52px}
+.app #s-onb .field:focus{border-bottom-color:#C6D8EA!important}
+.app #s-onb .btn{border-radius:0;font:300 13.5px 'Noto Sans KR',sans-serif;letter-spacing:.34em;background:transparent;color:#DCE6F0;border:1px solid rgba(198,216,234,.45)}
+.app #s-onb .btn:not(:disabled):hover{background:#DCE6F0;color:#0E1722}
+.app #s-onb .btn:disabled{opacity:.25}
+.app #s-onb .chip{border-radius:0;font:200 13px 'Noto Sans KR',sans-serif;letter-spacing:.12em;background:transparent}
+.app #s-onb .chip.sel{background:#DCE6F0!important;color:#0E1722!important}
+.app #s-onb .mbti-opt{border-radius:0;background:transparent!important}
+.app #s-onb .mbti-opt b{font-weight:300;letter-spacing:.1em}
+.app #s-onb .mbti-opt span{font-weight:200;letter-spacing:.06em}
+.app #s-onb .mbti-preview{font:200 34px 'Noto Serif KR',serif;letter-spacing:.5em;color:#AFC3D8}
+.app .load-txt{font:200 15px/2 'Noto Sans KR',sans-serif!important;letter-spacing:.2em;color:#AFBBCB}
+.app .ld-seal{width:64px!important;height:64px!important}
