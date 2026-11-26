@@ -275,7 +275,7 @@ $('btUnknown').onclick=()=>{const on=!$('btUnknown').classList.contains('sel');$
 $('btime').oninput=()=>{if($('btime').value){$('btUnknown').classList.remove('sel');$('btime').disabled=false}};
 ['birth','mtBirth'].forEach(id=>{const e=$(id);if(e)e.max=`${MAX_Y}-12-31`});
 /* 성별 (선택) — 대운 방향 계산에만 써요. 결과 화면에서 다시 묻지 않도록 온보딩에서 미리 받아요 */
-$('btUnknown').parentElement.insertAdjacentHTML('afterend',`<label class="lb">${TL('성별 (선택 · 대운 계산에만 써요)','Gender (optional · only for luck cycles)','性別(任意 · 大運の計算にだけ使います)')}</label><div class="chips-sel" id="obGender"><button type="button" class="chip" data-g="female">👩 ${TL('여자','Female','女性')}</button><button type="button" class="chip" data-g="male">👨 ${TL('남자','Male','男性')}</button></div>`);
+$('btUnknown').parentElement.insertAdjacentHTML('afterend',`<label class="lb">${TL('성별 · 선택 — 대운의 방향을 정할 때만 씁니다','Gender · optional — used only to set the direction of luck cycles','性別 · 任意 — 大運の向きを決めるときだけ使います')}</label><div class="chips-sel" id="obGender"><button type="button" class="chip" data-g="female">👩 ${TL('여자','Female','女性')}</button><button type="button" class="chip" data-g="male">👨 ${TL('남자','Male','男性')}</button></div>`);
 document.querySelectorAll('#obGender .chip').forEach(b=>b.onclick=()=>{ob.gender=ob.gender===b.dataset.g?null:b.dataset.g;document.querySelectorAll('#obGender .chip').forEach(x=>x.classList.toggle('sel',x.dataset.g===ob.gender))});
 function setStep(n){
   ob.step=n;
@@ -439,8 +439,8 @@ function renderTarot(){
   getSaju();
   const t=todayInfo(), days=TL(['일','월','화','수','목','금','토'],['Sun','Mon','Tue','Wed','Thu','Fri','Sat'],['日','月','火','水','木','金','土']);
   $('todayDate').textContent=TL(`${t.d.getMonth()+1}.${t.d.getDate()} ${days[t.d.getDay()]}요일 · TODAY`,`${days[t.d.getDay()]} ${t.d.getMonth()+1}.${t.d.getDate()} · TODAY`,`${t.d.getMonth()+1}.${t.d.getDate()} (${days[t.d.getDay()]}) · TODAY`);
-  $('todayHello').innerHTML=TL(`${esc(profile.nick)}님의<br>오늘 우주 날씨는? ☁️`,`${esc(profile.nick)}, what's your<br>cosmic weather today? ☁️`,`${esc(profile.nick)}さんの<br>今日の宇宙天気は? ☁️`);
-  $('todayStreak').textContent=TL(`🔥 ${calcStreak()}일 연속`,`🔥 ${calcStreak()}-day streak`,`🔥 ${calcStreak()}日連続`);
+  $('todayHello').innerHTML=TL(`${esc(profile.nick)}님의<br>오늘의 무늬`,`${esc(profile.nick)}’s<br>pattern for today`,`${esc(profile.nick)}さんの<br>今日の模様`);
+  $('todayStreak').textContent=TL(`연속 ${calcStreak()}일`,`${calcStreak()} days in a row`,`🔥 ${calcStreak()}日連続`);
   $('ilji').innerHTML=`<div class="big" style="color:${EL[t.tEl].color}">${STEMS[t.p.s]}${BRANCHES[t.p.b]}</div>
     <div><div class="t">${t.rel.emoji} ${TL('오늘은 '+t.rel.name,'Today: '+t.rel.name,'今日は'+t.rel.name)}</div><div class="d">${STEMS[t.p.s]}${BRANCHES[t.p.b]}日 · ${TL(`${EL[t.tEl].ko} 기운 × 나의 ${EL[STEM_EL[saju.dayStem]].ko} 기운`,`${EL[t.tEl].ko} day × your ${EL[STEM_EL[saju.dayStem]].ko}`,`${EL[t.tEl].ko}の日 × あなたの${EL[STEM_EL[saju.dayStem]].ko}`)}<br>${t.rel.desc}</div></div>`;
   draw = store.get('soulcode.draw.'+todayKey()) || (draw && draw.date===todayKey() ? draw : null);
@@ -610,7 +610,7 @@ function renderMe(){
   // streak
   const n=calcStreak(), visits=new Set(getVisits());
   $('stN').textContent=n;
-  $('stT').textContent= n>=7?TL('일주일 넘게 출석 중 👑','Over a week straight 👑','1週間以上連続 👑'): n>=3?TL('불타는 중! 🔥','On fire! 🔥','燃えてる! 🔥'):TL('오늘도 출석 완료 ✅','Checked in today ✅','今日もログイン完了 ✅');
+  $('stT').textContent= n>=7?TL('이레 넘게 이어진 실','A thread unbroken for over a week','一週間以上つながった糸'): n>=3?TL('사흘 넘게 이어지는 실','A thread kept for three days','三日以上つながる糸'):TL('오늘의 실을 이었어요','Today’s thread is tied','今日の糸をつなぎました');
   $('stS').textContent= n>=7?TL('카드 덱 스킨 해금 조건 달성 (정식 버전)','Deck skin unlock reached','デッキスキン解放条件達成'):TL(`${7-n}일만 더 오면 7일 연속 배지 획득`,`${7-n} more days for the 7-day badge`,`あと${7-n}日で7日連続バッジ獲得`);
   const days=TL(['일','월','화','수','목','금','토'],['S','M','T','W','T','F','S'],['日','月','火','水','木','金','土']), now=new Date(), wk=[];
   for(let i=6;i>=0;i--){const d=new Date(now);d.setDate(now.getDate()-i);wk.push(d)}
@@ -750,7 +750,7 @@ function spReset(){
 }
 
 /* ================= MATCH ================= */
-const MT_REL=[{k:'lover',e:'💘',n:'썸·연인 PRO'},{k:'friend',e:'🫶',n:'친구'},{k:'work',e:'💼',n:'동료'}];
+const MT_REL=[{k:'lover',e:'',n:'연인 · PRO'},{k:'friend',e:'',n:'벗'},{k:'work',e:'',n:'동료'}];
 const SAJU_MATCH=[
   {s:76,t:'닮은꼴 관계',d:'같은 오행끼리라 말 안 해도 통하는 게 많아요. 대신 둘 다 고집이 생기면 한 치도 안 물러설 수 있어요.'},
   {s:84,t:'내가 챙겨주는 관계',d:'내 기운이 상대를 키워주는 흐름이에요. 챙겨주는 맛이 있지만, 혼자 주기만 하다 지치지 않게 주의.'},
@@ -1557,7 +1557,7 @@ function activeEvents(){
   const tm=termToday(d); if(tm) ev.push({id:'term-'+k,e:'🌿',t:TL(`오늘은 ${tm.name}(${tm.hanja})`,`Today is ${(TERM_EN[tm.name]||[tm.hanja])[0]} (${tm.hanja})`,`今日は${tm.hanja}`),s:TL(TERM_TIP[tm.name]||'계절이 바뀌는 날이에요',(TERM_EN[tm.name]||[0,'A day when the season shifts'])[1],TERM_JA[tm.name]||'季節が変わる日です'),info:true});
   const m=d.getMonth()+1, Y=reportYear();
   if(m===12||m===1) ev.push({id:'ny-'+Y,e:'🎍',t:TL(`${Y} 신년운세 오픈`,`${Y} yearly fortune is open`,`${Y}年の運勢オープン`),s:TL(`${Y}년 12개월 흐름 그래프와 AI 풀이를 미리 봐요`,`Preview your ${Y} month-by-month graph and AI reading`,`${Y}年12か月の流れグラフとAI解説を先取り`),cta:TL(`${Y} 운세 보기`,`See ${Y}`,`${Y}年の運勢を見る`),fn:`openReport('year')`,keep:true});
-  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:TL('7일 연속 출석 이벤트','7-day streak event','7日連続ログインイベント'),s:TL(`7일 연속 오면 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,`Visit 7 days in a row to unlock the 'Strawberry Milk' skin forever · now <b>${Math.min(n,7)}/7</b>`,`7日連続で来るとスキン「いちごミルク」が永久解放 · 今 <b>${Math.min(n,7)}/7</b>`),prog:Math.min(n,7)/7,info:true,keep:true})}
+  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:TL('이레 연속 방문','Seven days in a row','七日連続の訪問'),s:TL(`7일 연속 오면 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,`Visit 7 days in a row to unlock the 'Strawberry Milk' skin forever · now <b>${Math.min(n,7)}/7</b>`,`7日連続で来るとスキン「いちごミルク」が永久解放 · 今 <b>${Math.min(n,7)}/7</b>`),prog:Math.min(n,7)/7,info:true,keep:true})}
   return ev.filter(e=>e.keep||e.info||!evDone(e.id));
 }
 function checkStreakReward(){
@@ -1571,7 +1571,7 @@ function renderEvents(){
   checkStreakReward();
   const all=activeEvents(), fm=nextFullMoon(), ev=all.slice(0,2);
   box.innerHTML=ev.map(e=>`<div class="ev-card${e.info?' info':''}"><div class="ev-e">${e.e}</div><div class="ev-b"><b>${e.t}</b><small>${e.s}</small>${e.prog!=null?`<i class="ev-bar"><i style="width:${e.prog*100}%"></i></i>`:''}${e.cta?`<button onclick="${e.fn}">${e.cta} →</button>`:''}</div></div>`).join('')
-    +(all.length>2?`<div class="ev-next">${all.slice(2).map(e=>e.e+' '+e.t.replace(/<[^>]+>/g,'')).join(' · ')}</div>`:'')+(fm&&!all.some(e=>e.id.startsWith('moon-'))?`<div class="ev-next">${TL('다음 이벤트 · 🌕 보름 소원 카드','Next event · 🌕 Full-moon wish card','次のイベント · 🌕 満月の願いごとカード')} D-${fm}</div>`:'');
+    +(all.length>2?`<div class="ev-next">${all.slice(2).map(e=>e.e+' '+e.t.replace(/<[^>]+>/g,'')).join(' · ')}</div>`:'')+(fm&&!all.some(e=>e.id.startsWith('moon-'))?`<div class="ev-next">${TL('다음 · 보름달 소원 카드','Next · full-moon wish card','次 · 満月の願いカード')} D-${fm}</div>`:'');
 }
 function openWish(id,kind){
   let m=$('wishM');
@@ -1818,10 +1818,10 @@ function tidyLayout(){
   ['pastLink','wantedLink','cmEntry'].forEach(id=>{const el=$(id);el&&el.remove()});
   // 궁합 탭: 친구랑 놀기 3칸 + 1:1 궁합 제목
   const f=$('mtForm');
-  if(f&&!$('hubMatch')){f.insertAdjacentHTML('beforebegin',hubHTML('hubMatch',['wanted','ask','map'],'👯 친구랑 같이 놀기')+'<div class="sec-t hub-t">💞 1:1 궁합 보기</div>')}
+  if(f&&!$('hubMatch')){f.insertAdjacentHTML('beforebegin',hubHTML('hubMatch',['wanted','ask','map'],TL('함께 읽기','Read together','一緒に読む'))+'<div class="sec-t hub-t">'+TL('두 사람의 궁합','A match between two','二人の相性')+'</div>')}
   // 소울 탭: 결과 아래 2칸
   const soul=$('s-soul'), dis=soul&&soul.querySelector('.disclaimer');
-  if(dis&&!$('hubSoul'))dis.insertAdjacentHTML('beforebegin',hubHTML('hubSoul',['wanted','ask'],'👯 이 결과로 친구랑 놀기'));
+  if(dis&&!$('hubSoul'))dis.insertAdjacentHTML('beforebegin',hubHTML('hubSoul',['wanted','ask'],TL('이 무늬로 함께 읽기','Read this pattern together','この模様で一緒に読む')));
   // 첫 화면: 밑줄 링크 → 작은 버튼 2개
   const sp=$('pastSplash'); if(sp&&!sp.classList.contains('hub-pills'))sp.className='past-splash hub-pills',sp.innerHTML='<a href="/wanted?utm_source=app_splash">수배전단</a><a href="/ask?utm_source=app_splash">친구들이 보는 나</a>';
   const ss=$('s-splash'); if(ss&&!$('splashLang')){const cur=window.soulLang||'ko';(sp||ss.querySelector('.disclaimer'))?.insertAdjacentHTML('afterend',`<div id="splashLang" class="splash-lang">${[['ko','한국어'],['en','English'],['ja','日本語']].map(([k,n])=>`<a href="#" class="${k===cur?'on':''}" onclick="setLang('${k}');return false">${n}</a>`).join(' · ')}</div>`)}

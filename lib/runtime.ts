@@ -273,6 +273,14 @@ export async function startSoulcode() {
     s.onerror = () => resolve();
     document.body.appendChild(s);
   });
+  // 이모지 → 상형 한자 (맨 마지막)
+  await new Promise<void>((resolve) => {
+    const s = document.createElement('script');
+    s.src = '/soulcode/glyph.js';
+    s.onload = () => resolve();
+    s.onerror = () => resolve();
+    document.body.appendChild(s);
+  });
 
   const qs = new URLSearchParams(location.search);
   if (qs.get('paid') === '1') { window.toast?.('PRO가 시작됐어요! 💎'); history.replaceState(null, '', location.pathname); }

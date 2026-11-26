@@ -1090,3 +1090,11 @@ body:has(#soul-root),html:has(#soul-root){background:#0A121B}
 .app #s-onb .mbti-preview{font:200 34px 'Noto Serif KR',serif;letter-spacing:.5em;color:#AFC3D8}
 .app .load-txt{font:200 15px/2 'Noto Sans KR',sans-serif!important;letter-spacing:.2em;color:#AFBBCB}
 .app .ld-seal{width:64px!important;height:64px!important}
+
+/* 상형 한자 (glyph.js가 이모지 자리에 넣는 글자) */
+.app i.gl{font:400 .92em/1 'Noto Serif KR',serif;font-style:normal;color:var(--moon-d);display:inline-block;margin:0 .38em 0 0;letter-spacing:0;vertical-align:-.02em}
+.app .chip.sel i.gl,.app .btn i.gl,.app .mc-tile.me i.gl{color:inherit;opacity:.75}
+.app .soul-emoji i.gl{margin:0;font-size:46px;font-weight:300;color:var(--moon)}
+.app .soul-emoji{display:grid;place-items:center}
+.app .hub-e i.gl{font-size:24px;margin:0;color:var(--moon)}
+.app .tabbar i.gl{display:none}
