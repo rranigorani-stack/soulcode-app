@@ -1211,3 +1211,12 @@ html[lang=en] .app #s-onb *:not(svg):not(path),html[lang=en] .app #s-splash *:no
 html[lang=en] .app #s-onb .q{font-size:clamp(22px,1.9vw,28px)!important;letter-spacing:.01em!important}
 html[lang=en] .app #s-splash .sp-facts{flex-wrap:nowrap;gap:18px}
 html[lang=en] .app #s-splash .sp-facts li{font-size:10px!important;letter-spacing:.06em!important}
+
+/* 영어판: 모든 글자를 Reenie Beanie 손글씨로. font-size-adjust로 작은 글자도 읽히는 크기로 맞춰요 */
+html[lang=en] .app,html[lang=en] .app *:not(svg):not(path),
+html[lang=en] .app #s-onb *:not(svg):not(path),html[lang=en] .app #s-splash *:not(svg):not(path),html[lang=en] .app #s-loading *{
+  font-family:'Reenie Beanie','Gaegu','Noto Serif KR',cursive!important;font-weight:400!important;font-size-adjust:.85;text-transform:none!important;letter-spacing:.01em!important}
+html[lang=en] .app em,html[lang=en] .app i:not(.gl){font-style:normal}
+html[lang=en] .app i.gl{font-family:'Noto Serif KR',serif!important;font-size-adjust:none}
+html[lang=en] .app .btn,html[lang=en] .app #s-splash .btn,html[lang=en] .app #s-onb .btn{font-size:17px!important;letter-spacing:.03em!important;padding:14px 34px}
+html[lang=en] .app .tabbar button{font-size:15px!important}
