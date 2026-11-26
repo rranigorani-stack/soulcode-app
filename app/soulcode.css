@@ -808,3 +808,171 @@ html,body{background:#E4DACA}
 .stk.s1,.stk.s2,.stk.s3,.stk.s5{border-left-width:4px!important}
 .mbti-preview{font-family:var(--serif);font-weight:900;color:var(--ink);-webkit-text-stroke:0;letter-spacing:.3em;font-size:44px}
 .toast{top:auto;bottom:92px;transform:translate(-50%,20px)}.toast.show{transform:translate(-50%,0)}
+
+/* =====================================================================
+   밤하늘 테마 (쿨톤) — 소개 페이지 「직녀의 베틀」과 같은 색
+   남색 바탕 · 은회색 글씨 · 달빛 하늘색 강조 · 붉은 도장은 포인트로만.
+   위의 한지 테마를 덮어쓰는 층이라, 이 덩어리를 지우면 한지 테마로 돌아가요.
+   ===================================================================== */
+.app{
+  --hanji:#0E1722; --hanji-2:#132030; --paper:#142131; --paper-2:#1A2A3D;
+  --ink:#E6ECF3; --text:#E6ECF3; --muted:#8C9AAE; --moon:#C6D8EA; --moon-d:#94AFC9;
+  --o-blue:#7FA6CF; --o-red:#C9554A; --o-yellow:#C9B37E; --o-white:#0E1722; --o-black:#E6ECF3;
+  --pink:#C9554A; --lav:#94AFC9; --yellow:#C9B37E; --green:#6BAE97; --orange:#C98A5E; --blue:#7FA6CF; --cyan:#7FBACB; --lime:#6BAE97;
+  --wood:#6BAE97; --fire:#D06A5E; --earth:#C9A86A; --metal:#A9B6C6; --water:#6E9BD6;
+  --line:rgba(198,216,234,.22); --line-2:rgba(198,216,234,.12);
+  --serif:'Noto Serif KR','Nanum Myeongjo',serif;
+  --card-back:radial-gradient(circle at 50% 50%,transparent 0 22%,#94AFC9 22.5% 23.5%,transparent 24%),
+    repeating-linear-gradient(45deg,rgba(148,175,201,.10) 0 2px,transparent 2px 10px),
+    repeating-linear-gradient(-45deg,rgba(148,175,201,.10) 0 2px,transparent 2px 10px),
+    linear-gradient(170deg,#1B2C44,#0F1A2A);
+  background:var(--hanji);color:var(--ink);color-scheme:dark}
+body:has(#soul-root),html:has(#soul-root){background:#0A121B}
+/* 바탕: 은하수 그림을 아주 어둡게 깔고, 위에 남색 막 */
+.app::before{inset:0;opacity:1;filter:none;animation:none;
+  background:linear-gradient(180deg,rgba(14,23,34,.80),rgba(14,23,34,.93) 55%,rgba(14,23,34,.97)),url(/landing/story/s1.webp) 62% 40%/cover no-repeat}
+.app::after{opacity:.55;animation:twinkle 5s ease-in-out infinite alternate;background:
+    radial-gradient(1.5px 1.5px at 12% 22%,#E4EDF8,transparent),radial-gradient(1px 1px at 72% 9%,#E4EDF8,transparent),
+    radial-gradient(1.5px 1.5px at 88% 34%,#E4EDF8,transparent),radial-gradient(1px 1px at 33% 48%,#E4EDF8,transparent),
+    radial-gradient(1px 1px at 8% 66%,#E4EDF8,transparent),radial-gradient(1.5px 1.5px at 62% 76%,#E4EDF8,transparent)}
+
+/* 글꼴: 굵은 명조 대신 가벼운 명조 + 얇은 고딕 */
+.app .h-display,.app .page-h,.app .soul-title,.app .res-head h3,.app .verdict,.app .q,.app .today-head h2,.app .pw h3,.app .st{font-weight:600;letter-spacing:.01em}
+.app .eng{color:var(--moon-d);letter-spacing:.32em}
+.app .sub,.app .muted,.app .disclaimer,.app .tagline small{color:var(--muted)}
+.app .holo-text{color:var(--moon);-webkit-text-fill-color:var(--moon)}
+
+/* 단추 */
+.app .btn{background:var(--moon);color:#0E1722;border:1px solid var(--moon);border-radius:4px}
+.app .btn:hover{background:#E0EAF4}
+.app .btn.ghost{background:transparent;color:var(--ink);border-color:var(--line)}
+.app .btn.ghost:hover{background:rgba(198,216,234,.08)}
+.app .btn.pink{background:transparent;color:var(--moon);border-color:var(--moon-d)}
+.app .btn:disabled{opacity:.28}
+
+/* 판·칸 */
+.app :is(.panel,.mini,.msg-box,.ai-box,.ilji,.pw,.entry-row button,.ev-card,.ev-card.info,.past-link,.cm-entry,.hub-tile,.offer,.vx-title,.vx-earn div,.vx-duo-list>*,.dy,.field,.mbti-opt,.plan,.soul-hero-in,.pil .gz,.mc-tile,.dw,.week i,.cal button,.dex button,.dex button:not(.lock),.q-echo span,.card-art,.story,.avatar .e){background:rgba(20,33,49,.78)!important;border-color:var(--line)!important;color:var(--ink)}
+.app :is(.panel,.mini,.hub-tile,.ev-card,.entry-row button,.msg-box,.ai-box,.ilji){backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.app .sec-t{color:var(--ink);border-bottom-color:var(--line-2)}
+.app .grid2 .mini:nth-child(1){border-top-color:var(--o-red)!important}.app .grid2 .mini:nth-child(2){border-top-color:var(--moon-d)!important}
+.app .grid2 .mini:nth-child(3){border-top-color:var(--o-yellow)!important}.app .grid2 .mini:nth-child(4){border-top-color:var(--wood)!important}
+.app .lucky .mini{border-top-color:var(--moon-d)!important}
+.app .ev-card{border-left-color:var(--moon-d)!important}
+.app .pro-banner{border-left-color:var(--moon-d)!important}
+.app .soul-hero-in{background-image:radial-gradient(circle at 50% 30%,rgba(148,175,201,.12),transparent 60%)!important}
+.app .soul-hero-in::after{border-color:var(--line-2)}
+.app .soul-sub{color:var(--moon);border-color:var(--line)}
+
+/* 선택된 칩·탭: 달빛 바탕 + 남색 글씨 */
+.app :is(.chip.sel,.mbti-opt.sel,.plan.sel,.week i.on,.dw.now,.offer.hot,.pil.me .gz.top,.mc-tile.me){background:var(--moon)!important;color:#0E1722!important;border-color:var(--moon)!important}
+.app :is(.mbti-opt.sel span,.plan.sel small,.mc-tile.me small,.dw.now .dw-a,.dw.now .dw-t,.offer.hot small){color:#3A4B60!important}
+.app .chip,.app .tag,.app .tag:nth-child(n){border-color:var(--line)!important;color:var(--ink)}
+.app .field{color:var(--ink)}
+.app .field::placeholder{color:#5F6E82}
+.app .field:focus{border-color:var(--moon-d)!important}
+.app .progress,.app .hold-bar,.app .bars .track,.app .ev-bar{background:rgba(198,216,234,.12)}
+.app .progress i,.app .hold-bar i,.app .ev-bar i{background:var(--moon)}
+.app .mbti-preview{color:var(--moon)}
+
+/* 붉은 도장(낙관)은 그대로 — 일간·배지 등 한 점 포인트 */
+.app :is(.soul-quip,.me-badge,.dw-now,.ai-badge,.res-head .ud,.pop-sticker,.tg-cell.on,.tg-me){background:#A8382A!important;color:#F3E6DE!important}
+.app .streak-chip{border-color:var(--moon-d);color:var(--moon)}
+.app .heart{color:var(--o-red)}
+.app .mchart>.me{background:rgba(148,175,201,.10)}
+
+/* 첫 화면 원상(圓相)과 글씨 */
+.app .ball::before{background:radial-gradient(circle,transparent 63%,var(--moon) 64% 66%,transparent 67%)}
+.app .ball span::after{color:var(--ink);font-weight:600}
+.app .ring-text text{fill:var(--muted)}
+.app .stk{background:rgba(20,33,49,.85)!important;color:var(--ink);border-color:var(--line)}
+.app .stk.s1{border-left-color:#A8382A}.app .stk.s2{border-left-color:var(--moon-d)}.app .stk.s3{border-left-color:var(--wood)}.app .stk.s5{border-left-color:var(--o-yellow)}
+.app .logo{color:var(--ink);font-weight:600}
+
+/* 타로 카드 */
+.app .cback,.app .face{border-color:#94AFC9}
+.app .cback::before,.app .face.back::before{border-color:rgba(148,175,201,.5)}
+.app .cback::after,.app .face.back::after{color:#D6E3F0!important}
+.app .card-art{color:var(--ink)}
+.app .card-art::before{box-shadow:inset 0 0 0 6px rgba(20,33,49,.5),inset 0 0 0 7px rgba(198,216,234,.25)}
+.app .card-art .sym{background:rgba(14,23,34,.85);border-color:var(--line)}
+.app .card-art .num{border-bottom-color:var(--line)}
+.app .slot{border-color:rgba(198,216,234,.35);background:rgba(20,33,49,.4)}
+.app .tone{border-color:var(--line)}
+.app .tone button.on,.app .tone button.sel{background:var(--moon);color:#0E1722}
+
+/* 달력·차트 */
+.app .cal button.good{background:rgba(107,174,151,.22)!important}.app .cal button.bad{background:rgba(201,85,74,.2)!important}
+.app .ychart i{background:var(--moon-d)}.app .ychart i.hi{background:var(--wood)}.app .ychart i.lo{background:var(--o-red)}
+.app .skins button.sel .sw{outline-color:var(--moon)}
+.app .vx-title-lock{background:var(--moon)!important;color:#0E1722!important}
+.app .vx-back{background:linear-gradient(170deg,#1B2C44,#0F1A2A)!important;color:#D6E3F0}
+.app .hub-pills a,.app .past-splash a{color:var(--ink);border-color:var(--line)!important}
+
+/* 하단 탭 (휴대폰) */
+.app .tabbar{background:rgba(12,20,30,.92);border-top-color:var(--line)}
+.app .tabbar button{color:var(--muted)}
+.app .tabbar button.on{color:var(--moon)}
+.app .tabbar button.on::after{background:var(--moon)}
+/* 탭 아이콘: 이모지 대신 한자 한 글자 */
+.app .tabbar button .i{font-size:0!important;filter:none!important;opacity:1!important;background:none!important;border:none!important;transform:none!important}
+.app .tabbar button .i::before{font:500 17px/1 var(--serif);color:currentColor}
+.app .tabbar button[data-go="s-tarot"] .i::before{content:'今'}
+.app .tabbar button[data-go="s-spread"] .i::before{content:'問'}
+.app .tabbar button[data-go="s-match"] .i::before{content:'緣'}
+.app .tabbar button[data-go="s-soul"] .i::before{content:'魂'}
+.app .tabbar button[data-go="s-me"] .i::before{content:'我'}
+
+/* 모달·토스트 */
+.app .modal{background:rgba(6,11,17,.72)}
+.app .toast{background:var(--moon);color:#0E1722}
+.app .story{color:var(--ink)}
+.app .story .logo-s{color:var(--ink)}
+
+/* =====================================================================
+   컴퓨터 화면: 휴대폰 한 줄 대신 왼쪽 메뉴 + 넓은 본문
+   ===================================================================== */
+@media (min-width:1000px){
+  .app{max-width:none;width:100%}
+  /* 왼쪽 세로 메뉴 */
+  .app .tabbar{left:0;top:0;bottom:0;right:auto;width:232px;height:auto;flex-direction:column;justify-content:flex-start;align-items:stretch;gap:4px;
+    padding:30px 18px;border-top:none;border-right:1px solid var(--line-2);background:rgba(10,17,26,.72);border-radius:0}
+  .app .tabbar::before{content:'SoulCode';font:300 24px 'Cormorant Garamond','Noto Serif KR',serif;letter-spacing:.02em;color:var(--ink);padding:0 12px 30px}
+  .app .tabbar button{flex-direction:row;justify-content:flex-start;gap:14px;width:100%;padding:12px 12px;border-radius:4px;font-size:14.5px;letter-spacing:.06em;font-weight:500}
+  .app .tabbar button:hover{background:rgba(198,216,234,.06);color:var(--ink)}
+  .app .tabbar button.on{background:rgba(198,216,234,.10)}
+  .app .tabbar button.on::after{display:none}
+  .app .tabbar button .i{width:28px;height:28px;border:1px solid var(--line)!important;border-radius:6px}
+  .app .tabbar button.on .i{border-color:var(--moon-d)!important}
+  /* 본문: 메뉴 오른쪽, 가운데 정렬 넓은 칸 */
+  .app:has(.tabbar.show) .screen{left:232px}
+  .app .screen{padding:64px max(56px,calc((100vw - 920px) / 2)) 96px}
+  .app:has(.tabbar.show) .screen{padding-left:max(56px,calc((100vw - 232px - 960px) / 2));padding-right:max(56px,calc((100vw - 232px - 960px) / 2))}
+  .app .screen::-webkit-scrollbar{display:block;width:8px}
+  .app .screen::-webkit-scrollbar-thumb{background:rgba(198,216,234,.15);border-radius:4px}
+  /* 첫 화면·입력 화면은 가운데 좁은 칸 */
+  .app #s-splash,.app #s-onb,.app #s-loading{padding-left:calc((100vw - 480px) / 2);padding-right:calc((100vw - 480px) / 2)}
+  /* 글자 조금 크게 */
+  .app .screen{font-size:15.5px}
+  .app .tabbar button{font-size:15px}
+  .app .page-h{font-size:34px}
+  .app .sec-t{font-size:17px;margin-top:44px}
+  .app .soul-title{font-size:34px}
+  /* 칸 나누기: 넓은 화면에서는 여러 칸으로 */
+  .app .grid2{grid-template-columns:repeat(4,minmax(0,1fr));gap:14px}
+  .app .lucky{grid-template-columns:repeat(6,minmax(0,1fr))}
+  .app .hub-3{grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+  .app .entry-row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .app .btn{max-width:420px;margin-left:auto;margin-right:auto}
+  .app .nav-row .btn{max-width:none}
+  .app .modal .btn,.app .pw .btn{max-width:none}
+  /* 타로 고르는 부채꼴은 넓게 */
+  .app .pick-area{max-width:760px;margin:0 auto}
+  .app .toast{bottom:40px}
+  .app .modal{left:0}
+}
+/* 밤하늘 테마: 흰 바탕이 남았던 칸들 */
+.app .vx-dex button,.app .vx-dex>*{background:rgba(20,33,49,.78)!important;color:var(--ink)!important;border-color:var(--line)!important}
+.app .vx-dex .lock small,.app .lock small{color:var(--muted)!important}
+.app .tg-info{background:rgba(14,23,34,.95)!important;color:var(--ink);border-color:var(--line)!important}
+.app .lk{background:rgba(198,216,234,.14)!important;color:var(--moon)!important}
+.app .sync .dot{background:var(--muted)!important}
