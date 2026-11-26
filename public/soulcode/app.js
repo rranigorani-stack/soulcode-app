@@ -280,7 +280,7 @@ document.querySelectorAll('#obGender .chip').forEach(b=>b.onclick=()=>{ob.gender
 function setStep(n){
   ob.step=n;
   document.querySelectorAll('.step').forEach(s=>s.classList.toggle('on',+s.dataset.step===n));
-  $('prog').style.width=(n*33.4)+'%'; $('stepLabel').textContent=`STEP ${n} / 3`;
+  $('prog').style.width=(n*33.4)+'%'; $('stepLabel').textContent=['一 · 이름','二 · 태어난 때','三 · 지금의 결'][n-1]||'';
 }
 function nextStep(){
   if(ob.step===2){const y=+$('birth').value.slice(0,4);if(y<1940||y>MAX_Y){toast(TL(`1940~${MAX_Y}년 사이로 입력해주세요`,`Enter a year between 1940 and ${MAX_Y}`,`1940〜${MAX_Y}年の間で入力してください`));return}}
@@ -293,8 +293,8 @@ function finishOnb(){
   store.set('soulcode.profile',profile);
   logVisit();
   go('s-loading');
-  const msgs=TL(['우주에서 너의 좌표 검색 중... 🛰️','오행 밸런스 체크 중... 물 한 잔 하고 와 💧','MBTI랑 사주 소개팅 시키는 중 💞','찾았다, 너의 소울코드! ✨'],['Searching for your coordinates in space... 🛰️','Checking your five-element balance... grab some water 💧','Setting your MBTI up on a blind date with your saju 💞','Found it, your Soulcode! ✨'],['宇宙であなたの座標を検索中... 🛰️','五行バランスをチェック中... お水でも飲んでて 💧','MBTIと四柱推命をお見合い中 💞','見つけた、あなたのソウルコード! ✨']);
-  msgs.forEach((m,i)=>setTimeout(()=>$('loadTxt').textContent=m,i*650));
+  const msgs=TL(['직녀가 베틀에 실을 거는 중이에요','만세력에서 태어난 날의 절기를 찾는 중이에요','네 기둥에 여덟 올을 엮는 중이에요','무늬가 다 짜였어요'],['The Weaver is threading her loom','Finding the solar term of your birth in the calendar','Weaving eight threads onto four pillars','Your pattern is woven'],['織女が機に糸をかけています','暦で生まれた日の節気を探しています','四本の柱に八本の糸を織っています','模様が織り上がりました']);
+  msgs.forEach((m,i)=>setTimeout(()=>$('loadTxt').textContent=m,i*800));
   setTimeout(()=>{const t=store.get('soulcode.afterOnb');if(t){store.del('soulcode.afterOnb');go(t);toast(TL('궁합 볼 상대의 생일을 넣어봐요 🔎','Enter the birthday of the person you want to match 🔎','相性を見たい相手の誕生日を入れてみて 🔎'))}else go('s-soul')},2700);
 }
 
@@ -1769,7 +1769,7 @@ function pastEntry(){
   if(!window.soulConfig)return;
   const soul=$('s-soul'); if(soul&&!$('pastLink')){const d=soul.querySelector('.disclaimer');d&&d.insertAdjacentHTML('beforebegin','<a class="panel past-link wanted-link" id="pastLink" href="/wanted?utm_source=app_soul"><span class="ev-e">🚨</span><span class="ev-b"><b>운명의 상대 수배전단 뽑기</b><small>내 사주에 부족한 기운으로 찾은 그 사람</small></span><span style="font-size:22px">→</span></a>')}
   const mt=$('s-match'); if(mt&&!$('wantedLink')){const f=$('mtForm');f&&f.insertAdjacentHTML('beforebegin','<a class="panel past-link wanted-link" id="wantedLink" href="/wanted?utm_source=app_match"><span class="ev-e">🚨</span><span class="ev-b"><b>운명의 상대 수배전단</b><small>내 사주에 부족한 기운으로 그린 몽타주</small></span><span style="font-size:22px">→</span></a>')}
-  const sp=$('s-splash'); if(sp&&!$('pastSplash')){const d=sp.querySelector('.disclaimer');d&&d.insertAdjacentHTML('afterend','<div id="pastSplash" class="past-splash"><a href="/wanted?utm_source=app_splash">🚨 운명의 상대 수배전단</a> · <a href="/ask?utm_source=app_splash">💌 친구들이 보는 나</a></div>')}
+  const sp=$('s-splash'); if(sp&&!$('pastSplash')){const d=sp.querySelector('.disclaimer');d&&d.insertAdjacentHTML('afterend','<div id="pastSplash" class="past-splash"><a href="/wanted?utm_source=app_splash">운명의 상대 수배전단</a> · <a href="/ask?utm_source=app_splash">친구들이 보는 나</a></div>')}
 }
 pastEntry();
 try{if(new URLSearchParams(location.search).get('go')==='match'){store.set('soulcode.afterOnb','s-match');history.replaceState(null,'',location.pathname)}}catch(e){}
