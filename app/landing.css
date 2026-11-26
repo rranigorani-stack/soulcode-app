@@ -134,12 +134,16 @@
 .jk .clouds{display:none}
 }
 
-/* English: Cormorant for titles and narration */
-.jk[lang=en] .jko{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(19px,1.45vw,23px);line-height:1.85;letter-spacing:.03em}
-.jk[lang=en] .ko{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(19px,1.45vw,23px);line-height:1.85;letter-spacing:.03em}
-.jk[lang=en] .title{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.06em;font-size:clamp(46px,4.6vw,76px);margin-left:0}
-.jk[lang=en] .jsub,.jk[lang=en] .ch .name,.jk[lang=en] .rail li span,.jk[lang=en] .cue span{letter-spacing:.16em}
+/* English: everything in DM Mono Light */
+.jk[lang=en],.jk[lang=en] *:not(svg):not(path){font-family:'DM Mono','Noto Serif KR',serif!important;font-weight:300!important}
+.jk[lang=en] .title{font-size:clamp(30px,3.2vw,52px);letter-spacing:.04em;margin-left:0;line-height:1.3}
+.jk[lang=en] .ko{font-size:clamp(13.5px,1vw,15.5px);line-height:2.15;letter-spacing:.02em}
 .jk[lang=en] .ko em{font-style:italic}
+.jk[lang=en] .jsub,.jk[lang=en] .ch .name,.jk[lang=en] .rail li span,.jk[lang=en] .cue span,.jk[lang=en] nav ul{letter-spacing:.1em;text-transform:uppercase;font-size:11px}
+.jk[lang=en] .jlogo{letter-spacing:.02em}
+.jk[lang=en] .jbtn{font-size:13px;letter-spacing:.14em;text-transform:uppercase}
+.jk[lang=en] .silk .read b{font-size:clamp(14px,1.1vw,19px)}
+.jk[lang=en] .silk .read{font-size:clamp(10.5px,.74vw,12.5px);line-height:1.9}
 .jk[lang=en] .pass{width:min(520px,36vw)}
 .jk[lang=en] .pass.mid{width:min(820px,84vw)}
 .jk .jlegal{position:fixed;left:0;right:0;bottom:16px;z-index:9;text-align:center;font:300 11px/1.9 'Noto Sans KR',sans-serif;letter-spacing:.08em;color:#6E7B8F;opacity:0;pointer-events:none;transition:opacity .8s}

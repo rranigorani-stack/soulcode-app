@@ -1196,9 +1196,18 @@ body:has(#soul-root),html:has(#soul-root){background:#0A121B}
 .app .skins button{font:300 13px 'Noto Serif KR',serif!important;letter-spacing:.12em;color:#C6D8EA}
 .app .skins button.sel .sw{outline:1px solid #E6ECF3!important;outline-offset:3px}
 
-/* 영어판: 제목은 Cormorant Garamond */
-html[lang=en] .app :is(.sp-h,.q,.page-h,.today-head h2,.soul-title,.shop-b b,.load-txt){font-family:'Cormorant Garamond',serif!important;font-weight:400!important;letter-spacing:.04em!important}
-html[lang=en] .app .sp-h{font-size:clamp(34px,2.9vw,46px)!important;line-height:1.35!important}
-html[lang=en] .app #s-onb .q{font-size:clamp(32px,2.6vw,42px)!important;line-height:1.35!important}
-html[lang=en] .app :is(.page-h,.today-head h2){font-size:48px!important}
-html[lang=en] .app #s-splash .sp-p,html[lang=en] .app #s-onb .sub{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:18px;letter-spacing:.03em;line-height:1.8;color:#A8B4C4}
+/* 영어판: 모든 글자를 DM Mono Light 하나로 (한자·한글은 명조로 자연스럽게 넘어가요) */
+html[lang=en] .app,html[lang=en] .app *:not(svg):not(path){font-family:'DM Mono','Noto Serif KR',serif!important;font-weight:300!important;text-transform:none}
+html[lang=en] .app :is(.eng,.sec-t,label.lb,.mini .k,.btn,.chip,.tabbar button,.disclaimer,.shop-k,.shop-p,.streak-chip){text-transform:uppercase}
+html[lang=en] .app em,html[lang=en] .app i:not(.gl){font-style:italic}
+html[lang=en] .app :is(.sp-h,.q,.page-h,.today-head h2,.soul-title){letter-spacing:.01em!important;line-height:1.35!important}
+html[lang=en] .app #s-splash .sp-h{font-size:clamp(26px,2.2vw,34px)!important}
+html[lang=en] .app #s-onb .q{font-size:clamp(24px,2vw,30px)!important}
+html[lang=en] .app :is(.page-h,.today-head h2){font-size:clamp(28px,2.4vw,36px)!important}
+html[lang=en] .app .soul-title{font-size:30px!important}
+html[lang=en] .app :is(#s-splash .sp-p,#s-onb .sub,.sub,.panel,.desc){font-size:13.5px!important;line-height:2!important;letter-spacing:.01em!important;color:#A3B0C1}
+html[lang=en] .app .sp-facts b{letter-spacing:.1em!important}
+html[lang=en] .app #s-onb *:not(svg):not(path),html[lang=en] .app #s-splash *:not(svg):not(path),html[lang=en] .app #s-loading *{font-family:'DM Mono','Noto Serif KR',serif!important;font-weight:300!important}
+html[lang=en] .app #s-onb .q{font-size:clamp(22px,1.9vw,28px)!important;letter-spacing:.01em!important}
+html[lang=en] .app #s-splash .sp-facts{flex-wrap:nowrap;gap:18px}
+html[lang=en] .app #s-splash .sp-facts li{font-size:10px!important;letter-spacing:.06em!important}
