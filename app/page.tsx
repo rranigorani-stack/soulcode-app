@@ -1,4 +1,3 @@
-import { headers } from 'next/headers';
 import Landing, { type LandingLang } from '@/components/Landing';
 import './landing.css';
 
@@ -17,12 +16,8 @@ if(go)location.replace('/app'+s+h)}catch(e){}})()`;
 export default async function Home({ searchParams }: { searchParams: Promise<Record<string, string | string[] | undefined>> }) {
   const sp = await searchParams;
   const q = typeof sp.lang === 'string' ? sp.lang : '';
-  let lang: LandingLang;
-  if (q === 'ko' || q === 'en') lang = q;
-  else {
-    const al = (await headers()).get('accept-language') || '';
-    lang = /^\s*ko/i.test(al) || !al ? 'ko' : 'en';
-  }
+  // 영어권이 기본 대상이에요. 한국어는 ?lang=ko 로 열어요.
+  const lang: LandingLang = q === 'ko' ? 'ko' : 'en';
   return (
     <>
       <script dangerouslySetInnerHTML={{ __html: FORWARD }} />

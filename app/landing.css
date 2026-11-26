@@ -134,6 +134,14 @@
 .jk .clouds{display:none}
 }
 
+/* English: Cormorant for titles and narration */
+.jk[lang=en] .jko{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(19px,1.45vw,23px);line-height:1.85;letter-spacing:.03em}
+.jk[lang=en] .ko{font-family:'Cormorant Garamond',serif;font-weight:400;font-size:clamp(19px,1.45vw,23px);line-height:1.85;letter-spacing:.03em}
+.jk[lang=en] .title{font-family:'Cormorant Garamond',serif;font-weight:300;letter-spacing:.06em;font-size:clamp(46px,4.6vw,76px);margin-left:0}
+.jk[lang=en] .jsub,.jk[lang=en] .ch .name,.jk[lang=en] .rail li span,.jk[lang=en] .cue span{letter-spacing:.16em}
+.jk[lang=en] .ko em{font-style:italic}
+.jk[lang=en] .pass{width:min(520px,36vw)}
+.jk[lang=en] .pass.mid{width:min(820px,84vw)}
 .jk .jlegal{position:fixed;left:0;right:0;bottom:16px;z-index:9;text-align:center;font:300 11px/1.9 'Noto Sans KR',sans-serif;letter-spacing:.08em;color:#6E7B8F;opacity:0;pointer-events:none;transition:opacity .8s}
 .jk .jlegal p{margin:0}.jk .jlegal a{color:inherit;text-decoration:none;margin:0 .7em}.jk .jlegal a:hover{color:#C6D8EA}.jk .jlegal span{margin:0 .5em}
 .jk.last .jlegal{opacity:1;pointer-events:auto}

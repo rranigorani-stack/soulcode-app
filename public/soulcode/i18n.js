@@ -2,6 +2,9 @@
  * 언어는 MY → 🌐 언어 또는 주소 ?lang=en|ja|ko 로 바꿔요. (아직 자동 감지 안 함: 콘텐츠 번역이 끝나면 켜기) */
 (function(){
   const D={
+    "수배전단":["WANTED poster", "手配書"],
+    "벗":["Friend", "友達"],
+    "연인 · PRO":["Partner · PRO", "恋人 · PRO"],
     "店 · 상점":["店 · Shop", "店 · ショップ"],
     "베틀에 더할 것들":["Things to add to the loom", "機に加えるもの"],
     "더 깊은 풀이와 새 카드 뒷면. 결제는 토스페이먼츠로 안전하게 진행돼요.":["Deeper readings and new card backs. Payments are handled securely by Toss Payments.", "より深い解説と新しいカードの裏面。決済はToss Paymentsで安全に行われます。"],
@@ -185,7 +188,7 @@
   };
   const L=['en','ja'];
   let lang='ko';
-  try{const q=new URLSearchParams(location.search).get('lang'); if(q&&['ko','en','ja'].includes(q)){localStorage.setItem('soulcode.lang',JSON.stringify(q))} const raw=localStorage.getItem('soulcode.lang'); if(raw){const v=JSON.parse(raw); if(['ko','en','ja'].includes(v))lang=v} else {const nl=((navigator.languages&&navigator.languages[0])||navigator.language||'ko').toLowerCase(); lang=nl.startsWith('ko')?'ko':nl.startsWith('ja')?'ja':'en'}}catch(e){}
+  try{const q=new URLSearchParams(location.search).get('lang'); if(q&&['ko','en','ja'].includes(q)){localStorage.setItem('soulcode.lang',JSON.stringify(q))} const raw=localStorage.getItem('soulcode.lang'); if(raw){const v=JSON.parse(raw); if(['ko','en','ja'].includes(v))lang=v} else {const nl=((navigator.languages&&navigator.languages[0])||navigator.language||'ko').toLowerCase(); lang=nl.startsWith('ja')?'ja':'en' /* 영어가 기본. 한국어는 ?lang=ko 또는 MY → 언어 */}}catch(e){}
   window.soulLang=lang;
   document.documentElement.lang=lang;
   if(lang==='ko')return;
