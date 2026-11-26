@@ -243,7 +243,7 @@ const ob = {step:1, mbti:{}};
 /* ================= NAV ================= */
 function go(id){
   document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('active',s.id===id));
-  const tabs = ['s-tarot','s-spread','s-match','s-soul','s-me','s-report'].includes(id);
+  const tabs = ['s-tarot','s-spread','s-match','s-soul','s-me','s-report','s-shop'].includes(id);
   $('tabbar').classList.toggle('show',tabs);
   document.querySelectorAll('.tabbar button').forEach(b=>b.classList.toggle('on',b.dataset.go===id));
   const scr=$(id); scr.scrollTop=0; const ap=$('app'); ap.scrollTop=0; ap.scrollLeft=0;
@@ -1013,7 +1013,7 @@ function activatePro(){
 }
 function deactivatePro(){store.set('soulcode.pro',{active:false});const s=SKINS.find(x=>x.k===(store.get('soulcode.skin')||'holo'));if(s&&s.pro)setSkin('holo');toast('PRO 해지됨 (테스트)');refreshAfterPro()}
 function refreshAfterPro(){refreshQuota();const a=document.querySelector('.screen.active');if(!a)return;if(a.id==='s-me')renderMe();if(a.id==='s-report')renderReport()}
-const SKINS=[{k:'holo',n:'홀로그램',sym:'☾'},{k:'starry',n:'별밤',sym:'★'},{k:'strawberry',n:'딸기우유',sym:'🍓',pro:true},{k:'chrome',n:'Y2K 크롬',sym:'✦',pro:true},{k:'matcha',n:'말차라떼',sym:'🍵',pro:true}];
+const SKINS=[{k:'holo',n:TL('은하수','Milky Way','天の川'),sym:'月'},{k:'starry',n:TL('별자리','Constellations','星座'),sym:'星'},{k:'strawberry',n:TL('주사','Cinnabar','朱砂'),sym:'印',pro:true},{k:'chrome',n:TL('금실','Gold thread','金糸'),sym:'織',pro:true},{k:'matcha',n:TL('청록','Celadon','青緑'),sym:'山',pro:true}];
 function applySkin(k){const app=$('app');if(!k||k==='holo')delete app.dataset.skin;else app.dataset.skin=k}
 function setSkin(k){store.set('soulcode.skin',k);applySkin(k)}
 function renderSkins(){
@@ -1023,7 +1023,7 @@ function renderSkins(){
     const s=SKINS.find(x=>x.k===b.dataset.k), sw=b.querySelector('.sw');
     const tmp=document.createElement('div'); if(s.k!=='holo')tmp.dataset.skin=s.k; tmp.className='app'; tmp.style.display='none'; document.body.appendChild(tmp);
     sw.style.background=getComputedStyle(tmp).getPropertyValue('--card-back'); tmp.remove();
-    b.onclick=()=>{ if(s.pro&&!isPro()&&!unlocks().includes(s.k)){openSkinOffer(s);return} setSkin(s.k); renderSkins(); toast(`${s.n} 덱으로 바꿨어요 🎴`) };
+    b.onclick=()=>{ if(s.pro&&!isPro()&&!unlocks().includes(s.k)){openSkinOffer(s);return} setSkin(s.k); renderSkins(); toast(`${s.n} 뒷면으로 바꿨어요`) };
   });
 }
 function renderProBanner(){
@@ -1557,13 +1557,13 @@ function activeEvents(){
   const tm=termToday(d); if(tm) ev.push({id:'term-'+k,e:'🌿',t:TL(`오늘은 ${tm.name}(${tm.hanja})`,`Today is ${(TERM_EN[tm.name]||[tm.hanja])[0]} (${tm.hanja})`,`今日は${tm.hanja}`),s:TL(TERM_TIP[tm.name]||'계절이 바뀌는 날이에요',(TERM_EN[tm.name]||[0,'A day when the season shifts'])[1],TERM_JA[tm.name]||'季節が変わる日です'),info:true});
   const m=d.getMonth()+1, Y=reportYear();
   if(m===12||m===1) ev.push({id:'ny-'+Y,e:'🎍',t:TL(`${Y} 신년운세 오픈`,`${Y} yearly fortune is open`,`${Y}年の運勢オープン`),s:TL(`${Y}년 12개월 흐름 그래프와 AI 풀이를 미리 봐요`,`Preview your ${Y} month-by-month graph and AI reading`,`${Y}年12か月の流れグラフとAI解説を先取り`),cta:TL(`${Y} 운세 보기`,`See ${Y}`,`${Y}年の運勢を見る`),fn:`openReport('year')`,keep:true});
-  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:TL('이레 연속 방문','Seven days in a row','七日連続の訪問'),s:TL(`7일 연속 오면 스킨 '딸기우유' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,`Visit 7 days in a row to unlock the 'Strawberry Milk' skin forever · now <b>${Math.min(n,7)}/7</b>`,`7日連続で来るとスキン「いちごミルク」が永久解放 · 今 <b>${Math.min(n,7)}/7</b>`),prog:Math.min(n,7)/7,info:true,keep:true})}
+  if(!unlocks().includes('strawberry')){const n=calcStreak();ev.push({id:'streak7',e:'🔥',t:TL('이레 연속 방문','Seven days in a row','七日連続の訪問'),s:TL(`7일 연속 오면 스킨 '주사' 평생 해금 · 지금 <b>${Math.min(n,7)}/7</b>`,`Visit 7 days in a row to unlock the 'Cinnabar' skin forever · now <b>${Math.min(n,7)}/7</b>`,`7日連続で来るとスキン「朱砂」が永久解放 · 今 <b>${Math.min(n,7)}/7</b>`),prog:Math.min(n,7)/7,info:true,keep:true})}
   return ev.filter(e=>e.keep||e.info||!evDone(e.id));
 }
 function checkStreakReward(){
   if(unlocks().includes('strawberry')||calcStreak()<7)return;
   store.set('soulcode.unlocks',[...unlocks(),'strawberry']);
-  setTimeout(()=>toast(TL("🎉 7일 연속 출석! '딸기우유' 스킨이 평생 해금됐어요","🎉 7-day streak! 'Strawberry Milk' skin unlocked forever","🎉 7日連続! 「いちごミルク」スキンが永久解放されました")),600);
+  setTimeout(()=>toast(TL("🎉 7일 연속 출석! '주사' 스킨이 평생 해금됐어요","🎉 7-day streak! 'Cinnabar' skin unlocked forever","🎉 7日連続! 「朱砂」スキンが永久解放されました")),600);
 }
 function renderEvents(){
   if(!$('evBox')) renderYesterdayAsk();
@@ -1779,7 +1779,7 @@ try{const q=new URLSearchParams(location.search).get('map');if(q&&/^[a-z2-9]{8}$
 {const pw=$('paywall'); if(pw&&window.soulPay){const pl=pw.querySelector('.plans'); pl&&pl.insertAdjacentHTML('afterend','<button class="again tk-link" onclick="closePaywall();openOffer(\'PRO 대신 필요한 것만 한 번\',null)">한 번만 필요해요? 1회 이용권 990원 →</button>')}}
 {const _fill=fillResult; fillResult=function(){_fill(); renderFit()};
  const _rt=renderTarot; renderTarot=function(){_rt(); renderYesterdayAsk(); renderEvents()};
- const _rm=renderMe; renderMe=function(){_rm(); renderDiary(); renderPushSetting(); const n=calcStreak(); if(unlocks().includes('strawberry'))$('stS').textContent=TL("🍓 '딸기우유' 스킨 평생 해금 완료","🍓 'Strawberry Milk' skin unlocked forever","🍓 「いちごミルク」スキン永久解放済み"); else $('stS').textContent=n>=7?TL('7일 달성! 스킨이 곧 해금돼요','7 days done! Skin unlocking soon','7日達成!スキンがもうすぐ解放'):TL(`${7-n}일만 더 오면 '딸기우유' 스킨 평생 해금 🍓`,`${7-n} more days to unlock 'Strawberry Milk' forever 🍓`,`あと${7-n}日で「いちごミルク」スキン永久解放 🍓`)}}
+ const _rm=renderMe; renderMe=function(){_rm(); renderDiary(); renderPushSetting(); const n=calcStreak(); if(unlocks().includes('strawberry'))$('stS').textContent=TL("'주사' 스킨 평생 해금 완료","'Cinnabar' skin unlocked forever","「朱砂」スキン永久解放済み"); else $('stS').textContent=n>=7?TL('7일 달성! 스킨이 곧 해금돼요','7 days done! Skin unlocking soon','7日達成!スキンがもうすぐ解放'):TL(`${7-n}일만 더 오면 '주사' 스킨 평생 해금`,`${7-n} more days to unlock 'Cinnabar' forever`,`あと${7-n}日で「朱砂」スキン永久解放`)}}
 
 /* ================= PRODUCTION HOOKS ================= */
 (function(){
@@ -1818,7 +1818,7 @@ function tidyLayout(){
   ['pastLink','wantedLink','cmEntry'].forEach(id=>{const el=$(id);el&&el.remove()});
   // 궁합 탭: 친구랑 놀기 3칸 + 1:1 궁합 제목
   const f=$('mtForm');
-  if(f&&!$('hubMatch')){f.insertAdjacentHTML('beforebegin',hubHTML('hubMatch',['wanted','ask','map'],TL('함께 읽기','Read together','一緒に読む'))+'<div class="sec-t hub-t">'+TL('두 사람의 궁합','A match between two','二人の相性')+'</div>')}
+  if(f&&!$('hubMatch')){f.insertAdjacentHTML('beforebegin','<div id="hubMatch" class="sec-t hub-t">'+TL('두 사람의 궁합','A match between two','二人の相性')+'</div>')}
   // 소울 탭: 결과 아래 2칸
   const soul=$('s-soul'), dis=soul&&soul.querySelector('.disclaimer');
   // 소울 탭 아래 '함께 읽기' 칸은 뺐어요 (2026-11)
@@ -1881,8 +1881,8 @@ function loginPrompt(){
 {const _qt=quotaText; quotaText=function(){return needsAILogin()?TL(`🔐 로그인하면 AI 해석 하루 ${freeLimit()}회 무료`,`🔐 Log in for ${freeLimit()} free AI readings a day`,`🔐 ログインでAI解説が1日${freeLimit()}回無料`):_qt()}; refreshQuota();}
 // 무료 베타에선 스킨이 이미 다 열려 있어서, 출석 보상은 "베타가 끝나도 평생 소장"으로 안내해요
 if(window.soulConfig&&window.soulConfig.freeBeta){
-  const _ae=activeEvents; activeEvents=function(){return _ae().map(e=>e.id!=='streak7'?e:{...e,s:TL(`7일 연속 오면 '딸기우유' 스킨을 베타가 끝나도 평생 소장 · 지금 <b>${Math.min(calcStreak(),7)}/7</b>`,`Visit 7 days in a row to keep the 'Strawberry Milk' skin forever, even after the beta · now <b>${Math.min(calcStreak(),7)}/7</b>`,`7日連続で来ると「いちごミルク」スキンをベータ終了後もずっと使える · 今 <b>${Math.min(calcStreak(),7)}/7</b>`)})};
-  const _rm3=renderMe; renderMe=function(){_rm3(); const n=calcStreak(); if(!unlocks().includes('strawberry')&&n<7&&$('stS'))$('stS').textContent=TL(`${7-n}일만 더 오면 '딸기우유' 스킨 베타 끝나도 평생 소장 🍓`,`${7-n} more days to keep 'Strawberry Milk' forever, even after the beta 🍓`,`あと${7-n}日で「いちごミルク」をベータ後もずっと使える 🍓`)};
+  const _ae=activeEvents; activeEvents=function(){return _ae().map(e=>e.id!=='streak7'?e:{...e,s:TL(`7일 연속 오면 '주사' 스킨을 베타가 끝나도 평생 소장 · 지금 <b>${Math.min(calcStreak(),7)}/7</b>`,`Visit 7 days in a row to keep the 'Cinnabar' skin forever, even after the beta · now <b>${Math.min(calcStreak(),7)}/7</b>`,`7日連続で来ると「朱砂」スキンをベータ終了後もずっと使える · 今 <b>${Math.min(calcStreak(),7)}/7</b>`)})};
+  const _rm3=renderMe; renderMe=function(){_rm3(); const n=calcStreak(); if(!unlocks().includes('strawberry')&&n<7&&$('stS'))$('stS').textContent=TL(`${7-n}일만 더 오면 '주사' 스킨 베타 끝나도 평생 소장`,`${7-n} more days to keep 'Cinnabar' forever, even after the beta`,`あと${7-n}日で「朱砂」をベータ後もずっと使える`)};
 }
 
 /* ================= BOOT ================= */

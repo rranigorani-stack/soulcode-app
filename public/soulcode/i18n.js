@@ -2,6 +2,22 @@
  * 언어는 MY → 🌐 언어 또는 주소 ?lang=en|ja|ko 로 바꿔요. (아직 자동 감지 안 함: 콘텐츠 번역이 끝나면 켜기) */
 (function(){
   const D={
+    "店 · 상점":["店 · Shop", "店 · ショップ"],
+    "베틀에 더할 것들":["Things to add to the loom", "機に加えるもの"],
+    "더 깊은 풀이와 새 카드 뒷면. 결제는 토스페이먼츠로 안전하게 진행돼요.":["Deeper readings and new card backs. Payments are handled securely by Toss Payments.", "より深い解説と新しいカードの裏面。決済はToss Paymentsで安全に行われます。"],
+    "소울코드 PRO":["SoulCode PRO", "ソウルコード PRO"],
+    "AI 풀이 무제한 · 연간 리포트 12개월 상세 · 카드 뒷면 3종":["Unlimited AI readings · full 12-month yearly report · 3 card backs", "AI解説無制限 · 年間レポート12か月詳細 · カード裏面3種"],
+    "월 3,900원":["₩3,900 / month", "月 3,900ウォン"],
+    "살펴보기":["View", "見る"],
+    "1회 이용권":["Single pass", "1回利用券"],
+    "PRO 풀이 한 번, 또는 카드 뒷면 하나를 평생 소장":["One PRO reading, or keep one card back forever", "PRO解説1回、またはカード裏面1つを永久所有"],
+    "990원":["₩990", "990ウォン"],
+    "은하수 · 별자리 · 주사 · 금실 · 청록":["Milky Way · Constellations · Cinnabar · Gold thread · Celadon", "天の川 · 星座 · 朱砂 · 金糸 · 青緑"],
+    "990원부터":["From ₩990", "990ウォンから"],
+    "고르기":["Choose", "選ぶ"],
+    "상점":["Shop", "ショップ"],
+    "가격은 부가세 포함이에요 · 환불은 환불정책을 따라요":["Prices include VAT · refunds follow our refund policy", "価格は税込 · 返金は返金ポリシーに従います"],
+    "두 사람의 궁합":["A match between two", "二人の相性"],
     "七":["VII", "七"],
     "베틀 앞에서":["At the loom", "機の前で"],
     "당신의 무늬를":["Now we read", "あなたの模様を"],
