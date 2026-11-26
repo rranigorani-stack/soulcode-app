@@ -1821,7 +1821,7 @@ function tidyLayout(){
   if(f&&!$('hubMatch')){f.insertAdjacentHTML('beforebegin',hubHTML('hubMatch',['wanted','ask','map'],TL('함께 읽기','Read together','一緒に読む'))+'<div class="sec-t hub-t">'+TL('두 사람의 궁합','A match between two','二人の相性')+'</div>')}
   // 소울 탭: 결과 아래 2칸
   const soul=$('s-soul'), dis=soul&&soul.querySelector('.disclaimer');
-  if(dis&&!$('hubSoul'))dis.insertAdjacentHTML('beforebegin',hubHTML('hubSoul',['wanted','ask'],TL('이 무늬로 함께 읽기','Read this pattern together','この模様で一緒に読む')));
+  // 소울 탭 아래 '함께 읽기' 칸은 뺐어요 (2026-11)
   // 첫 화면: 밑줄 링크 → 작은 버튼 2개
   const sp=$('pastSplash'); if(sp&&!sp.classList.contains('hub-pills'))sp.className='past-splash hub-pills',sp.innerHTML='<a href="/wanted?utm_source=app_splash">수배전단</a><a href="/ask?utm_source=app_splash">친구들이 보는 나</a>';
   const ss=$('s-splash'); if(ss&&!$('splashLang')){const cur=window.soulLang||'ko';(sp||ss.querySelector('.disclaimer'))?.insertAdjacentHTML('afterend',`<div id="splashLang" class="splash-lang">${[['ko','한국어'],['en','English'],['ja','日本語']].map(([k,n])=>`<a href="#" class="${k===cur?'on':''}" onclick="setLang('${k}');return false">${n}</a>`).join(' · ')}</div>`)}
