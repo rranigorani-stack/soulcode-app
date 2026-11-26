@@ -1212,15 +1212,10 @@ html[lang=en] .app #s-onb .q{font-size:clamp(22px,1.9vw,28px)!important;letter-s
 html[lang=en] .app #s-splash .sp-facts{flex-wrap:nowrap;gap:18px}
 html[lang=en] .app #s-splash .sp-facts li{font-size:10px!important;letter-spacing:.06em!important}
 
-/* 영어판: 모든 글자를 Reenie Beanie 손글씨로. font-size-adjust로 작은 글자도 읽히는 크기로 맞춰요 */
-html[lang=en] .app,html[lang=en] .app *:not(svg):not(path),
-html[lang=en] .app #s-onb *:not(svg):not(path),html[lang=en] .app #s-splash *:not(svg):not(path),html[lang=en] .app #s-loading *{
+/* 영어판: 손글씨(Reenie Beanie)는 '직녀의 목소리'에만 — 큰 제목과 이야기 한 줄.
+   메뉴·버튼·라벨·가격·풀이 본문은 위의 DM Mono 그대로예요. */
+html[lang=en] .app :is(#s-splash .sp-h,#s-onb .q,.page-h,.today-head h2,.soul-title,#s-loading .load-txt),
+html[lang=en] .app :is(#s-splash .sp-h,#s-onb .q,.page-h,.today-head h2,.soul-title,#s-loading .load-txt) *:not(i.gl){
   font-family:'Reenie Beanie','Gaegu','Noto Serif KR',cursive!important;font-weight:400!important;font-size-adjust:.85;text-transform:none!important;letter-spacing:.01em!important}
-html[lang=en] .app em,html[lang=en] .app i:not(.gl){font-style:normal}
-html[lang=en] .app i.gl{font-family:'Noto Serif KR',serif!important;font-size-adjust:none}
-html[lang=en] .app .btn,html[lang=en] .app #s-splash .btn,html[lang=en] .app #s-onb .btn{font-size:17px!important;letter-spacing:.03em!important;padding:14px 34px}
-html[lang=en] .app .tabbar button{font-size:15px!important}
-/* 영어판: 고정폭으로 남아 있던 라벨들도 손글씨로 (오행 막대 이름 등) */
-html[lang=en] .app :is(.eng,.sec-t,label.lb,.mini .k,.bars .nm,.today-head .eng,.ev-next,.disclaimer,.streak-chip,.chip,.btn,.shop-k,.shop-p,.tabbar button){font-family:'Reenie Beanie','Gaegu','Noto Serif KR',cursive!important;font-weight:400!important;text-transform:none!important;letter-spacing:.01em!important;font-size-adjust:.85}
-html[lang=en] .app .bars .nm{white-space:nowrap;font-size:15px!important;line-height:1.2;width:96px!important;flex:none}
-html[lang=en] .app .bars .nm b,html[lang=en] .app .bars .nm small{font-family:'Noto Serif KR',serif!important;font-size-adjust:none}
+html[lang=en] .app :is(#s-splash .sp-h,#s-onb .q,.page-h,.today-head h2,.soul-title){line-height:1.15!important}
+html[lang=en] .app #s-onb .q{font-size:clamp(30px,2.5vw,40px)!important}
